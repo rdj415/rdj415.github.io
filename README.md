@@ -1,6 +1,6 @@
-# 🚀 Roblox Luau Systems Architect Portfolio (GitHub Pages)
+# 🚀 Adam — Senior Roblox Developer & Systems Architect Portfolio (GitHub Pages)
 
-A modern, high-performance portfolio website built specifically for a **Roblox Luau Systems Architect**, pre-configured for instant and free hosting on **GitHub Pages** (identical platform to `physic2952.github.io`).
+A modern, high-performance portfolio website built specifically for **Adam (Senior Roblox Developer & Systems Architect)**, pre-configured for instant and free hosting on **GitHub Pages** (identical platform to `physic2952.github.io`).
 
 ---
 
