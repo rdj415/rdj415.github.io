@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roblox Luau Systems Architect | Production Portfolio</title>
+  <meta name="description" content="Senior Roblox Luau Systems Architect with 6+ years of experience. Core libraries, architectural orchestrators, server-authoritative anti-cheat, and autonomous AI." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23080b11'/><path d='M8 10h16v3H11v4h11v3H11v6H8z' fill='%2300f2fe'/></svg>" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Roblox Luau Systems Architect — Core Libraries & Architecture" />
+  <meta property="og:description" content="6+ years of Luau development. Production architectures: AtomicBinding, ModuleLoader, AntiCheatService, AIService." />
+  <meta property="og:theme-color" content="#00f2fe" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Particle Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Sticky Navbar -->
+  <header class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">
+        <span class="logo-bracket">&lt;</span>
+        <span class="logo-name">LuauDev</span>
+        <span class="logo-slash">/</span>
+        <span class="logo-bracket">&gt;</span>
+      </a>
+
+      <nav class="nav-links" id="nav-links">
+        <a href="#hero" class="nav-link active">Overview</a>
+        <a href="#systems" class="nav-link">Core Systems & Libraries</a>
+        <a href="#code-showroom" class="nav-link">Production Code</a>
+        <a href="#technologies" class="nav-link">Tech Stack</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="status-pill status-open">
+          <span class="status-dot"></span>
+          <span class="status-text">ACTIVE ARCHITECT</span>
+        </div>
+
+        <a href="https://github.com/rdj415" target="_blank" rel="noopener" class="btn btn-github-quick" title="View GitHub Profile (@rdj415)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span class="btn-github-text">GitHub</span>
+        </a>
+
+        <button class="btn btn-discord-quick" id="quickDiscordBtn" data-discord="rdj_rb" title="Click to copy Discord tag">
+          <svg class="discord-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+          <span class="btn-discord-text">Discord</span>
+        </button>
+
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ══════════════════════════════════════════════════════════════
+         HERO SECTION
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="hero-section" id="hero">
+      <div class="container hero-container">
+        
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-icon">⚡</span>
+            <span>Roblox Luau Senior / Systems Architect</span>
+          </div>
+
+          <h1 class="hero-title">
+            Engineering <span class="gradient-text">Authoritative Systems</span> & Custom Libraries
+          </h1>
+
+          <p class="hero-subtitle">
+            Designing core architectural libraries, custom pattern binders, phased lifecycle orchestrators, and authoritative server algorithms in Roblox. Engineered strictly via <strong>Rojo, Wally, and Git</strong>.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#code-showroom" class="btn btn-primary">
+              <span>Inspect Production Code</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#systems" class="btn btn-outline">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span>Core Libraries</span>
+            </a>
+            <button class="btn btn-glass copy-btn" data-copy="rdj_rb">
+              <span class="copy-label">Copy Discord</span>
+            </button>
+          </div>
+
+          <!-- Verified Experience Metric -->
+          <div class="proof-bar">
+            <div class="proof-item">
+              <div class="proof-val">6+ <span class="proof-unit">Years</span></div>
+              <div class="proof-lbl">Roblox & Luau Development Experience</div>
+            </div>
+            <div class="proof-badge-tag">
+              <span>Production Proven</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal Widget Featuring Substantial User Code -->
+        <div class="hero-terminal-wrapper">
+          <div class="terminal-card">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <div class="terminal-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>src/server/ServerModules/AIService.luau</span>
+              </div>
+              <span class="terminal-badge">2,035 LINES</span>
+            </div>
+
+            <div class="terminal-code">
+              <pre><code><span class="t-comment">-- [SBAC / ServerModules / AIService.luau]</span>
+<span class="t-comment">-- Multi-agent autonomous navigation, raycast obstacle steering & vehicle torque physics</span>
+<span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">Workspace</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Workspace"</span>)
+<span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
+<span class="t-kw">local</span> <span class="t-def">CollectionService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"CollectionService"</span>)
+
+<span class="t-kw">local</span> AIService: <span class="t-type">any</span> = {}
+AIService.Metadata = {
+    Priority = <span class="t-num">8</span>,
+}
+
+<span class="t-kw">local</span> _npcs: { [<span class="t-type">Model</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> _characterVehicleSlowTime: { [<span class="t-type">Model</span>]: <span class="t-type">number</span> } = {}
+<span class="t-kw">local</span> _charLastSpatialPos: { [<span class="t-type">Model</span>]: <span class="t-type">Vector3</span> } = {}
+
+<span class="t-comment">-- Dynamic safe zone containment with lerped vector pull strength</span>
+<span class="t-kw">local function</span> <span class="t-fn">_keepInZone</span>(npc: <span class="t-type">Model</span>, targetPos: <span class="t-type">Vector3</span>): <span class="t-type">Vector3</span>
+    <span class="t-kw">if not</span> _zoneService <span class="t-kw">then return</span> targetPos <span class="t-kw">end</span>
+    <span class="t-kw">local</span> stormCenter = _zoneService.<span class="t-fn">GetStormCenter</span>()
+    <span class="t-kw">local</span> stormRadius = _zoneService.<span class="t-fn">GetStormRadius</span>()
+    <span class="t-kw">if not</span> stormCenter <span class="t-kw">or not</span> stormRadius <span class="t-kw">then return</span> targetPos <span class="t-kw">end</span>
+
+    <span class="t-kw">local</span> npcPos = npc:<span class="t-fn">GetPivot</span>().Position
+    <span class="t-kw">local</span> distToCenter = <span class="t-fn">Vector2.new</span>(npcPos.X - stormCenter.X, npcPos.Z - stormCenter.Z).Magnitude
+    <span class="t-kw">local</span> safetyThreshold = stormRadius * <span class="t-num">0.85</span>
+
+    <span class="t-kw">if</span> distToCenter &gt; safetyThreshold <span class="t-kw">then</span>
+        <span class="t-kw">local</span> pullStrength = <span class="t-fn">math.clamp</span>((distToCenter - safetyThreshold) / (stormRadius - safetyThreshold), <span class="t-num">0</span>, <span class="t-num">1</span>)
+        <span class="t-kw">local</span> flatCenter = <span class="t-fn">Vector3.new</span>(stormCenter.X, targetPos.Y, stormCenter.Z)
+        <span class="t-kw">return</span> targetPos:<span class="t-fn">Lerp</span>(flatCenter, pullStrength)
+    <span class="t-kw">end</span>
+    <span class="t-kw">return</span> targetPos
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Multi-angle raycast obstacle avoidance for autonomous agents</span>
+<span class="t-kw">local function</span> <span class="t-fn">_getObstacleAvoidanceSteerOffset</span>(seat: <span class="t-type">VehicleSeat</span>, range: <span class="t-type">number</span>): <span class="t-type">number</span>
+    <span class="t-kw">local</span> cframe = seat.CFrame
+    <span class="t-kw">local</span> origin = seat.Position + cframe.LookVector * (seat.Size.Z / <span class="t-num">2</span> + <span class="t-num">1</span>)
+    
+    <span class="t-kw">local</span> rayParams = <span class="t-fn">RaycastParams.new</span>()
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    rayParams.FilterDescendantsInstances = { seat.Parent }
+
+    <span class="t-kw">local</span> forwardDir = cframe.LookVector * range
+    <span class="t-kw">local</span> leftDir = (cframe * <span class="t-fn">CFrame.Angles</span>(<span class="t-num">0</span>, <span class="t-fn">math.rad</span>(<span class="t-num">25</span>), <span class="t-num">0</span>)).LookVector * range
+    <span class="t-kw">local</span> rightDir = (cframe * <span class="t-fn">CFrame.Angles</span>(<span class="t-num">0</span>, <span class="t-fn">math.rad</span>(-<span class="t-num">25</span>), <span class="t-num">0</span>)).LookVector * range
+
+    <span class="t-kw">local</span> hitForward = Workspace:<span class="t-fn">Raycast</span>(origin, forwardDir, rayParams)
+    <span class="t-kw">local</span> hitLeft = Workspace:<span class="t-fn">Raycast</span>(origin, leftDir, rayParams)
+    <span class="t-kw">local</span> hitRight = Workspace:<span class="t-fn">Raycast</span>(origin, rightDir, rayParams)
+
+    <span class="t-kw">local</span> steerOffset = <span class="t-num">0</span>
+    <span class="t-kw">if</span> hitForward <span class="t-kw">then</span>
+        <span class="t-kw">local</span> distLeft = hitLeft <span class="t-kw">and</span> (hitLeft.Position - origin).Magnitude <span class="t-kw">or</span> range
+        <span class="t-kw">local</span> distRight = hitRight <span class="t-kw">and</span> (hitRight.Position - origin).Magnitude <span class="t-kw">or</span> range
+        steerOffset = <span class="t-kw">if</span> distLeft &gt; distRight <span class="t-kw">then</span> -<span class="t-num">1.0</span> <span class="t-kw">else</span> <span class="t-num">1.0</span>
+    <span class="t-kw">elseif</span> hitLeft <span class="t-kw">then</span>
+        <span class="t-kw">local</span> leftDist = (hitLeft.Position - origin).Magnitude
+        steerOffset = (<span class="t-num">1</span> - (leftDist / range)) * <span class="t-num">0.8</span>
+    <span class="t-kw">elseif</span> hitRight <span class="t-kw">then</span>
+        <span class="t-kw">local</span> rightDist = (hitRight.Position - origin).Magnitude
+        steerOffset = -(<span class="t-num">1</span> - (rightDist / range)) * <span class="t-num">0.8</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">return</span> steerOffset
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Server-side vehicle physics & torque velocity computation</span>
+<span class="t-kw">local function</span> <span class="t-fn">_updateVehiclePhysicsServer</span>(car: <span class="t-type">Model</span>, throttleInput: <span class="t-type">number</span>, steeringInput: <span class="t-type">number</span>, deltaTime: <span class="t-type">number</span>)
+    <span class="t-kw">local</span> chassis = car:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"Chassis"</span>) :: <span class="t-type">BasePart?</span>
+    <span class="t-kw">local</span> engine = car:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"Engine"</span>)
+    <span class="t-kw">local</span> steering = car:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"Steering"</span>)
+    <span class="t-kw">local</span> wheels = car:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"Wheels"</span>)
+    <span class="t-kw">if not</span> (chassis <span class="t-kw">and</span> engine <span class="t-kw">and</span> steering <span class="t-kw">and</span> wheels) <span class="t-kw">then return end</span>
+
+    <span class="t-comment">-- Convert relative linear velocity to MPH</span>
+    <span class="t-kw">local</span> relativeVelocity = chassis.CFrame:<span class="t-fn">VectorToObjectSpace</span>(chassis.AssemblyLinearVelocity)
+    <span class="t-kw">local</span> forwardSpeed = (-relativeVelocity.Z / <span class="t-num">5280</span>) * <span class="t-num">3600</span>
+
+    <span class="t-comment">-- [REDACTED: Non-linear torque curve interpolation and Differential Motor sync]</span>
+    <span class="t-kw">local</span> torqueAlpha = <span class="t-fn">math.clamp</span>(<span class="t-fn">math.abs</span>(forwardSpeed) / <span class="t-num">70</span>, <span class="t-num">0</span>, <span class="t-num">1</span>)
+    <span class="t-kw">local</span> torque = <span class="t-num">25000</span> + (<span class="t-num">5000</span> - <span class="t-num">25000</span>) * torqueAlpha
+
+    <span class="t-comment">-- [REDACTED: Tactical scoring evaluation & Pathfinding compute]</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> AIService</code></pre>
+            </div>
+            
+            <div class="terminal-footer">
+              <span class="term-status"><span class="pulse-circle"></span> Source: SBAC / ServerModules / AIService.luau</span>
+              <span class="term-lang">Real Production Code</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ENGINEERED SYSTEMS & CORE LIBRARIES
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="section" id="systems">
+      <div class="container">
+        
+        <div class="section-header">
+          <span class="section-tag">// ARCHITECTURAL IMPLEMENTATIONS</span>
+          <h2 class="section-title">Core Systems & Libraries</h2>
+          <p class="section-desc">
+            Custom-built architectural libraries and authoritative server systems powering enterprise-grade Roblox game modes.
+          </p>
+        </div>
+
+        <div class="systems-grid">
+
+          <!-- System 1: Autonomous AI & Vehicle Navigation -->
+          <div class="system-card">
+            <div class="system-media">
+              <img src="assets/images/ai_system_banner.jpg" alt="Autonomous AI Navigation" class="system-img" />
+              <div class="system-media-badge">AI Core • Pathfinding</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Autonomous AI & Vehicle Navigation Core</h3>
+                  <span class="system-sub">PathfindingService • Raycast Avoidance • State Machine</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Full server-side navigation engine featuring dynamic raycast obstacle avoidance (25° scanning cone), autonomous vehicle hijacking with server-side torque/physics simulation, dynamic storm zone retention math, and pluggable tactical behaviors (Tactician, Survivor, Berserker).
+              </p>
+
+              <div class="system-tags">
+                <span>AIService.luau</span>
+                <span>Raycast Vectors</span>
+                <span>Vehicle Physics</span>
+                <span>State Machine</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System 2: Combat & Hitbox Validation -->
+          <div class="system-card">
+            <div class="system-media">
+              <img src="assets/images/combat_system_banner.jpg" alt="Combat & Lag Compensation" class="system-img" />
+              <div class="system-media-badge">Combat • Security</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Authoritative Combat & Anti-Cheat Core</h3>
+                  <span class="system-sub">AntiCheatService • Displacement Auditing • BanAsync</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Server-authoritative physics verification and security enforcement. Features real-time instant displacement auditing, suspicion score decay algorithms, executor detection via trap honeypots, and automated universe-wide suspensions with <code>Players:BanAsync</code>.
+              </p>
+
+              <div class="system-tags">
+                <span>AntiCheatService.luau</span>
+                <span>Instant Displacement</span>
+                <span>Honeypots</span>
+                <span>Players:BanAsync</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System 3: Atomic Tree Pattern Binding Library -->
+          <div class="system-card system-card-plain">
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div class="system-icon-box">🔗</div>
+                <div>
+                  <h3 class="system-title">Atomic Tree Pattern Binding Library</h3>
+                  <span class="system-sub">AtomicBinding.luau • Path Resolver • Teardown Dtors</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                A custom pattern-matching library for Roblox instance hierarchies. Resolves complex multi-branch manifests dynamically, handles child additions/removals with zero race conditions, and guarantees strict teardown execution (dtors) with integrated MicroProfiler instrumentation.
+              </p>
+
+              <div class="system-tags">
+                <span>AtomicBinding.luau</span>
+                <span>Instance Tree Binder</span>
+                <span>Lifecycle Dtors</span>
+                <span>Zero Leaks</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System 4: Phased Lifecycle & Boot Orchestrator -->
+          <div class="system-card system-card-plain">
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div class="system-icon-box">⚙️</div>
+                <div>
+                  <h3 class="system-title">Phased Lifecycle & Boot Orchestrator</h3>
+                  <span class="system-sub">ModuleLoader.luau • Phased Init/Start • Client Pacing</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Enterprise module loading architecture featuring discrete bootstrap scopes (Shared, Server, Client), two-stage lifecycle execution (<code>Init</code> ➔ <code>Start</code>), client-side step pacing to eliminate frame stalls, and real-time boot progress tracking percentages.
+              </p>
+
+              <div class="system-tags">
+                <span>ModuleLoader.luau</span>
+                <span>Phased Bootstrap</span>
+                <span>Init / Start</span>
+                <span>Client Pacing</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         CODE SHOWROOM (AUTHENTIC PROJECT MODULES)
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="section" id="code-showroom">
+      <div class="container">
+        
+        <div class="section-header">
+          <span class="section-tag">// PRODUCTION CODE BASE</span>
+          <h2 class="section-title">Production Code Showcase</h2>
+          <p class="section-desc">
+            Direct implementations extracted from the <code>SBAC/MainGameMode/src</code> codebase. Demonstrates type safety, algorithmic rigor, and resilient server-side design.
+          </p>
+        </div>
+
+        <div class="code-showroom-card">
+          <div class="code-tabs">
+            <button class="code-tab active" data-target="code-atomic">
+              <span class="tab-icon">🔗</span>
+              <span>AtomicBinding.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-loader">
+              <span class="tab-icon">⚙️</span>
+              <span>ModuleLoader.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-anticheat">
+              <span class="tab-icon">🛡️</span>
+              <span>AntiCheatService.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-buffer">
+              <span class="tab-icon">⚡</span>
+              <span>BufferUtil.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-ai">
+              <span class="tab-icon">🧠</span>
+              <span>AIService.luau</span>
+            </button>
+          </div>
+
+          <!-- Tab 1: AtomicBinding.luau -->
+          <div class="code-panel active" id="code-atomic">
+            <div class="code-panel-meta">
+              <span>Source: src/shared/SharedModules/AtomicBinding.luau • Recursive tree pattern binder & destructor lifecycle</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-atomic">Copy Code</button>
+            </div>
+            <pre><code id="raw-atomic"><span class="t-comment">-- [SBAC / Shared / SharedModules / AtomicBinding.luau]</span>
+<span class="t-comment">-- Custom pattern-matching library: Resolves hierarchical instance trees with automated destructors</span>
+<span class="t-kw">local</span> RootAlias = <span class="t-str">"root"</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">parsePath</span>(pathStr: <span class="t-type">string</span>): { <span class="t-type">string</span> }
+    <span class="t-kw">local</span> pathArray = <span class="t-fn">string.split</span>(pathStr, <span class="t-str">"/"</span>)
+    <span class="t-kw">for</span> idx = #pathArray, <span class="t-num">1</span>, -<span class="t-num">1</span> <span class="t-kw">do</span>
+        <span class="t-kw">if</span> pathArray[idx] == <span class="t-str">""</span> <span class="t-kw">then</span>
+            <span class="t-fn">table.remove</span>(pathArray, idx)
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">return</span> pathArray
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">isManifestResolved</span>(resolvedManifest: { [<span class="t-type">string</span>]: <span class="t-type">Instance</span> }, manifestSizeTarget: <span class="t-type">number</span>): <span class="t-type">boolean</span>
+    <span class="t-kw">local</span> manifestSize = <span class="t-num">0</span>
+    <span class="t-kw">for</span> _ <span class="t-kw">in pairs</span>(resolvedManifest) <span class="t-kw">do</span>
+        manifestSize += <span class="t-num">1</span>
+    <span class="t-kw">end</span>
+    <span class="t-fn">assert</span>(manifestSize &lt;= manifestSizeTarget, manifestSize)
+    <span class="t-kw">return</span> manifestSize == manifestSizeTarget
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">unbindNodeDescend</span>(node: <span class="t-type">any</span>, resolvedManifest: { [<span class="t-type">string</span>]: <span class="t-type">Instance</span> })
+    <span class="t-kw">if</span> node.instance == <span class="t-kw">nil then return end</span>
+    node.instance = <span class="t-kw">nil</span>
+    <span class="t-kw">local</span> connections = node.connections
+    <span class="t-kw">if</span> connections <span class="t-kw">then</span>
+        <span class="t-kw">for</span> _, conn <span class="t-kw">in ipairs</span>(connections) <span class="t-kw">do</span>
+            conn:<span class="t-fn">Disconnect</span>()
+        <span class="t-kw">end</span>
+        <span class="t-fn">table.clear</span>(connections)
+    <span class="t-kw">end</span>
+    <span class="t-kw">if</span> resolvedManifest <span class="t-kw">and</span> node.alias <span class="t-kw">then</span>
+        resolvedManifest[node.alias] = <span class="t-kw">nil</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">local</span> children = node.children
+    <span class="t-kw">if</span> children <span class="t-kw">then</span>
+        <span class="t-kw">for</span> _, childNode <span class="t-kw">in pairs</span>(children) <span class="t-kw">do</span>
+            <span class="t-fn">unbindNodeDescend</span>(childNode, resolvedManifest)
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> AtomicBinding = {}
+AtomicBinding.__index = AtomicBinding
+
+<span class="t-kw">function</span> AtomicBinding.<span class="t-fn">new</span>(manifest: { [<span class="t-type">string</span>]: <span class="t-type">string</span> }, boundFn: (<span class="t-type">any</span>) -&gt; (<span class="t-type">any</span>))
+    <span class="t-kw">local</span> parsedManifest = {}
+    <span class="t-kw">local</span> manifestSizeTarget = <span class="t-num">1</span>
+    <span class="t-kw">for</span> alias, rawPath <span class="t-kw">in pairs</span>(manifest) <span class="t-kw">do</span>
+        parsedManifest[alias] = <span class="t-fn">parsePath</span>(rawPath)
+        manifestSizeTarget += <span class="t-num">1</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">return</span> <span class="t-fn">setmetatable</span>({
+        _boundFn = boundFn,
+        _parsedManifest = parsedManifest,
+        _manifestSizeTarget = manifestSizeTarget,
+        _dtorMap = {},
+        _connections = {},
+        _rootInstToRootNode = {},
+        _rootInstToManifest = {},
+    }, AtomicBinding)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> AtomicBinding:<span class="t-fn">bindRoot</span>(root: <span class="t-type">Instance</span>)
+    <span class="t-fn">debug.profilebegin</span>(<span class="t-str">"AtomicBinding:BindRoot"</span>)
+    <span class="t-kw">local</span> parsedManifest = self._parsedManifest
+    <span class="t-kw">local</span> rootInstToRootNode = self._rootInstToRootNode
+    <span class="t-kw">local</span> rootInstToManifest = self._rootInstToManifest
+    <span class="t-kw">local</span> manifestSizeTarget = self._manifestSizeTarget
+    <span class="t-fn">assert</span>(rootInstToManifest[root] == <span class="t-kw">nil</span>)
+
+    <span class="t-kw">local</span> resolvedManifest = {}
+    rootInstToManifest[root] = resolvedManifest
+
+    <span class="t-kw">local</span> rootNode = {
+        alias = RootAlias,
+        instance = root,
+        children = {},
+        connections = {},
+    }
+    rootInstToRootNode[root] = rootNode
+
+    <span class="t-comment">-- Build hierarchical search tree from path segments</span>
+    <span class="t-kw">for</span> alias, parsedPath <span class="t-kw">in pairs</span>(parsedManifest) <span class="t-kw">do</span>
+        <span class="t-kw">local</span> parentNode = rootNode
+        <span class="t-kw">for</span> idx, childName <span class="t-kw">in ipairs</span>(parsedPath) <span class="t-kw">do</span>
+            <span class="t-kw">local</span> leaf = idx == #parsedPath
+            <span class="t-kw">local</span> childNode = parentNode.children[childName] <span class="t-kw">or</span> {}
+            <span class="t-kw">if</span> leaf <span class="t-kw">then</span>
+                childNode.alias = alias
+            <span class="t-kw">else</span>
+                childNode.children = childNode.children <span class="t-kw">or</span> {}
+                childNode.connections = childNode.connections <span class="t-kw">or</span> {}
+            <span class="t-kw">end</span>
+            parentNode.children[childName] = childNode
+            parentNode = childNode
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+
+    <span class="t-kw">local function</span> <span class="t-fn">processNode</span>(node: <span class="t-type">any</span>)
+        <span class="t-kw">local</span> instance = <span class="t-fn">assert</span>(node.instance)
+        <span class="t-kw">local</span> children = node.children
+        <span class="t-kw">if</span> node.alias <span class="t-kw">then</span> resolvedManifest[node.alias] = instance <span class="t-kw">end</span>
+
+        <span class="t-kw">if</span> children <span class="t-kw">then</span>
+            <span class="t-kw">local function</span> <span class="t-fn">processAddChild</span>(childInstance: <span class="t-type">Instance</span>)
+                <span class="t-kw">local</span> childNode = children[childInstance.Name]
+                <span class="t-kw">if not</span> childNode <span class="t-kw">or</span> childNode.instance ~= <span class="t-kw">nil then return end</span>
+                childNode.instance = childInstance
+                <span class="t-fn">processNode</span>(childNode)
+            <span class="t-kw">end</span>
+
+            <span class="t-kw">local function</span> <span class="t-fn">processDeleteChild</span>(childInstance: <span class="t-type">Instance</span>)
+                <span class="t-kw">local</span> childNode = children[childInstance.Name]
+                <span class="t-kw">if not</span> childNode <span class="t-kw">or</span> childNode.instance ~= childInstance <span class="t-kw">then return end</span>
+                self:<span class="t-fn">_stopBoundFn</span>(root)
+                <span class="t-fn">unbindNodeDescend</span>(childNode, resolvedManifest)
+            <span class="t-kw">end</span>
+
+            <span class="t-kw">for</span> _, child <span class="t-kw">in ipairs</span>(instance:<span class="t-fn">GetChildren</span>()) <span class="t-kw">do</span> <span class="t-fn">processAddChild</span>(child) <span class="t-kw">end</span>
+            <span class="t-fn">table.insert</span>(node.connections, instance.ChildAdded:<span class="t-fn">Connect</span>(processAddChild))
+            <span class="t-fn">table.insert</span>(node.connections, instance.ChildRemoved:<span class="t-fn">Connect</span>(processDeleteChild))
+        <span class="t-kw">end</span>
+
+        <span class="t-kw">if not</span> children <span class="t-kw">and</span> <span class="t-fn">isManifestResolved</span>(resolvedManifest, manifestSizeTarget) <span class="t-kw">then</span>
+            self:<span class="t-fn">_startBoundFn</span>(root, resolvedManifest)
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+
+    <span class="t-fn">processNode</span>(rootNode)
+    <span class="t-fn">debug.profileend</span>()
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> AtomicBinding</code></pre>
+          </div>
+
+          <!-- Tab 2: ModuleLoader.luau -->
+          <div class="code-panel" id="code-loader">
+            <div class="code-panel-meta">
+              <span>Source: src/shared/ModuleLoader.luau • Phased lifecycle orchestration (Init / Start) & boot pacing</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-loader">Copy Code</button>
+            </div>
+            <pre><code id="raw-loader"><span class="t-comment">-- [SBAC / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and progress states</span>
+<span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
+<span class="t-kw">local</span> <span class="t-def">ReplicatedStorage</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"ReplicatedStorage"</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+<span class="t-kw">local</span> ScopeBootProgressByName = {}
+
+<span class="t-kw">local function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+    <span class="t-kw">return</span> {
+        ScopeName = ScopeName,
+        CurrentModuleName = <span class="t-str">"Preparing"</span>,
+        CurrentPhaseName = <span class="t-str">"Boot"</span>,
+        CurrentModulePercent = <span class="t-num">0</span>,
+        CompletedStepCount = <span class="t-num">0</span>,
+        TotalStepCount = <span class="t-num">0</span>,
+        Percent = <span class="t-num">0</span>,
+        IsComplete = <span class="t-kw">false</span>,
+    }
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+    <span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+    <span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+    <span class="t-kw">return</span> <span class="t-fn">math.clamp</span>(<span class="t-fn">math.floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">any</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+    <span class="t-kw">local</span> Count = <span class="t-num">0</span>
+    <span class="t-kw">for</span> _, Unit <span class="t-kw">in ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+        <span class="t-kw">local</span> Loaded = Unit.Loaded
+        <span class="t-kw">if type</span>(Loaded) == <span class="t-str">"table"</span> <span class="t-kw">and type</span>(Loaded[PhaseName]) == <span class="t-str">"function"</span> <span class="t-kw">then</span>
+            Count += <span class="t-num">1</span>
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">any</span> }, PhaseName: <span class="t-type">string</span>)
+    <span class="t-kw">for</span> _, Unit <span class="t-kw">in ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+        <span class="t-kw">local</span> Loaded = Unit.Loaded
+        <span class="t-kw">if type</span>(Loaded) == <span class="t-str">"table"</span> <span class="t-kw">and type</span>(Loaded[PhaseName]) == <span class="t-str">"function"</span> <span class="t-kw">then</span>
+            <span class="t-fn">debug.profilebegin</span>(ScopeName .. <span class="t-str">":"</span> .. Unit.Name .. <span class="t-str">":"</span> .. PhaseName)
+            <span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+                Loaded[PhaseName](Loaded)
+            <span class="t-kw">end</span>)
+            <span class="t-fn">debug.profileend</span>()
+            <span class="t-kw">if not</span> success <span class="t-kw">then</span>
+                <span class="t-fn">error</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[ModuleLoader] Error during %s on %s: %s"</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+            <span class="t-kw">end</span>
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> ModuleLoader</code></pre>
+          </div>
+
+          <!-- Tab 3: AntiCheatService.luau -->
+          <div class="code-panel" id="code-anticheat">
+            <div class="code-panel-meta">
+              <span>Source: src/server/ServerModules/AntiCheatService.luau • Suspicion decay, displacement auditing & universe bans</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-anticheat">Copy Code</button>
+            </div>
+            <pre><code id="raw-anticheat"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [SBAC / ServerModules / AntiCheatService.luau]</span>
+<span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
+
+<span class="t-kw">export type</span> <span class="t-type">ViolationData</span> = {
+    Type: <span class="t-type">string</span>,
+    Details: { [<span class="t-type">string</span>]: <span class="t-type">any</span> }?,
+    Timestamp: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">export type</span> <span class="t-type">PlayerState</span> = {
+    Player: <span class="t-type">Player</span>,
+    Violations: <span class="t-type">number</span>,
+    SuspicionScore: <span class="t-type">number</span>,
+    JoinTime: <span class="t-type">number</span>,
+    LastCheckTime: <span class="t-type">number</span>,
+    LastPosition: <span class="t-type">Vector3?</span>,
+    LastVerifiedPosition: <span class="t-type">Vector3?</span>,
+    LastVelocity: <span class="t-type">Vector3</span>,
+    AirTime: <span class="t-type">number</span>,
+    BypassUntil: <span class="t-type">number</span>,
+    IsWhitelisted: <span class="t-type">boolean</span>,
+}
+
+<span class="t-kw">local</span> AntiCheatService: <span class="t-type">any</span> = {}
+<span class="t-kw">local</span> AntiCheatConfig = {
+    PositionCheckInterval = <span class="t-num">0.1</span>,
+    MaxInstantDisplacement = <span class="t-num">45</span>,
+    MaxSuspicionScore = <span class="t-num">30</span>,
+    RubberbandThreshold = <span class="t-num">8</span>,
+    DecayRate = <span class="t-num">2.0</span>,
+    NoclipCheck = <span class="t-kw">true</span>,
+    AutoKickThreshold = <span class="t-num">12</span>,
+    AutoBanThreshold = <span class="t-num">20</span>,
+    StrictPunishment = <span class="t-kw">true</span>,
+    LogViolations = <span class="t-kw">true</span>,
+    Whitelist = {} :: { <span class="t-type">number</span> },
+}
+
+<span class="t-kw">local</span> PlayerStates: { [<span class="t-type">number</span>]: <span class="t-type">PlayerState</span> } = {}
+<span class="t-kw">local</span> ViolationHistory: { [<span class="t-type">number</span>]: { <span class="t-type">ViolationData</span> } } = {}
+
+AntiCheatService.Metadata = {
+    Priority = <span class="t-num">5</span>,
+}
+
+<span class="t-kw">local function</span> <span class="t-fn">EnforcePunishment</span>(Player: <span class="t-type">Player</span>, Action: <span class="t-type">string</span>, Reason: <span class="t-type">string</span>)
+    <span class="t-kw">if not</span> AntiCheatConfig.StrictPunishment <span class="t-kw">then</span>
+        <span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[AntiCheatService] [DRY RUN] %s on %s. Reason: %s"</span>, Action, Player.Name, Reason))
+        <span class="t-kw">return</span>
+    <span class="t-kw">end</span>
+
+    <span class="t-kw">if</span> Action == <span class="t-str">"Kick"</span> <span class="t-kw">then</span>
+        Player:<span class="t-fn">Kick</span>(<span class="t-str">"\n[Security Enforcement]\n"</span> .. Reason)
+    <span class="t-kw">elseif</span> Action == <span class="t-str">"Ban"</span> <span class="t-kw">then</span>
+        <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+            Players:<span class="t-fn">BanAsync</span>({
+                UserIds = { Player.UserId },
+                ApplyToUniverse = <span class="t-kw">true</span>,
+                Duration = <span class="t-num">604800</span>,
+                DisplayReason = <span class="t-str">"Security Violation: Exploiting Detected"</span>,
+                PrivateReason = Reason,
+            })
+        <span class="t-kw">end</span>)
+        Player:<span class="t-fn">Kick</span>(<span class="t-str">"\n[Security System]\nAccount suspended for exploiting."</span>)
+    <span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">RecordViolation</span>(Player: <span class="t-type">Player</span>, Violation: <span class="t-type">ViolationData</span>)
+    <span class="t-kw">local</span> UserId = Player.UserId
+    ViolationHistory[UserId] = ViolationHistory[UserId] <span class="t-kw">or</span> {}
+    <span class="t-fn">table.insert</span>(ViolationHistory[UserId], Violation)
+    
+    <span class="t-kw">local</span> State = PlayerStates[UserId]
+    <span class="t-kw">if</span> State <span class="t-kw">then</span>
+        State.Violations += <span class="t-num">1</span>
+        <span class="t-kw">if</span> Violation.Type == <span class="t-str">"HoneypotTriggered"</span> <span class="t-kw">or</span> Violation.Type == <span class="t-str">"ExecutorDetected"</span> <span class="t-kw">then</span>
+            EnforcePunishment(Player, <span class="t-str">"Ban"</span>, <span class="t-str">"Unauthorized Honeypot / Exploit Execution"</span>)
+        <span class="t-kw">elseif</span> State.Violations &gt;= AntiCheatConfig.AutoBanThreshold <span class="t-kw">then</span>
+            EnforcePunishment(Player, <span class="t-str">"Ban"</span>, <span class="t-str">"Multiple Anti-Cheat Violations"</span>)
+        <span class="t-kw">elseif</span> State.Violations &gt;= AntiCheatConfig.AutoKickThreshold <span class="t-kw">then</span>
+            EnforcePunishment(Player, <span class="t-str">"Kick"</span>, <span class="t-str">"Displacement verification threshold exceeded"</span>)
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> AntiCheatService</code></pre>
+          </div>
+
+          <!-- Tab 4: BufferUtil.luau -->
+          <div class="code-panel" id="code-buffer">
+            <div class="code-panel-meta">
+              <span>Source: src/shared/Packages/BufferUtil.luau • Binary cursor writer & Vector3 bitpacking</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-buffer">Copy Code</button>
+            </div>
+            <pre><code id="raw-buffer"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [SBAC / Shared / Packages / BufferUtil.luau]</span>
+<span class="t-kw">local</span> BufferUtil = {}
+
+<span class="t-kw">function</span> BufferUtil.<span class="t-fn">WriteVector3</span>(b: <span class="t-type">buffer</span>, offset: <span class="t-type">number</span>, v: <span class="t-type">Vector3</span>): <span class="t-type">number</span>
+    <span class="t-fn">buffer.writef32</span>(b, offset, v.X)
+    <span class="t-fn">buffer.writef32</span>(b, offset + <span class="t-num">4</span>, v.Y)
+    <span class="t-fn">buffer.writef32</span>(b, offset + <span class="t-num">8</span>, v.Z)
+    <span class="t-kw">return</span> offset + <span class="t-num">12</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> BufferUtil.<span class="t-fn">ReadVector3</span>(b: <span class="t-type">buffer</span>, offset: <span class="t-type">number</span>): (<span class="t-type">Vector3</span>, <span class="t-type">number</span>)
+    <span class="t-kw">return</span> <span class="t-fn">Vector3.new</span>(
+        <span class="t-fn">buffer.readf32</span>(b, offset),
+        <span class="t-fn">buffer.readf32</span>(b, offset + <span class="t-num">4</span>),
+        <span class="t-fn">buffer.readf32</span>(b, offset + <span class="t-num">8</span>)
+    ), offset + <span class="t-num">12</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> BufferUtil.<span class="t-fn">CreateWriter</span>(initialSize: <span class="t-type">number?</span>)
+    <span class="t-kw">local</span> b = <span class="t-fn">buffer.create</span>(initialSize <span class="t-kw">or</span> <span class="t-num">64</span>)
+    <span class="t-kw">local</span> cursor = <span class="t-num">0</span>
+    <span class="t-kw">local</span> writer = {}
+
+    <span class="t-kw">function</span> writer:<span class="t-fn">WriteU8</span>(v: <span class="t-type">number</span>)
+        <span class="t-fn">buffer.writeu8</span>(b, cursor, v)
+        cursor += <span class="t-num">1</span>
+    <span class="t-kw">end</span>
+
+    <span class="t-kw">function</span> writer:<span class="t-fn">WriteF32</span>(v: <span class="t-type">number</span>)
+        <span class="t-fn">buffer.writef32</span>(b, cursor, v)
+        cursor += <span class="t-num">4</span>
+    <span class="t-kw">end</span>
+
+    <span class="t-kw">function</span> writer:<span class="t-fn">WriteVector3</span>(v: <span class="t-type">Vector3</span>)
+        cursor = BufferUtil.<span class="t-fn">WriteVector3</span>(b, cursor, v)
+    <span class="t-kw">end</span>
+
+    <span class="t-kw">function</span> writer:<span class="t-fn">GetBuffer</span>(): (<span class="t-type">buffer</span>, <span class="t-type">number</span>)
+        <span class="t-kw">return</span> b, cursor
+    <span class="t-kw">end</span>
+
+    <span class="t-kw">return</span> writer
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> BufferUtil</code></pre>
+          </div>
+
+          <!-- Tab 5: AIService.luau -->
+          <div class="code-panel" id="code-ai">
+            <div class="code-panel-meta">
+              <span>Source: src/server/ServerModules/AIService.luau • Tactical target checks & anti-stuck jumps</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-ai">Copy Code</button>
+            </div>
+            <pre><code id="raw-ai"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [SBAC / ServerModules / AIService.luau]</span>
+<span class="t-kw">local function</span> <span class="t-fn">_isValidTargetForStrategy</span>(npc: <span class="t-type">Model</span>, targetChar: <span class="t-type">Model</span>): <span class="t-type">boolean</span>
+    <span class="t-kw">local</span> data = _npcs[npc]
+    <span class="t-kw">if not</span> data <span class="t-kw">then return true end</span>
+
+    <span class="t-kw">if</span> data.Strategy == <span class="t-str">"Tactician"</span> <span class="t-kw">then</span>
+        <span class="t-kw">if</span> _zoneService <span class="t-kw">then</span>
+            <span class="t-kw">local</span> stormCenter = _zoneService.<span class="t-fn">GetStormCenter</span>()
+            <span class="t-kw">local</span> stormRadius = _zoneService.<span class="t-fn">GetStormRadius</span>()
+            <span class="t-kw">local</span> targetHRP = targetChar:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>)
+            <span class="t-kw">if</span> stormCenter <span class="t-kw">and</span> stormRadius <span class="t-kw">and</span> targetHRP <span class="t-kw">then</span>
+                <span class="t-kw">local</span> targetDistToCenter = <span class="t-fn">Vector2.new</span>(targetHRP.Position.X - stormCenter.X, targetHRP.Position.Z - stormCenter.Z).Magnitude
+                <span class="t-kw">return</span> targetDistToCenter &gt; stormRadius * <span class="t-num">0.6</span>
+            <span class="t-kw">end</span>
+        <span class="t-kw">end</span>
+    <span class="t-kw">elseif</span> data.Strategy == <span class="t-str">"Survivor"</span> <span class="t-kw">then</span>
+        <span class="t-kw">local</span> hrp = npc:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>)
+        <span class="t-kw">local</span> targetHRP = targetChar:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>)
+        <span class="t-kw">if</span> hrp <span class="t-kw">and</span> targetHRP <span class="t-kw">then</span>
+            <span class="t-kw">local</span> dist = (targetHRP.Position - hrp.Position).Magnitude
+            <span class="t-kw">return</span> dist &lt; <span class="t-num">25</span>
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">return true</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">_moveNPCTo</span>(npc: <span class="t-type">Model</span>, targetPos: <span class="t-type">Vector3</span>, speed: <span class="t-type">number</span>, dt: <span class="t-type">number</span>): <span class="t-type">boolean</span>
+    targetPos = <span class="t-fn">_keepInZone</span>(npc, targetPos)
+    <span class="t-kw">local</span> humanoid = npc:<span class="t-fn">FindFirstChildOfClass</span>(<span class="t-str">"Humanoid"</span>)
+    <span class="t-kw">local</span> hrp = npc:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>)
+    <span class="t-kw">if not</span> humanoid <span class="t-kw">or not</span> hrp <span class="t-kw">then return false end</span>
+
+    <span class="t-kw">local</span> currentPos = hrp.Position
+    <span class="t-kw">local</span> direction = (targetPos - currentPos)
+    <span class="t-kw">local</span> directionXZ = <span class="t-fn">Vector3.new</span>(direction.X, <span class="t-num">0</span>, direction.Z)
+    <span class="t-kw">local</span> distance = directionXZ.Magnitude
+
+    <span class="t-kw">if</span> distance &lt; <span class="t-num">1.5</span> <span class="t-kw">then</span>
+        humanoid:<span class="t-fn">Move</span>(Vector3.zero, <span class="t-kw">false</span>)
+        <span class="t-kw">return true</span>
+    <span class="t-kw">end</span>
+
+    humanoid.WalkSpeed = speed
+    humanoid.AutoRotate = <span class="t-kw">true</span>
+    humanoid:<span class="t-fn">Move</span>(directionXZ.Unit, <span class="t-kw">false</span>)
+
+    <span class="t-comment">-- Anti-stuck jump detection</span>
+    <span class="t-kw">local</span> data = _npcs[npc]
+    <span class="t-kw">if</span> data <span class="t-kw">then</span>
+        <span class="t-kw">local</span> now = <span class="t-fn">os.clock</span>()
+        <span class="t-kw">local</span> currentSpeed = <span class="t-fn">Vector3.new</span>(hrp.AssemblyLinearVelocity.X, <span class="t-num">0</span>, hrp.AssemblyLinearVelocity.Z).Magnitude
+        <span class="t-kw">if</span> speed &gt; <span class="t-num">0</span> <span class="t-kw">and</span> currentSpeed &lt; <span class="t-num">1.5</span> <span class="t-kw">then</span>
+            <span class="t-kw">if not</span> data.WalkStuckTime <span class="t-kw">then</span>
+                data.WalkStuckTime = now
+            <span class="t-kw">elseif</span> now - data.WalkStuckTime &gt; <span class="t-num">0.5</span> <span class="t-kw">then</span>
+                humanoid.Jump = <span class="t-kw">true</span>
+                data.WalkStuckTime = <span class="t-kw">nil</span>
+            <span class="t-kw">end</span>
+        <span class="t-kw">else</span>
+            data.WalkStuckTime = <span class="t-kw">nil</span>
+        <span class="t-kw">end</span>
+    <span class="t-kw">end</span>
+    <span class="t-kw">return false</span>
+<span class="t-kw">end</span></code></pre>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         TECHNICAL ARSENAL
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="section" id="technologies">
+      <div class="container">
+        
+        <div class="section-header">
+          <span class="section-tag">// ARCHITECTURAL FOUNDATION</span>
+          <h2 class="section-title">Technical Stack & Paradigms</h2>
+          <p class="section-desc">
+            Industry standard tools, libraries, and engineering disciplines applied across large-scale codebases.
+          </p>
+        </div>
+
+        <div class="tech-grid">
+
+          <div class="tech-card">
+            <h3 class="tech-card-title">Languages & Typing</h3>
+            <ul class="tech-card-list">
+              <li><strong>Luau Strict (`--!strict`)</strong>: 100% static type coverage, interfaces, generics, metatable OOP.</li>
+              <li><strong>Lua 5.1 & Metatables</strong>: Deep understanding of Luau VM bytecode, memory garbage collection, and custom class abstractions.</li>
+              <li><strong>TypeScript (roblox-ts)</strong>: Compile-to-Luau pipeline support for multi-contributor engineering teams.</li>
+            </ul>
+          </div>
+
+          <div class="tech-card">
+            <h3 class="tech-card-title">Toolchain & DevOps</h3>
+            <ul class="tech-card-list">
+              <li><strong>Rojo & VS Code</strong>: External multi-file codebase structure synced bi-directionally with Roblox Studio.</li>
+              <li><strong>Wally & Foreman</strong>: Strict package dependency management and reproducible development toolchains.</li>
+              <li><strong>Git & GitHub Actions</strong>: Semantic versioning, code reviews, automated formatting via StyLua, and Selene linter.</li>
+            </ul>
+          </div>
+
+          <div class="tech-card">
+            <h3 class="tech-card-title">Frameworks & Lifecycle</h3>
+            <ul class="tech-card-list">
+              <li><strong>Custom ModuleLoader</strong>: Phased bootstrap system with scoped Init/Start cycles and pacing controls.</li>
+              <li><strong>AtomicBinding Pattern</strong>: Recursive instance hierarchy binder eliminating race conditions and memory leaks.</li>
+              <li><strong>Janitor / Maid Class</strong>: Defensive resource management ensuring zero dangling events upon instance destruction.</li>
+            </ul>
+          </div>
+
+          <div class="tech-card">
+            <h3 class="tech-card-title">Security & Network Code</h3>
+            <ul class="tech-card-list">
+              <li><strong>Server-Authoritative Anti-Cheat</strong>: Noclip, speed, and instant displacement verification with universe bans.</li>
+              <li><strong>Buffer Serialization</strong>: Custom byte packing and delta compression via the Luau Buffer API.</li>
+              <li><strong>MicroProfiler Tuning</strong>: Eliminating garbage collection spikes and high-frequency render overhead.</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         CONTACT
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="section" id="contact">
+      <div class="container">
+        
+        <div class="contact-box">
+          <div class="contact-left">
+            <span class="section-tag">// GET IN TOUCH</span>
+            <h2 class="contact-title">Connect with me</h2>
+            <p class="contact-desc">
+              Feel free to reach out on Discord or connect via my developer profiles to discuss systems architecture or technical questions.
+            </p>
+
+            <div class="contact-badges">
+              <div class="c-badge">
+                <span class="c-badge-dot"></span>
+                <span>Active Systems Architect</span>
+              </div>
+              <div class="c-badge">
+                <span>Direct 1-on-1 Communication</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-right">
+            <div class="contact-card discord-card">
+              <div class="c-card-header">
+                <div class="c-card-icon">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="c-card-type">DISCORD (DIRECT)</span>
+                  <div class="c-card-value">rdj_rb</div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block copy-btn" data-copy="rdj_rb">
+                <span>Copy Discord Tag</span>
+              </button>
+            </div>
+
+            <div class="contact-card crypto-card">
+              <div class="c-card-header">
+                <div class="c-card-icon crypto-icon">
+                  <span class="crypto-symbol">₮</span>
+                </div>
+                <div>
+                  <span class="c-card-type">TRON (TRC-20) WALLET</span>
+                  <div class="c-card-value crypto-address">TNaavXhoj6iadhgPjAqBmJna1Lnwv4Jvjb</div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-block copy-btn" data-copy="TNaavXhoj6iadhgPjAqBmJna1Lnwv4Jvjb">
+                <span>Copy TRC-20 Address</span>
+              </button>
+            </div>
+
+            <div class="external-links-grid">
+              <a href="https://www.roblox.com/users/55770147/profile" target="_blank" rel="noopener" class="ext-link-card">
+                <span class="ext-icon">🟥</span>
+                <span class="ext-title">Roblox Profile</span>
+                <span class="ext-arrow">↗</span>
+              </a>
+              <a href="https://github.com/rdj415" target="_blank" rel="noopener" class="ext-link-card">
+                <span class="ext-icon">🐙</span>
+                <span class="ext-title">GitHub Profile (@rdj415)</span>
+                <span class="ext-arrow">↗</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-left">
+        <span class="footer-logo">&lt;LuauDev /&gt;</span>
+        <p class="footer-copy">© 2026. Roblox Luau Systems Architect • <a href="https://github.com/rdj415" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: none;">GitHub (@rdj415)</a></p>
+      </div>
+      <div class="footer-right">
+        <a href="#hero" class="btn btn-sm btn-glass">Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="script.js"></script>
+</body>
+</html>
