@@ -5,42 +5,109 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 1. Interactive Particle Canvas
+  // 1. High-Performance Interactive Background Engine
   const canvas = document.getElementById('bg-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let width = 0;
+    let height = 0;
+    let dpr = window.devicePixelRatio || 1;
 
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Mouse Interaction
+    const mouse = {
+      x: null,
+      y: null,
+      radius: 180,
+      active: false
+    };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
     });
 
+    window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    const colors = [
+      { r: 0, g: 242, b: 254 },   // Cyan
+      { r: 168, g: 85, b: 247 },  // Purple
+      { r: 56, g: 189, b: 248 },  // Sky
+      { r: 16, g: 185, b: 129 }   // Emerald
+    ];
+
+    const particleCount = Math.min(Math.floor(window.innerWidth / 18), 75);
     const particles = [];
-    const particleCount = Math.min(Math.floor(width / 22), 60);
 
     class Particle {
       constructor() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.4;
-        this.vy = (Math.random() - 0.5) * 0.4;
-        this.radius = Math.random() * 1.4 + 0.8;
+        this.vx = (Math.random() - 0.5) * 0.55;
+        this.vy = (Math.random() - 0.5) * 0.55;
+        this.radius = Math.random() * 1.6 + 0.9;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.pulsePhase = Math.random() * Math.PI * 2;
+        this.pulseSpeed = 0.02 + Math.random() * 0.02;
       }
+
       update() {
+        // Mouse Repulsion
+        if (mouse.active && mouse.x !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouse.radius) {
+            const force = (mouse.radius - dist) / mouse.radius;
+            const angle = Math.atan2(dy, dx);
+            this.x -= Math.cos(angle) * force * 1.6;
+            this.y -= Math.sin(angle) * force * 1.6;
+          }
+        }
+
         this.x += this.vx;
         this.y += this.vy;
-        if (this.x < 0) this.x = width;
-        if (this.x > width) this.x = 0;
-        if (this.y < 0) this.y = height;
-        if (this.y > height) this.y = 0;
+
+        // Wrap edges smoothly
+        if (this.x < -10) this.x = width + 10;
+        if (this.x > width + 10) this.x = -10;
+        if (this.y < -10) this.y = height + 10;
+        if (this.y > height + 10) this.y = -10;
+
+        this.pulsePhase += this.pulseSpeed;
       }
+
       draw() {
+        const pulse = Math.sin(this.pulsePhase) * 0.35 + 0.65;
+        const currentRadius = this.radius * (0.85 + pulse * 0.3);
+
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 242, 254, 0.4)';
+        ctx.arc(this.x, this.y, currentRadius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${0.55 * pulse})`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.7)`;
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
     }
 
@@ -48,31 +115,77 @@ document.addEventListener('DOMContentLoaded', () => {
       particles.push(new Particle());
     }
 
+    // Traveling Data Packets
+    let pulseT = 0;
+
     function animate() {
       ctx.clearRect(0, 0, width, height);
+      pulseT += 0.012;
 
+      // 1. Connect nearby particles
+      const connectionDist = 135;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
+          const p1 = particles[i];
+          const p2 = particles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 120) {
+          if (dist < connectionDist) {
+            const alpha = (1 - dist / connectionDist) * 0.22;
             ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            const alpha = (1 - dist / 120) * 0.14;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = `rgba(0, 242, 254, ${alpha})`;
-            ctx.lineWidth = 0.75;
+            ctx.lineWidth = 0.8;
             ctx.stroke();
+
+            // Occasional traveling data pulse between linked nodes
+            if ((i + j) % 6 === 0 && dist < 110) {
+              const packetPos = (Math.sin(pulseT * 2 + i) + 1) / 2;
+              const px = p1.x + (p2.x - p1.x) * packetPos;
+              const py = p1.y + (p2.y - p1.y) * packetPos;
+              ctx.beginPath();
+              ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+              ctx.fill();
+            }
           }
         }
       }
 
-      particles.forEach((p) => {
-        p.update();
-        p.draw();
-      });
+      // 2. Connect particles to mouse cursor when active
+      if (mouse.active && mouse.x !== null) {
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mouse.radius) {
+            const alpha = (1 - dist / mouse.radius) * 0.48;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(0, 242, 254, ${alpha})`;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            // Glow on connected node
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius * 1.6, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 242, 254, ${alpha * 0.8})`;
+            ctx.fill();
+          }
+        }
+      }
+
+      // 3. Update & render particles
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
 
       requestAnimationFrame(animate);
     }
