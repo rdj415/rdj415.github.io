@@ -1,80 +1,45 @@
-# 🚀 Adam — Senior Roblox Developer & Systems Architect Portfolio (GitHub Pages)
+# ⚡ Adam — Senior Roblox Developer & Systems Architect
 
-A modern, high-performance portfolio website built specifically for **Adam (Senior Roblox Developer & Systems Architect)**, pre-configured for instant and free hosting on **GitHub Pages** (identical platform to `physic2952.github.io`).
+[![Live Portfolio](https://img.shields.io/badge/Live_Portfolio-rdj415.github.io-00f2fe?style=for-the-badge&logo=googlechrome&logoColor=black)](https://rdj415.github.io)
+[![Experience](https://img.shields.io/badge/Experience-6%2B_Years-10b981?style=for-the-badge)](https://rdj415.github.io)
+[![Roblox](https://img.shields.io/badge/Roblox-Profile-eb4034?style=for-the-badge&logo=roblox&logoColor=white)](https://www.roblox.com/users/55770147/profile)
+[![Discord](https://img.shields.io/badge/Discord-rdj__rb-5865f2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com)
 
----
+Welcome to the official repository for my developer portfolio. I am a **Senior Roblox Developer & Luau Systems Architect** with **6+ years of production experience** engineering core architectural frameworks, custom libraries, authoritative server security, and autonomous AI systems in Roblox.
 
-## 🛠️ Highlights & Architecture:
-
-1. **Clean, Grounded Engineering Focus**:
-   - Zero selling, zero pricing calculators, zero commercial packages.
-   - Highlights your exact verified experience: **`6+ Years of Development Experience`**.
-   - Showcases real, substantial production-grade codebase modules and architectural libraries.
-
-2. **Featured Systems & Real Project Libraries**:
-   - **Atomic Tree Pattern Binding Library** (`src/shared/SharedModules/AtomicBinding.luau`):
-     - Recursive instance hierarchy binder resolving complex multi-branch manifests dynamically.
-     - Dynamic event tracking for `ChildAdded` and `ChildRemoved` with automatic descent unbinding.
-     - Strict destructor teardowns (`dtors`) eliminating dangling connections and memory leaks.
-   - **Phased Lifecycle & Boot Orchestrator** (`src/shared/ModuleLoader.luau`):
-     - Enterprise modular loader with discrete bootstrap scopes (Shared, Server, Client).
-     - Phased lifecycle execution (`Init` ➔ `Start`) with dependency ordering and client step pacing.
-     - Real-time boot progress tracking percentages and MicroProfiler performance metrics.
-   - **Authoritative Anti-Cheat & Combat Core** (`src/server/ServerModules/AntiCheatService.luau`):
-     - Instant displacement checking, suspicion score decaying, executor detection via trap honeypots, and universe-wide bans with `Players:BanAsync`.
-   - **Autonomous AI & Vehicle Navigation Core** (`src/server/ServerModules/AIService.luau`):
-     - 25° raycast obstacle avoidance vectors, autonomous vehicle physics & torque simulation, storm zone containment math, and tactical behavior states.
-   - **Binary Buffer Networking** (`src/shared/Packages/BufferUtil.luau`):
-     - Low-level binary serialization via `buffer.create`, `WriteVector3`, and cursor-based `CreateWriter`.
-
-3. **Visual Assets**:
-   - High-tech cyberpunk schematics saved locally in `assets/images/`:
-     - `ai_system_banner.jpg` (Autonomous AI Neural Grid & Navigation)
-     - `combat_system_banner.jpg` (3D Raycasting & Hitbox Lag Compensation)
+🌐 **Live Portfolio:** [**rdj415.github.io**](https://rdj415.github.io)
 
 ---
 
-## 🌐 How to Publish to GitHub Pages in 2 Minutes:
+## 🛠️ Core Systems & Production Libraries
 
-To get your own free URL like `https://rdj415.github.io`:
+- **`AtomicBinding.luau` — Atomic Instance-Tree Pattern Binder**  
+  Recursive instance-hierarchy binder resolving complex multi-branch manifests dynamically. Handles dynamic event tracking for `ChildAdded` and `ChildRemoved` with automatic descent unbinding and strict destructor teardowns (`dtors`) eliminating memory leaks.
 
-### Option A: Browser Drag-and-Drop (No Terminal Needed)
-1. Go to [github.com/new](https://github.com/new) and create a repository.
-2. Name the repository:
-   - `rdj415.github.io` (for a clean root address `https://rdj415.github.io`)
-   - OR `portfolio` (for address `https://rdj415.github.io/portfolio`).
-3. Ensure it is set to **Public** and click **Create repository**.
-4. Click **uploading an existing file**.
-5. Drag and drop the files and `assets` folder:
-   - `index.html`
-   - `style.css`
-   - `script.js`
-   - `assets/` (with images inside)
-6. Click **Commit changes**.
-7. Go to **Settings** ➔ **Pages** (on the left menu) ➔ Under **Branch**, select `main` (or `master`) ➔ Click **Save**.
-8. Within 60 seconds, your portfolio will be live worldwide with free SSL!
+- **`ModuleLoader.luau` — Phased Lifecycle & Boot Orchestrator**  
+  Enterprise modular loader with discrete bootstrap scopes (Shared, Server, Client), two-stage lifecycle execution (`Init` ➔ `Start`), client-side step pacing to eliminate frame stalls, and real-time MicroProfiler metrics.
+
+- **`AntiCheatService.luau` — Authoritative Server Security & Physics Audit**  
+  Server-authoritative physics verification and security enforcement. Features real-time instant displacement auditing, suspicion score decay algorithms, executor detection via trap honeypots, and automated universe-wide suspensions with `Players:BanAsync`.
+
+- **`AIService.luau` — Autonomous AI & Vehicle Navigation Engine**  
+  Full server-side navigation engine featuring dynamic raycast obstacle avoidance (25° scanning cone), autonomous vehicle hijacking with server-side torque/physics simulation, dynamic storm zone retention math, and pluggable tactical behaviors.
+
+- **`BufferUtil.luau` — High-Throughput Binary Buffer Networking**  
+  Low-level binary serialization via the native Luau `buffer` library, custom cursor writers, and high-performance packet compression for high-frequency multiplayer replication.
 
 ---
 
-### Option B: Via Git CLI
-```bash
-git init
-git add .
-git commit -m "Deploy Roblox Luau Systems Architect Portfolio"
-git branch -M main
-git remote add origin https://github.com/rdj415/rdj415.github.io.git
-git push -u origin main
-```
-Then enable Pages in **Settings ➔ Pages**.
+## 💻 Technical Toolchain
+- **Language**: Luau (`--!strict`, Generics, Parallel Luau / Actors)
+- **External Workflow**: Rojo, Wally, Git / GitHub
+- **Performance Profiling**: Roblox MicroProfiler, Memory Analyzer
+- **Target Platform**: Roblox Engine (Desktop, Console, Mobile)
 
 ---
 
-## ✏️ Configured Profiles & Contacts:
-
-All contacts are fully wired into [`index.html`](file:///C:/Users/Adam/.gemini/antigravity/scratch/roblox-luau-portfolio/index.html):
-- **GitHub**: [`https://github.com/rdj415`](https://github.com/rdj415) (in navbar, contact cards, and footer)
-- **Discord Tag**: `rdj_rb` (with 1-click copy button and toast notifications)
-- **Roblox Profile**: [`https://www.roblox.com/users/55770147/profile`](https://www.roblox.com/users/55770147/profile)
-- **Crypto Wallet**: TRON (TRC-20) address `TNaavXhoj6iadhgPjAqBmJna1Lnwv4Jvjb` (with 1-click copy button)
-
-
+## 📬 Contact & Handles
+- **Portfolio**: [https://rdj415.github.io](https://rdj415.github.io)
+- **Discord**: `rdj_rb`
+- **Roblox Profile**: [https://www.roblox.com/users/55770147/profile](https://www.roblox.com/users/55770147/profile)
+- **GitHub**: [https://github.com/rdj415](https://github.com/rdj415)
