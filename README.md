@@ -28,6 +28,15 @@ Welcome to the official repository for my developer portfolio. I am a **Senior R
 - **`BufferUtil.luau` — High-Throughput Binary Buffer Networking**  
   Low-level binary serialization via the native Luau `buffer` library, custom cursor writers, and high-performance packet compression for high-frequency multiplayer replication.
 
+- **`AbilityService.luau` — Character Ability & Cooldown Rate-Limiter**  
+  Authoritative server ability pipeline with high-precision timestamp verification (`os.clock()`), cooldown enforcement, player disconnect state reclamation, and automated anti-cheat displacement bypass integration during high-velocity dashes and combat abilities.
+
+- **`InteractionController.luau` — Proximity Interaction & Puzzle Prompt Engine**  
+  Client-side interaction framework designed for dense multiplayer maps (doors, generators, chests, interactables). Utilizes `TagService` dynamic CollectionService watchers with automatic janitor cleanup and a throttled 5 Hz distance calculation loop to maintain 60 FPS without per-frame CPU degradation.
+
+- **`ZoneService.luau` — Dynamic Spatial Danger Zone & Round Orchestrator**  
+  Multi-phase round boundary shrinkage using cubic Hermite smoothstep curves (`3t² - 2t³`) for stutter-free network replication, coordinating with client storm visualizers and applying throttled 1 Hz radial out-of-zone player damage.
+
 ---
 
 ## 💻 Technical Toolchain

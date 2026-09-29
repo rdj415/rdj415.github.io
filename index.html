@@ -362,6 +362,78 @@ AIService.Metadata = {
             </div>
           </div>
 
+          <!-- System 5: Character Ability & Action Pipeline -->
+          <div class="system-card system-card-plain">
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div class="system-icon-box">⚡</div>
+                <div>
+                  <h3 class="system-title">Character Ability & Action Pipeline</h3>
+                  <span class="system-sub">AbilityService.luau • Cooldown Security • AntiCheat Whitelist</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Authoritative server-side ability dispatching engine with high-precision timestamp rate-limiting (<code>os.clock()</code>), dynamic modular service routing, player disconnect garbage collection, and coordinated anti-cheat physics whitelisting during high-velocity bursts or dash actions.
+              </p>
+
+              <div class="system-tags">
+                <span>AbilityService.luau</span>
+                <span>Rate Limiting</span>
+                <span>AntiCheat Whitelisting</span>
+                <span>Dynamic Dispatch</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System 6: Proximity Interaction & Dynamic Prompts -->
+          <div class="system-card system-card-plain">
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div class="system-icon-box">👆</div>
+                <div>
+                  <h3 class="system-title">Proximity Interaction & Dynamic Prompts</h3>
+                  <span class="system-sub">InteractionController.luau • TagService • Throttled Heartbeat</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Client-side interaction framework designed for high-density environments (doors, generators, chests, puzzles). Watches CollectionService tags with automated teardown janitors, utilizing a throttled 5 Hz distance evaluation loop to maintain a solid 60 FPS without per-frame overhead.
+              </p>
+
+              <div class="system-tags">
+                <span>InteractionController.luau</span>
+                <span>CollectionService</span>
+                <span>Throttled 5 Hz</span>
+                <span>Memory Cleanups</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System 7: Dynamic Spatial Zone & Storm Orchestrator -->
+          <div class="system-card system-card-plain">
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div class="system-icon-box">🌐</div>
+                <div>
+                  <h3 class="system-title">Dynamic Spatial Zone & Storm Orchestrator</h3>
+                  <span class="system-sub">ZoneService.luau • Cubic Hermite Smoothstep • Radial Damage</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Multi-phase spatial danger boundary manager for round-based game modes. Interpolates circle shrinking using cubic Hermite curves (<code>3t² - 2t³</code>) for smooth replication, coordinates network events with client visualizers, and performs throttled 1 Hz out-of-bounds radial damage.
+              </p>
+
+              <div class="system-tags">
+                <span>ZoneService.luau</span>
+                <span>Hermite Smoothstep</span>
+                <span>Phased Rounds</span>
+                <span>Radial Damage Tick</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -395,8 +467,20 @@ AIService.Metadata = {
               <span class="tab-icon">🛡️</span>
               <span>AntiCheatService.luau</span>
             </button>
-            <button class="code-tab" data-target="code-buffer">
+            <button class="code-tab" data-target="code-ability">
               <span class="tab-icon">⚡</span>
+              <span>AbilityService.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-interaction">
+              <span class="tab-icon">👆</span>
+              <span>InteractionController.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-zone">
+              <span class="tab-icon">🌐</span>
+              <span>ZoneService.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-buffer">
+              <span class="tab-icon">📦</span>
               <span>BufferUtil.luau</span>
             </button>
             <button class="code-tab" data-target="code-ai">
@@ -835,6 +919,337 @@ AntiCheatService.Metadata = {
     <span class="t-kw">end</span>
     <span class="t-kw">return false</span>
 <span class="t-kw">end</span></code></pre>
+          </div>
+
+          <!-- Tab 6: AbilityService.luau -->
+          <div class="code-panel" id="code-ability">
+            <div class="code-panel-meta">
+              <span>Source: src/server/ServerModules/AbilityService.luau • Cooldown rate-limiting, server validation & AntiCheat coordination</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-ability">Copy Code</button>
+            </div>
+            <pre><code id="raw-ability"><span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">ReplicatedStorage</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"ReplicatedStorage"</span>)
+
+<span class="t-kw">local</span> AbilityService: <span class="t-type">any</span> = {}
+AbilityService.Metadata = {
+	Priority = <span class="t-num">20</span>,
+}
+
+<span class="t-kw">local</span> _maid = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _moduleLoader = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _abilityConfig = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _abilityActivated = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _lastUse = {}
+
+<span class="t-kw">local function</span> <span class="t-fn">_onAbilityActivated</span>(player: <span class="t-type">Player</span>, abilityName: <span class="t-type">string</span>, arg1: <span class="t-type">any</span>, arg2: <span class="t-type">any</span>)
+	<span class="t-kw">if typeof</span>(abilityName) ~= <span class="t-str">"string"</span> <span class="t-kw">then return end</span>
+	<span class="t-kw">local</span> abilityData = _abilityConfig.Abilities[abilityName]
+	<span class="t-kw">if not</span> abilityData <span class="t-kw">then return end</span>
+
+	<span class="t-kw">local</span> now = <span class="t-fn">os.clock</span>()
+	_lastUse[player] = _lastUse[player] <span class="t-kw">or</span> {}
+	<span class="t-kw">local</span> lastTime = _lastUse[player][abilityName] <span class="t-kw">or</span> <span class="t-num">0</span>
+	<span class="t-kw">if</span> now - lastTime &lt; (abilityData.Cooldown - <span class="t-num">0.2</span>) <span class="t-kw">then</span>
+		<span class="t-fn">warn</span>(<span class="t-str">"[AbilityService] Rate limit exceeded for"</span>, player.Name, <span class="t-str">"on"</span>, abilityName)
+		<span class="t-kw">return</span>
+	<span class="t-kw">end</span>
+	_lastUse[player][abilityName] = now
+
+	<span class="t-comment">-- Coordinate with server anti-cheat to whitelist physics burst during ability</span>
+	<span class="t-kw">local</span> antiCheat = _moduleLoader <span class="t-kw">and</span> _moduleLoader.<span class="t-fn">RequireScoped</span>(<span class="t-str">"ServerModules.AntiCheatService"</span>)
+	<span class="t-kw">if</span> antiCheat <span class="t-kw">and</span> antiCheat.BypassPlayer <span class="t-kw">then</span>
+		antiCheat.<span class="t-fn">BypassPlayer</span>(player, <span class="t-num">4</span>)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> abilityData.ServiceName <span class="t-kw">then</span>
+		<span class="t-kw">local</span> service = _moduleLoader.<span class="t-fn">Require</span>(<span class="t-str">"Server"</span>, <span class="t-str">"ServerModules."</span> .. abilityData.ServiceName)
+		<span class="t-kw">if</span> service <span class="t-kw">and</span> service.OnAbilityActivated <span class="t-kw">then</span>
+			service.<span class="t-fn">OnAbilityActivated</span>(player, abilityName, arg1, arg2)
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">_setupRemotes</span>()
+	<span class="t-kw">local</span> remotes = ReplicatedStorage:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"Remotes"</span>)
+	<span class="t-kw">if not</span> remotes <span class="t-kw">then</span>
+		remotes = <span class="t-fn">Instance.new</span>(<span class="t-str">"Folder"</span>)
+		remotes.Name = <span class="t-str">"Remotes"</span>
+		remotes.Parent = ReplicatedStorage
+	<span class="t-kw">end</span>
+	_abilityActivated = remotes:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"AbilityActivated"</span>)
+	<span class="t-kw">if not</span> _abilityActivated <span class="t-kw">then</span>
+		_abilityActivated = <span class="t-fn">Instance.new</span>(<span class="t-str">"RemoteEvent"</span>)
+		_abilityActivated.Name = <span class="t-str">"AbilityActivated"</span>
+		_abilityActivated.Parent = remotes
+	<span class="t-kw">end</span>
+	_maid:<span class="t-fn">GiveTask</span>(_abilityActivated.OnServerEvent:<span class="t-fn">Connect</span>(_onAbilityActivated))
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> AbilityService.<span class="t-fn">Init</span>(context: <span class="t-type">any</span>)
+	_moduleLoader = context.ModuleLoader
+	<span class="t-kw">local</span> Maid = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.Maid"</span>)
+	_maid = Maid.<span class="t-fn">new</span>()
+	_abilityConfig = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.AbilityConfig"</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> AbilityService.<span class="t-fn">Start</span>(context: <span class="t-type">any</span>)
+	<span class="t-fn">_setupRemotes</span>()
+	_maid:<span class="t-fn">GiveTask</span>(Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(plr)
+		_lastUse[plr] = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>))
+	<span class="t-fn">print</span>(<span class="t-str">"[AbilityService] Started"</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> AbilityService.<span class="t-fn">Destroy</span>()
+	<span class="t-kw">if</span> _maid <span class="t-kw">then</span>
+		_maid:<span class="t-fn">Destroy</span>()
+		_maid = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> AbilityService</code></pre>
+          </div>
+
+          <!-- Tab 7: InteractionController.luau -->
+          <div class="code-panel" id="code-interaction">
+            <div class="code-panel-meta">
+              <span>Source: src/client/Controllers/InteractionController.luau • Proximity prompts, TagService dynamic binding & throttled Heartbeat</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-interaction">Copy Code</button>
+            </div>
+            <pre><code id="raw-interaction"><span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
+
+<span class="t-kw">local</span> InteractionController = {}
+<span class="t-kw">local</span> _spatialService = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _tagService = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _maid = <span class="t-kw">nil</span>
+
+<span class="t-kw">local</span> CheckInterval = <span class="t-num">0.2</span>
+<span class="t-kw">local</span> InteractionRadius = <span class="t-num">15</span>
+<span class="t-kw">local</span> _localPlayer = Players.LocalPlayer
+<span class="t-kw">local</span> _activePrompts = {}
+
+<span class="t-kw">function</span> InteractionController.<span class="t-fn">Init</span>(Context)
+	<span class="t-kw">local</span> ML = Context.ModuleLoader
+	_spatialService = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.SpatialService"</span>)
+	_tagService = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.TagService"</span>)
+	_maid = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.Maid"</span>).<span class="t-fn">new</span>()
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> InteractionController.<span class="t-fn">Start</span>()
+	<span class="t-fn">print</span>(<span class="t-str">"[InteractionController] Started"</span>)
+
+	<span class="t-comment">-- Dynamically watch tags and manage teardown janitors</span>
+	_tagService.<span class="t-fn">Watch</span>(<span class="t-str">"Interactable"</span>, <span class="t-kw">function</span>(instance, janitor)
+		<span class="t-kw">local function</span> <span class="t-fn">setupPrompt</span>(prompt)
+			prompt.Enabled = <span class="t-kw">false</span>
+			_activePrompts[instance] = prompt
+		<span class="t-kw">end</span>
+
+		<span class="t-kw">local</span> prompt = instance:<span class="t-fn">FindFirstChildWhichIsA</span>(<span class="t-str">"ProximityPrompt"</span>, <span class="t-kw">true</span>)
+		<span class="t-kw">if</span> prompt <span class="t-kw">then</span>
+			<span class="t-fn">setupPrompt</span>(prompt)
+		<span class="t-kw">else</span>
+			<span class="t-kw">local</span> conn
+			conn = instance.DescendantAdded:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(descendant)
+				<span class="t-kw">if</span> descendant:<span class="t-fn">IsA</span>(<span class="t-str">"ProximityPrompt"</span>) <span class="t-kw">then</span>
+					<span class="t-fn">setupPrompt</span>(descendant)
+					<span class="t-kw">if</span> conn <span class="t-kw">then</span>
+						conn:<span class="t-fn">Disconnect</span>()
+						conn = <span class="t-kw">nil</span>
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>)
+			janitor:<span class="t-fn">Add</span>(<span class="t-kw">function</span>()
+				<span class="t-kw">if</span> conn <span class="t-kw">then</span>
+					conn:<span class="t-fn">Disconnect</span>()
+					conn = <span class="t-kw">nil</span>
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>)
+		<span class="t-kw">end</span>
+
+		janitor:<span class="t-fn">Add</span>(<span class="t-kw">function</span>()
+			_activePrompts[instance] = <span class="t-kw">nil</span>
+		<span class="t-kw">end</span>)
+	<span class="t-kw">end</span>)
+
+	<span class="t-comment">-- Throttled proximity loop (5 Hz) prevents per-frame CPU degradation</span>
+	<span class="t-kw">local</span> timeAccumulator = <span class="t-num">0</span>
+	<span class="t-kw">local</span> heartbeatConn = RunService.Heartbeat:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(dt)
+		timeAccumulator += dt
+		<span class="t-kw">if</span> timeAccumulator &lt; CheckInterval <span class="t-kw">then return end</span>
+		timeAccumulator = <span class="t-num">0</span>
+
+		<span class="t-kw">local</span> character = _localPlayer.Character
+		<span class="t-kw">if not</span> character <span class="t-kw">then return end</span>
+		<span class="t-kw">local</span> primaryPart = character.PrimaryPart
+		<span class="t-kw">if not</span> primaryPart <span class="t-kw">then return end</span>
+
+		<span class="t-kw">local</span> myPos = primaryPart.Position
+		<span class="t-kw">for</span> instance, prompt <span class="t-kw">in pairs</span>(_activePrompts) <span class="t-kw">do</span>
+			<span class="t-kw">local</span> dist = (instance:<span class="t-fn">GetPivot</span>().Position - myPos).Magnitude
+			<span class="t-kw">if</span> dist &lt;= InteractionRadius <span class="t-kw">then</span>
+				prompt.Enabled = <span class="t-kw">true</span>
+			<span class="t-kw">else</span>
+				prompt.Enabled = <span class="t-kw">false</span>
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>)
+	_maid:<span class="t-fn">GiveTask</span>(heartbeatConn)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> InteractionController.<span class="t-fn">Destroy</span>()
+	<span class="t-kw">if</span> _maid <span class="t-kw">then</span>
+		_maid:<span class="t-fn">Destroy</span>()
+		_maid = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> InteractionController</code></pre>
+          </div>
+
+          <!-- Tab 8: ZoneService.luau -->
+          <div class="code-panel" id="code-zone">
+            <div class="code-panel-meta">
+              <span>Source: src/server/ServerModules/ZoneService.luau • Phased danger zone shrinking, smoothstep interpolation & radial damage</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-zone">Copy Code</button>
+            </div>
+            <pre><code id="raw-zone"><span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">ReplicatedStorage</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"ReplicatedStorage"</span>)
+<span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
+
+<span class="t-kw">local</span> ZoneService = {}
+ZoneService.Metadata = {
+	Priority = <span class="t-num">22</span>,
+}
+
+<span class="t-kw">local</span> _maid = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _networkRegistry = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _stormStateEvent = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _testConfig = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _initialDiameter = <span class="t-num">1000</span>
+<span class="t-kw">local</span> _currentDiameter = <span class="t-num">1000</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">_updateStormVisuals</span>(diameter: <span class="t-type">number</span>)
+	_currentDiameter = diameter
+	<span class="t-kw">local</span> stormZone = workspace:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"StormZone"</span>)
+	<span class="t-kw">if not</span> stormZone <span class="t-kw">then return end</span>
+	stormZone:<span class="t-fn">SetAttribute</span>(<span class="t-str">"Diameter"</span>, diameter)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">_checkAndDamagePlayers</span>()
+	<span class="t-kw">local</span> radius = _currentDiameter / <span class="t-num">2</span>
+	<span class="t-kw">local</span> stormZone = workspace:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"StormZone"</span>)
+	<span class="t-kw">local</span> outer = stormZone <span class="t-kw">and</span> stormZone:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"StormWall"</span>)
+	<span class="t-kw">local</span> stormCenter = outer <span class="t-kw">and</span> outer.Position <span class="t-kw">or</span> <span class="t-fn">Vector3.new</span>(<span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">0</span>)
+
+	<span class="t-kw">for</span> _, player <span class="t-kw">in ipairs</span>(Players:<span class="t-fn">GetPlayers</span>()) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> char = player.Character
+		<span class="t-kw">local</span> hrp = char <span class="t-kw">and</span> char:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>)
+		<span class="t-kw">local</span> humanoid = char <span class="t-kw">and</span> char:<span class="t-fn">FindFirstChildOfClass</span>(<span class="t-str">"Humanoid"</span>)
+		<span class="t-kw">if</span> hrp <span class="t-kw">and</span> humanoid <span class="t-kw">and</span> humanoid.Health &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
+			<span class="t-kw">local</span> dist2D = <span class="t-fn">Vector2.new</span>(hrp.Position.X - stormCenter.X, hrp.Position.Z - stormCenter.Z).Magnitude
+			<span class="t-kw">if</span> dist2D &gt; radius <span class="t-kw">then</span>
+				humanoid:<span class="t-fn">TakeDamage</span>(<span class="t-num">5</span>)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ZoneService.<span class="t-fn">Init</span>(context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> Maid = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.Maid"</span>)
+	_maid = Maid.<span class="t-fn">new</span>()
+	_networkRegistry = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.NetworkRegistry"</span>)
+	_testConfig = context.ModuleLoader.<span class="t-fn">RequireScoped</span>(<span class="t-str">"ServerModules.TestConfig"</span>)
+	_stormStateEvent = _networkRegistry.<span class="t-fn">Resolve</span>(<span class="t-str">"StormStateEvent"</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ZoneService.<span class="t-fn">Start</span>(context: <span class="t-type">any</span>)
+	<span class="t-kw">if</span> _testConfig <span class="t-kw">and</span> _testConfig.EnableStorm == <span class="t-kw">false then return end</span>
+	<span class="t-kw">if</span> _testConfig <span class="t-kw">then</span>
+		_initialDiameter = _testConfig.StormInitialDiameter <span class="t-kw">or</span> <span class="t-num">1000</span>
+	<span class="t-kw">end</span>
+	_currentDiameter = _initialDiameter
+	_updateStormVisuals(_initialDiameter)
+
+	<span class="t-kw">local</span> currentPhaseIndex = <span class="t-num">1</span>
+	<span class="t-kw">local</span> phases = (_testConfig <span class="t-kw">and</span> _testConfig.StormPhases) <span class="t-kw">or</span> {
+		{ WaitDuration = <span class="t-num">15</span>, ShrinkDuration = <span class="t-num">25</span>, TargetDiameter = <span class="t-num">300</span> }
+	}
+
+	<span class="t-kw">local function</span> <span class="t-fn">runNextPhase</span>()
+		<span class="t-kw">if</span> currentPhaseIndex &gt; #phases <span class="t-kw">then return end</span>
+		<span class="t-kw">local</span> phase = phases[currentPhaseIndex]
+		<span class="t-kw">local</span> activeMaid = _maid
+
+		<span class="t-fn">task.delay</span>(phase.WaitDuration, <span class="t-kw">function</span>()
+			<span class="t-kw">if not</span> _stormStateEvent <span class="t-kw">or</span> _maid ~= activeMaid <span class="t-kw">then return end</span>
+			_stormStateEvent:<span class="t-fn">FireAllClients</span>(<span class="t-str">"Shrinking"</span>, phase.ShrinkDuration)
+
+			<span class="t-kw">local</span> startDiameter = _currentDiameter
+			<span class="t-kw">local</span> targetDiameter = phase.TargetDiameter
+			<span class="t-kw">local</span> startTime = <span class="t-fn">os.clock</span>()
+			<span class="t-kw">local</span> duration = phase.ShrinkDuration
+
+			<span class="t-kw">local</span> conn
+			conn = RunService.Heartbeat:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>()
+				<span class="t-kw">if</span> _maid ~= activeMaid <span class="t-kw">then</span> conn:<span class="t-fn">Disconnect</span>() <span class="t-kw">return end</span>
+				<span class="t-kw">local</span> elapsed = <span class="t-fn">os.clock</span>() - startTime
+				<span class="t-kw">local</span> alpha = <span class="t-fn">math.clamp</span>(elapsed / duration, <span class="t-num">0</span>, <span class="t-num">1</span>)
+				<span class="t-comment">-- Cubic Hermite smoothstep for natural boundary shrinking</span>
+				<span class="t-kw">local</span> t = alpha * alpha * (<span class="t-num">3</span> - <span class="t-num">2</span> * alpha)
+				<span class="t-kw">local</span> currentDiameter = startDiameter + (targetDiameter - startDiameter) * t
+				<span class="t-fn">_updateStormVisuals</span>(currentDiameter)
+
+				<span class="t-kw">if</span> alpha &gt;= <span class="t-num">1</span> <span class="t-kw">then</span>
+					conn:<span class="t-fn">Disconnect</span>()
+					_stormStateEvent:<span class="t-fn">FireAllClients</span>(<span class="t-str">"Finished"</span>)
+					currentPhaseIndex += <span class="t-num">1</span>
+					<span class="t-fn">runNextPhase</span>()
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>)
+
+			<span class="t-kw">if</span> _maid == activeMaid <span class="t-kw">then</span>
+				activeMaid:<span class="t-fn">GiveTask</span>(conn)
+			<span class="t-kw">else</span>
+				conn:<span class="t-fn">Disconnect</span>()
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>)
+	<span class="t-kw">end</span>
+
+	<span class="t-fn">runNextPhase</span>()
+
+	<span class="t-comment">-- Periodic damage tick (1.0s accumulator) avoids per-frame CPU overhead</span>
+	<span class="t-kw">local</span> damageTimer = <span class="t-num">0</span>
+	<span class="t-kw">local</span> damageConn = RunService.Heartbeat:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(dt)
+		damageTimer += dt
+		<span class="t-kw">if</span> damageTimer &gt;= <span class="t-num">1.0</span> <span class="t-kw">then</span>
+			damageTimer = <span class="t-num">0</span>
+			<span class="t-fn">_checkAndDamagePlayers</span>()
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>)
+	_maid:<span class="t-fn">GiveTask</span>(damageConn)
+	<span class="t-fn">print</span>(<span class="t-str">"[ZoneService] Started"</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ZoneService.<span class="t-fn">GetStormCenter</span>(): <span class="t-type">Vector3</span>
+	<span class="t-kw">local</span> stormZone = workspace:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"StormZone"</span>)
+	<span class="t-kw">local</span> outer = stormZone <span class="t-kw">and</span> stormZone:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"StormWall"</span>)
+	<span class="t-kw">return</span> outer <span class="t-kw">and</span> outer.Position <span class="t-kw">or</span> <span class="t-fn">Vector3.new</span>(<span class="t-num">0</span>, <span class="t-num">0</span>, <span class="t-num">0</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ZoneService.<span class="t-fn">GetStormRadius</span>(): <span class="t-type">number</span>
+	<span class="t-kw">return</span> _currentDiameter / <span class="t-num">2</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ZoneService.<span class="t-fn">Destroy</span>()
+	<span class="t-kw">if</span> _maid <span class="t-kw">then</span>
+		_maid:<span class="t-fn">Destroy</span>()
+		_maid = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> ZoneService</code></pre>
           </div>
 
         </div>
