@@ -988,40 +988,34 @@
     const scriptMatActor = new THREE.MeshStandardMaterial({ map: scriptTexActor, roughness: 0.25, metalness: 0.7 });
 
     // ─────────────────────────────────────────────────────────────
-    // 1. MASTER 3D OFFICIAL LUA CELESTIAL EMBLEM & ARCHITECTURE
+    // 1. MASTER 3D OFFICIAL ROBLOX LUAU ARCHITECTURAL EMBLEM
     // ─────────────────────────────────────────────────────────────
 
-    // Master Materials for the Official Lua Logo
-    const luaBluePlanetMat = new THREE.MeshPhysicalMaterial({
-      color: 0x001489,             // Official deep royal navy blue
-      emissive: 0x000624,
-      emissiveIntensity: 0.25,
+    // Master Materials for the Official Roblox Luau Monument
+    const luauBlueFrontMat = new THREE.MeshPhysicalMaterial({
+      color: 0x1d4ed8,             // Radiant Official Luau Royal Blue
       roughness: 0.16,
-      metalness: 0.12,
+      metalness: 0.28,
       clearcoat: 1.0,
       clearcoatRoughness: 0.08,
-      reflectivity: 0.9
+      reflectivity: 0.95
     });
 
-    const luaWhiteMoonMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,             // Pure stark white lunar disc
-      emissive: 0xffffff,
-      emissiveIntensity: 0.08,
-      roughness: 0.22,
-      metalness: 0.05,
-      clearcoat: 0.7,
-      clearcoatRoughness: 0.1
+    const luauBlueRearMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0f2050,             // Deep Aerospace Dark Navy Backplate
+      roughness: 0.25,
+      metalness: 0.78,
+      clearcoat: 0.8
     });
 
-    const luaLettersMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,             // Brilliant white 3D beveled letters
-      emissive: 0xffffff,
-      emissiveIntensity: 0.15,
-      roughness: 0.18,
-      metalness: 0.15
+    const luauWhiteMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,             // Ceramic studio white
+      roughness: 0.15,
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.08
     });
 
-    const luaOrbitMat = new THREE.MeshStandardMaterial({
+    const luauOrbitMat = new THREE.MeshStandardMaterial({
       color: 0x94a3b8,             // Polished metallic dashed orbit track
       emissive: 0x00f2fe,
       emissiveIntensity: 0.15,
@@ -1029,153 +1023,222 @@
       metalness: 0.88
     });
 
-    // Exact geometric constants from the official Lua logo SVG:
-    // Primary planet: radius R = 1.85 (SVG R = 362)
-    // Scale factor: 1.85 / 362
-    // Center in SVG: (473.5, 473.5)
-    // White Moon: dx = +150, dy = -150 (+45°), radius r = 106 (r = 0.542 in 3D)
-    // Satellite Moon: dx = +362, dy = -362 (+45°), radius r = 106 (r = 0.542 in 3D, dist = 2.616)
-    // Orbit track: radius R_orbit = 2.616, dashed ring
-    const R_PLANET = 1.85;
-    const SVG_R = 362;
-    const LUA_SCALE = R_PLANET / SVG_R;
-    const SVG_CX = 473.5;
-    const SVG_CY = 473.5;
+    // Geometric constants for official Luau emblem:
+    // Scale factor: 0.095 (40 units in SVG -> 3.80 in 3D)
+    // Signature Roblox tilt: -15° clockwise (Math.PI * -15 / 180)
+    const LUAU_SCALE = 0.095;
+    const BOX_SIZE = 40 * LUAU_SCALE; // 3.80
+    const BOX_R = 2.0 * LUAU_SCALE;    // 0.19
+    const TILT_ANGLE = -15 * Math.PI / 180; // Clockwise 15° tilt
 
-    // Helper: Project flat extruded geometry onto the sphere surface
-    function projectGeometryOntoSphere(geometry, radius, baseOffset) {
-      const pos = geometry.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const y = pos.getY(i);
-        const z = pos.getZ(i);
-        const r2 = x * x + y * y;
-        if (r2 < radius * radius) {
-          const sphereZ = Math.sqrt(radius * radius - r2);
-          const nx = x / radius, ny = y / radius, nz = sphereZ / radius;
-          const totalOffset = baseOffset + z;
-          pos.setXYZ(i, x + nx * totalOffset, y + ny * totalOffset, sphereZ + nz * totalOffset);
-        }
-      }
-      geometry.computeVertexNormals();
-      return geometry;
+    function createRoundedRectShape(w, h, r) {
+      const shape = new THREE.Shape();
+      const x = -w / 2;
+      const y = -h / 2;
+      shape.moveTo(x + r, y);
+      shape.lineTo(x + w - r, y);
+      shape.quadraticCurveTo(x + w, y, x + w, y + r);
+      shape.lineTo(x + w, y + h - r);
+      shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      shape.lineTo(x + r, y + h);
+      shape.quadraticCurveTo(x, y + h, x, y + h - r);
+      shape.lineTo(x, y + r);
+      shape.quadraticCurveTo(x, y, x + r, y);
+      return shape;
     }
 
-    // Helper: Parse SVG path string with M, h, H, v, V, c, z commands
-    function parseSvgPathToShapes(d) {
-      const shapes = [];
-      let currentPath = null;
-      let cx = 0, cy = 0;
-      const tokens = d.match(/[a-df-z]|[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/gi);
-      if (!tokens) return shapes;
-      let i = 0;
-      let cmd = '';
-      while (i < tokens.length) {
-        const t = tokens[i];
-        if (/^[a-df-z]$/i.test(t)) { cmd = t; i++; }
-        if (cmd === 'M') {
-          const x = parseFloat(tokens[i++]);
-          const y = parseFloat(tokens[i++]);
-          cx = x; cy = y;
-          currentPath = new THREE.Shape();
-          currentPath.moveTo(cx, -cy);
-          shapes.push(currentPath);
-        } else if (cmd === 'h') {
-          const dx = parseFloat(tokens[i++]);
-          cx += dx;
-          currentPath.lineTo(cx, -cy);
-        } else if (cmd === 'H') {
-          cx = parseFloat(tokens[i++]);
-          currentPath.lineTo(cx, -cy);
-        } else if (cmd === 'v') {
-          const dy = parseFloat(tokens[i++]);
-          cy += dy;
-          currentPath.lineTo(cx, -cy);
-        } else if (cmd === 'V') {
-          cy = parseFloat(tokens[i++]);
-          currentPath.lineTo(cx, -cy);
-        } else if (cmd === 'c') {
-          const dx1 = parseFloat(tokens[i++]);
-          const dy1 = parseFloat(tokens[i++]);
-          const dx2 = parseFloat(tokens[i++]);
-          const dy2 = parseFloat(tokens[i++]);
-          const dx = parseFloat(tokens[i++]);
-          const dy = parseFloat(tokens[i++]);
-          currentPath.bezierCurveTo(cx + dx1, -(cy + dy1), cx + dx2, -(cy + dy2), cx + dx, -(cy + dy));
-          cx += dx; cy += dy;
-        } else if (cmd === 'z' || cmd === 'Z') {
-          currentPath.closePath();
-        }
-      }
-      return shapes;
-    }
-
-    // Helper: Normalize SVG curve coordinates to 3D space centered at origin
-    function normalizeSvgShape(rawShape, isShape, scale = LUA_SCALE, cx = SVG_CX, cy = SVG_CY, offsetY = 0) {
-      const res = isShape ? new THREE.Shape() : new THREE.Path();
-      rawShape.curves.forEach((curve, idx) => {
-        if (curve.isLineCurve) {
-          const p1 = new THREE.Vector2((curve.v1.x - cx) * scale, (curve.v1.y + cy) * scale + offsetY);
-          const p2 = new THREE.Vector2((curve.v2.x - cx) * scale, (curve.v2.y + cy) * scale + offsetY);
-          if (idx === 0) res.moveTo(p1.x, p1.y);
-          res.lineTo(p2.x, p2.y);
-        } else if (curve.isCubicBezierCurve) {
-          const p1 = new THREE.Vector2((curve.v0.x - cx) * scale, (curve.v0.y + cy) * scale + offsetY);
-          const cp1 = new THREE.Vector2((curve.v1.x - cx) * scale, (curve.v1.y + cy) * scale + offsetY);
-          const cp2 = new THREE.Vector2((curve.v2.x - cx) * scale, (curve.v2.y + cy) * scale + offsetY);
-          const p2 = new THREE.Vector2((curve.v3.x - cx) * scale, (curve.v3.y + cy) * scale + offsetY);
-          if (idx === 0) res.moveTo(p1.x, p1.y);
-          res.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y);
-        }
-      });
-      return res;
-    }
+    // Auto-generated unrotated Luau letter shapes from official SVG (ALL SOLID)
+function getLuauLettersShapes(scale) {
+  const shapes = [];
+  let s = null;
+  // Shape 0
+  s = new THREE.Shape();
+  s.moveTo((-8.2766) * scale, (-12.5911) * scale);
+  s.lineTo((-8.2767) * scale, (-14.0000) * scale);
+  s.lineTo((-13.4521) * scale, (-14.0000) * scale);
+  s.lineTo((-13.4521) * scale, (-12.5911) * scale);
+  s.lineTo((-8.2766) * scale, (-12.5911) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 1
+  s = new THREE.Shape();
+  s.moveTo((-12.9566) * scale, (-3.6914) * scale);
+  s.lineTo((-12.9565) * scale, (-14.0000) * scale);
+  s.lineTo((-14.7336) * scale, (-14.0000) * scale);
+  s.lineTo((-14.7336) * scale, (-3.6914) * scale);
+  s.lineTo((-12.9566) * scale, (-3.6914) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 2
+  s = new THREE.Shape();
+  s.moveTo((-2.6904) * scale, (-12.1945) * scale);
+  s.lineTo((-2.6904) * scale, (-6.3393) * scale);
+  s.lineTo((-0.9770) * scale, (-6.3394) * scale);
+  s.lineTo((-0.9770) * scale, (-14.0000) * scale);
+  s.lineTo((-2.5913) * scale, (-14.0000) * scale);
+  s.lineTo((-2.6904) * scale, (-12.1945) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 3
+  s = new THREE.Shape();
+  s.moveTo((-2.4497) * scale, (-10.6016) * scale);
+  s.lineTo((-1.8762) * scale, (-10.5874) * scale);
+  s.bezierCurveTo((-1.8762) * scale, (-11.1019) * scale, (-1.9329) * scale, (-11.5762) * scale, (-2.0462) * scale, (-12.0105) * scale);
+  s.bezierCurveTo((-2.1595) * scale, (-12.4400) * scale, (-2.3341) * scale, (-12.8153) * scale, (-2.5701) * scale, (-13.1362) * scale);
+  s.bezierCurveTo((-2.8061) * scale, (-13.4524) * scale, (-3.1081) * scale, (-13.7003) * scale, (-3.4763) * scale, (-13.8797) * scale);
+  s.bezierCurveTo((-3.8445) * scale, (-14.0543) * scale, (-4.2858) * scale, (-14.1416) * scale, (-4.8003) * scale, (-14.1416) * scale);
+  s.bezierCurveTo((-5.1732) * scale, (-14.1416) * scale, (-5.5154) * scale, (-14.0873) * scale, (-5.8269) * scale, (-13.9787) * scale);
+  s.bezierCurveTo((-6.1384) * scale, (-13.8701) * scale, (-6.4074) * scale, (-13.7027) * scale, (-6.6340) * scale, (-13.4761) * scale);
+  s.bezierCurveTo((-6.8559) * scale, (-13.2495) * scale, (-7.0282) * scale, (-12.9545) * scale, (-7.1509) * scale, (-12.5910) * scale);
+  s.bezierCurveTo((-7.2736) * scale, (-12.2276) * scale, (-7.3350) * scale, (-11.7934) * scale, (-7.3350) * scale, (-11.2884) * scale);
+  s.lineTo((-7.3350) * scale, (-6.3393) * scale);
+  s.lineTo((-5.6287) * scale, (-6.3393) * scale);
+  s.lineTo((-5.6287) * scale, (-11.3025) * scale);
+  s.bezierCurveTo((-5.6286) * scale, (-11.5810) * scale, (-5.5956) * scale, (-11.8146) * scale, (-5.5295) * scale, (-12.0034) * scale);
+  s.bezierCurveTo((-5.4635) * scale, (-12.1875) * scale, (-5.3738) * scale, (-12.3362) * scale, (-5.2605) * scale, (-12.4494) * scale);
+  s.bezierCurveTo((-5.1472) * scale, (-12.5628) * scale, (-5.0150) * scale, (-12.6430) * scale, (-4.8640) * scale, (-12.6902) * scale);
+  s.bezierCurveTo((-4.7130) * scale, (-12.7374) * scale, (-4.5525) * scale, (-12.7610) * scale, (-4.3825) * scale, (-12.7610) * scale);
+  s.bezierCurveTo((-3.8964) * scale, (-12.7610) * scale, (-3.5141) * scale, (-12.6666) * scale, (-3.2356) * scale, (-12.4778) * scale);
+  s.bezierCurveTo((-2.9524) * scale, (-12.2842) * scale, (-2.7518) * scale, (-12.0246) * scale, (-2.6338) * scale, (-11.6990) * scale);
+  s.bezierCurveTo((-2.5111) * scale, (-11.3732) * scale, (-2.4497) * scale, (-11.0075) * scale, (-2.4497) * scale, (-10.6016) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 4
+  s = new THREE.Shape();
+  s.moveTo((5.0906) * scale, (-12.4636) * scale);
+  s.lineTo((5.0905) * scale, (-8.8103) * scale);
+  s.bezierCurveTo((5.0906) * scale, (-8.5365) * scale, (5.0410) * scale, (-8.3005) * scale, (4.9419) * scale, (-8.1023) * scale);
+  s.bezierCurveTo((4.8427) * scale, (-7.9040) * scale, (4.6917) * scale, (-7.7507) * scale, (4.4888) * scale, (-7.6421) * scale);
+  s.bezierCurveTo((4.2905) * scale, (-7.5335) * scale, (4.0403) * scale, (-7.4792) * scale, (3.7382) * scale, (-7.4792) * scale);
+  s.bezierCurveTo((3.4598) * scale, (-7.4793) * scale, (3.2191) * scale, (-7.5264) * scale, (3.0161) * scale, (-7.6209) * scale);
+  s.bezierCurveTo((2.8131) * scale, (-7.7153) * scale, (2.6550) * scale, (-7.8427) * scale, (2.5418) * scale, (-8.0031) * scale);
+  s.bezierCurveTo((2.4285) * scale, (-8.1636) * scale, (2.3719) * scale, (-8.3454) * scale, (2.3718) * scale, (-8.5483) * scale);
+  s.lineTo((0.6726) * scale, (-8.5483) * scale);
+  s.bezierCurveTo((0.6726) * scale, (-8.2463) * scale, (0.7458) * scale, (-7.9536) * scale, (0.8920) * scale, (-7.6704) * scale);
+  s.bezierCurveTo((1.0384) * scale, (-7.3872) * scale, (1.2508) * scale, (-7.1347) * scale, (1.5293) * scale, (-6.9128) * scale);
+  s.bezierCurveTo((1.8078) * scale, (-6.6910) * scale, (2.1405) * scale, (-6.5163) * scale, (2.5276) * scale, (-6.3889) * scale);
+  s.bezierCurveTo((2.9146) * scale, (-6.2615) * scale, (3.3489) * scale, (-6.1977) * scale, (3.8303) * scale, (-6.1977) * scale);
+  s.bezierCurveTo((4.4061) * scale, (-6.1978) * scale, (4.9160) * scale, (-6.2945) * scale, (5.3596) * scale, (-6.4880) * scale);
+  s.bezierCurveTo((5.8080) * scale, (-6.6815) * scale, (6.1596) * scale, (-6.9742) * scale, (6.4145) * scale, (-7.3660) * scale);
+  s.bezierCurveTo((6.6741) * scale, (-7.7530) * scale, (6.8040) * scale, (-8.2391) * scale, (6.8040) * scale, (-8.8245) * scale);
+  s.lineTo((6.8040) * scale, (-12.2299) * scale);
+  s.bezierCurveTo((6.8040) * scale, (-12.5792) * scale, (6.8275) * scale, (-12.8931) * scale, (6.8747) * scale, (-13.1716) * scale);
+  s.bezierCurveTo((6.9266) * scale, (-13.4454) * scale, (6.9998) * scale, (-13.6838) * scale, (7.0943) * scale, (-13.8867) * scale);
+  s.lineTo((7.0942) * scale, (-14.0000) * scale);
+  s.lineTo((5.3454) * scale, (-14.0000) * scale);
+  s.bezierCurveTo((5.2652) * scale, (-13.8159) * scale, (5.2015) * scale, (-13.5823) * scale, (5.1543) * scale, (-13.2990) * scale);
+  s.bezierCurveTo((5.1118) * scale, (-13.0111) * scale, (5.0906) * scale, (-12.7326) * scale, (5.0906) * scale, (-12.4636) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 5
+  s = new THREE.Shape();
+  s.moveTo((5.3384) * scale, (-9.3413) * scale);
+  s.lineTo((5.3525) * scale, (-10.3962) * scale);
+  s.lineTo((4.1277) * scale, (-10.3962) * scale);
+  s.bezierCurveTo((3.8114) * scale, (-10.3963) * scale, (3.5330) * scale, (-10.4269) * scale, (3.2922) * scale, (-10.4883) * scale);
+  s.bezierCurveTo((3.0515) * scale, (-10.5449) * scale, (2.8509) * scale, (-10.6298) * scale, (2.6904) * scale, (-10.7431) * scale);
+  s.bezierCurveTo((2.5300) * scale, (-10.8564) * scale, (2.4096) * scale, (-10.9933) * scale, (2.3294) * scale, (-11.1538) * scale);
+  s.bezierCurveTo((2.2491) * scale, (-11.3143) * scale, (2.2090) * scale, (-11.4960) * scale, (2.2090) * scale, (-11.6990) * scale);
+  s.bezierCurveTo((2.2090) * scale, (-11.9019) * scale, (2.2562) * scale, (-12.0884) * scale, (2.3506) * scale, (-12.2583) * scale);
+  s.bezierCurveTo((2.4450) * scale, (-12.4235) * scale, (2.5819) * scale, (-12.5533) * scale, (2.7613) * scale, (-12.6477) * scale);
+  s.bezierCurveTo((2.9453) * scale, (-12.7421) * scale, (3.1671) * scale, (-12.7893) * scale, (3.4268) * scale, (-12.7893) * scale);
+  s.bezierCurveTo((3.7761) * scale, (-12.7893) * scale, (4.0805) * scale, (-12.7185) * scale, (4.3401) * scale, (-12.5769) * scale);
+  s.bezierCurveTo((4.6044) * scale, (-12.4306) * scale, (4.8121) * scale, (-12.2536) * scale, (4.9631) * scale, (-12.0459) * scale);
+  s.bezierCurveTo((5.1142) * scale, (-11.8335) * scale, (5.1944) * scale, (-11.6329) * scale, (5.2039) * scale, (-11.4441) * scale);
+  s.lineTo((5.7561) * scale, (-12.2017) * scale);
+  s.bezierCurveTo((5.6994) * scale, (-12.3952) * scale, (5.6027) * scale, (-12.6029) * scale, (5.4658) * scale, (-12.8247) * scale);
+  s.bezierCurveTo((5.3290) * scale, (-13.0465) * scale, (5.1495) * scale, (-13.2590) * scale, (4.9277) * scale, (-13.4619) * scale);
+  s.bezierCurveTo((4.7106) * scale, (-13.6602) * scale, (4.4486) * scale, (-13.8230) * scale, (4.1419) * scale, (-13.9505) * scale);
+  s.bezierCurveTo((3.8398) * scale, (-14.0779) * scale, (3.4904) * scale, (-14.1416) * scale, (3.0940) * scale, (-14.1416) * scale);
+  s.bezierCurveTo((2.5937) * scale, (-14.1416) * scale, (2.1476) * scale, (-14.0424) * scale, (1.7559) * scale, (-13.8443) * scale);
+  s.bezierCurveTo((1.3641) * scale, (-13.6413) * scale, (1.0573) * scale, (-13.3699) * scale, (0.8355) * scale, (-13.0300) * scale);
+  s.bezierCurveTo((0.6136) * scale, (-12.6854) * scale, (0.5027) * scale, (-12.2961) * scale, (0.5027) * scale, (-11.8618) * scale);
+  s.bezierCurveTo((0.5027) * scale, (-11.4558) * scale, (0.5782) * scale, (-11.0972) * scale, (0.7293) * scale, (-10.7857) * scale);
+  s.bezierCurveTo((0.8850) * scale, (-10.4694) * scale, (1.1115) * scale, (-10.2050) * scale, (1.4089) * scale, (-9.9926) * scale);
+  s.bezierCurveTo((1.7110) * scale, (-9.7803) * scale, (2.0792) * scale, (-9.6197) * scale, (2.5134) * scale, (-9.5113) * scale);
+  s.bezierCurveTo((2.9477) * scale, (-9.3979) * scale, (3.4432) * scale, (-9.3413) * scale, (4.0002) * scale, (-9.3413) * scale);
+  s.lineTo((5.3384) * scale, (-9.3413) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 6
+  s = new THREE.Shape();
+  s.moveTo((13.1973) * scale, (-12.1946) * scale);
+  s.lineTo((13.1972) * scale, (-6.3394) * scale);
+  s.lineTo((14.9106) * scale, (-6.3394) * scale);
+  s.lineTo((14.9106) * scale, (-14.0000) * scale);
+  s.lineTo((13.2964) * scale, (-14.0000) * scale);
+  s.lineTo((13.1973) * scale, (-12.1946) * scale);
+  s.closePath();
+  shapes.push(s);
+  // Shape 7
+  s = new THREE.Shape();
+  s.moveTo((13.4380) * scale, (-10.6015) * scale);
+  s.lineTo((14.0115) * scale, (-10.5874) * scale);
+  s.bezierCurveTo((14.0115) * scale, (-11.1018) * scale, (13.9549) * scale, (-11.5763) * scale, (13.8416) * scale, (-12.0105) * scale);
+  s.bezierCurveTo((13.7283) * scale, (-12.4400) * scale, (13.5537) * scale, (-12.8152) * scale, (13.3176) * scale, (-13.1363) * scale);
+  s.bezierCurveTo((13.0816) * scale, (-13.4525) * scale, (12.7795) * scale, (-13.7002) * scale, (12.4114) * scale, (-13.8796) * scale);
+  s.bezierCurveTo((12.0432) * scale, (-14.0543) * scale, (11.6018) * scale, (-14.1416) * scale, (11.0874) * scale, (-14.1416) * scale);
+  s.bezierCurveTo((10.7145) * scale, (-14.1416) * scale, (10.3723) * scale, (-14.0874) * scale, (10.0608) * scale, (-13.9788) * scale);
+  s.bezierCurveTo((9.7493) * scale, (-13.8702) * scale, (9.4802) * scale, (-13.7026) * scale, (9.2537) * scale, (-13.4761) * scale);
+  s.bezierCurveTo((9.0318) * scale, (-13.2496) * scale, (8.8596) * scale, (-12.9545) * scale, (8.7368) * scale, (-12.5911) * scale);
+  s.bezierCurveTo((8.6141) * scale, (-12.2277) * scale, (8.5528) * scale, (-11.7933) * scale, (8.5528) * scale, (-11.2883) * scale);
+  s.lineTo((8.5528) * scale, (-6.3394) * scale);
+  s.lineTo((10.2590) * scale, (-6.3394) * scale);
+  s.lineTo((10.2591) * scale, (-11.3025) * scale);
+  s.bezierCurveTo((10.2590) * scale, (-11.5810) * scale, (10.2920) * scale, (-11.8146) * scale, (10.3582) * scale, (-12.0034) * scale);
+  s.bezierCurveTo((10.4243) * scale, (-12.1875) * scale, (10.5139) * scale, (-12.3362) * scale, (10.6272) * scale, (-12.4495) * scale);
+  s.bezierCurveTo((10.7404) * scale, (-12.5627) * scale, (10.8726) * scale, (-12.6430) * scale, (11.0237) * scale, (-12.6902) * scale);
+  s.bezierCurveTo((11.1747) * scale, (-12.7374) * scale, (11.3352) * scale, (-12.7609) * scale, (11.5051) * scale, (-12.7610) * scale);
+  s.bezierCurveTo((11.9913) * scale, (-12.7609) * scale, (12.3736) * scale, (-12.6666) * scale, (12.6521) * scale, (-12.4778) * scale);
+  s.bezierCurveTo((12.9353) * scale, (-12.2843) * scale, (13.1359) * scale, (-12.0246) * scale, (13.2539) * scale, (-11.6990) * scale);
+  s.bezierCurveTo((13.3766) * scale, (-11.3733) * scale, (13.4380) * scale, (-11.0075) * scale, (13.4380) * scale, (-10.6015) * scale);
+  s.closePath();
+  shapes.push(s);
+  return shapes;
+}
 
     // ─────────────────────────────────────────────────────────────
-    // 2. PRIMARY LUA PLANET (Hemispherical Shells with JIT Core)
+    // 2. PRIMARY LUAU MONUMENT (Dual-Shell 15° Tilted Slabs)
     // ─────────────────────────────────────────────────────────────
 
-    // Helper to create solid hemisphere shell
-    function createHemisphereShell(isFront, radius) {
-      const hGroup = new THREE.Group();
-      const domeGeo = new THREE.SphereGeometry(radius, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2);
-      const dome = new THREE.Mesh(domeGeo, luaBluePlanetMat);
-      dome.rotation.x = isFront ? (Math.PI / 2) : (-Math.PI / 2);
-      hGroup.add(dome);
-
-      // Inner seal cap
-      const capGeo = new THREE.CircleGeometry(radius, 48);
-      const capMat = new THREE.MeshStandardMaterial({
-        color: 0x091428,
-        roughness: 0.35,
-        metalness: 0.8
-      });
-      const cap = new THREE.Mesh(capGeo, capMat);
-      if (isFront) cap.rotation.y = Math.PI;
-      hGroup.add(cap);
-
-      return hGroup;
-    }
-
-    const frontHemisphere = createHemisphereShell(true, R_PLANET);
+    // Front Luau Plate
+    const luauBodyShape = createRoundedRectShape(BOX_SIZE, BOX_SIZE, BOX_R);
+    const luauFrontGeo = new THREE.ExtrudeGeometry(luauBodyShape, {
+      depth: 0.22,
+      bevelEnabled: true,
+      bevelThickness: 0.04,
+      bevelSize: 0.03,
+      bevelSegments: 4
+    });
+    luauFrontGeo.center();
+    const luauFrontMesh = new THREE.Mesh(luauFrontGeo, luauBlueFrontMat);
     registerPart(
-      frontHemisphere,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, 0.4, 2.2),
-      new THREE.Euler(0.12, -0.18, 0.06)
+      luauFrontMesh,
+      new THREE.Vector3(0, 0, 0.11),
+      new THREE.Euler(0, 0, TILT_ANGLE),
+      new THREE.Vector3(0, 0.35, 2.2),
+      new THREE.Euler(0.12, -0.18, TILT_ANGLE + 0.06)
     );
 
-    const rearHemisphere = createHemisphereShell(false, R_PLANET);
+    // Rear Luau Backplate
+    const luauRearGeo = new THREE.ExtrudeGeometry(luauBodyShape, {
+      depth: 0.22,
+      bevelEnabled: true,
+      bevelThickness: 0.04,
+      bevelSize: 0.03,
+      bevelSegments: 4
+    });
+    luauRearGeo.center();
+    const luauRearMesh = new THREE.Mesh(luauRearGeo, luauBlueRearMat);
     registerPart(
-      rearHemisphere,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, -0.4, -2.5),
-      new THREE.Euler(-0.12, 0.18, -0.06)
+      luauRearMesh,
+      new THREE.Vector3(0, 0, -0.11),
+      new THREE.Euler(0, 0, TILT_ANGLE),
+      new THREE.Vector3(0, -0.35, -2.4),
+      new THREE.Euler(-0.12, 0.18, TILT_ANGLE - 0.06)
     );
 
-    // Inner Luau Compiler Nucleus (Revealed during disassembly)
+    // Inner Luau Compiler Core (Revealed during disassembly)
     const nucleusGeo = new THREE.SphereGeometry(0.72, 32, 32);
     const nucleus = new THREE.Mesh(nucleusGeo, mats.neonCyan);
 
@@ -1198,134 +1261,99 @@
       new THREE.Vector3(0, 0, 0),
       new THREE.Euler(0, 0, 0),
       new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0)
+      new THREE.Euler(0.2, 0.3, 0.1)
     );
 
     // ─────────────────────────────────────────────────────────────
-    // 3. WHITE LUNAR DISC CAP (Contoured at +45° Upper-Right)
+    // 3. WHITE SQUARE MOON (Upper-Right Corner, tilted 15°)
     // ─────────────────────────────────────────────────────────────
-    const moonCx = 150 * LUA_SCALE;    // ~0.7666
-    const moonCy = 149.9 * LUA_SCALE;  // ~0.7661
-    const moonR  = 106 * LUA_SCALE;    // ~0.5417
-    const moonCz = Math.sqrt(R_PLANET * R_PLANET - moonCx * moonCx - moonCy * moonCy);
-    const moonDir = new THREE.Vector3(moonCx, moonCy, moonCz).normalize();
-    const moonAlpha = Math.asin(moonR / R_PLANET); // Angular radius ~0.297 rad
-
-    const moonCapGroup = new THREE.Group();
-
-    // Outer spherical convex cap
-    const moonDomeGeo = new THREE.SphereGeometry(R_PLANET + 0.024, 48, 24, 0, Math.PI * 2, 0, moonAlpha);
-    const moonDome = new THREE.Mesh(moonDomeGeo, luaWhiteMoonMat);
-    moonCapGroup.add(moonDome);
-
-    // Beveled rim ring
-    const moonRimGeo = new THREE.TorusGeometry(moonR * 0.99, 0.016, 12, 48);
-    const moonRim = new THREE.Mesh(moonRimGeo, luaWhiteMoonMat);
-    moonRim.position.y = Math.cos(moonAlpha) * (R_PLANET + 0.024);
-    moonRim.rotation.x = Math.PI / 2;
-    moonCapGroup.add(moonRim);
-
-    const moonQuat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), moonDir);
-    const moonAssemEuler = new THREE.Euler().setFromQuaternion(moonQuat);
-    moonCapGroup.rotation.copy(moonAssemEuler);
-
-    registerPart(
-      moonCapGroup,
-      new THREE.Vector3(0, 0, 0),
-      moonAssemEuler,
-      new THREE.Vector3(2.4, 2.4, 3.4),
-      new THREE.Euler(moonAssemEuler.x - 0.25, moonAssemEuler.y + 0.35, moonAssemEuler.z + 0.15)
-    );
-
-    // ─────────────────────────────────────────────────────────────
-    // 4. BEVELED 3D "Lua" TYPOGRAPHY (Extruded from Official SVG)
-    // ─────────────────────────────────────────────────────────────
-    const pathL = 'M258.1,627.8h117.3v26.7H227.8V417h30.3V627.8z';
-    const pathU = 'M515.5,654.5v-23.8c-16,22.5-31.9,31.3-57,31.3c-33.2,0-54.4-18.2-54.4-46.6V483.8h27v120.9c0,20.5,13.7,33.6,35.2,33.6c28.3,0,46.6-22.8,46.6-57.7v-96.8h27v170.7H515.5z';
-    const pathA = 'M738.4,659.1c-8.8,2.3-13,2.9-18.6,2.9c-17.6,0-26.1-7.8-28-25.1c-19.2,17.6-36.5,25.1-58,25.1c-34.5,0-56-19.5-56-50.5c0-22.2,10.1-37.5,30-45.6c10.4-4.2,16.3-5.5,54.7-10.4c21.5-2.6,28.3-7.5,28.3-18.9v-7.2c0-16.3-13.7-25.4-38.1-25.4c-25.4,0-37.8,9.4-40.1,30.3h-27.4c0.7-16.9,3.9-26.7,11.7-35.5c11.4-12.7,31.9-19.9,56.7-19.9c42,0,64.2,16.3,64.2,46.6v100.4c0,8.5,5.2,13.4,14.7,13.4c1.6,0,2.9,0,5.9-0.7V659.1z M690.8,570.1c-9.1,4.2-15,5.5-43.7,9.4c-29,4.2-41.1,13.4-41.1,31.3c0,17.3,12.4,27.4,33.6,27.4c16,0,29.3-5.2,40.4-15.3c8.1-7.5,10.8-13,10.8-22.2V570.1z';
-
-    const letterExtrudeSettings = {
-      depth: 0.12,
+    const MOON_SIZE = 8.0 * LUAU_SCALE;
+    const MOON_R = 0.5 * LUAU_SCALE;
+    const luauMoonShape = createRoundedRectShape(MOON_SIZE, MOON_SIZE, MOON_R);
+    const luauMoonGeo = new THREE.ExtrudeGeometry(luauMoonShape, {
+      depth: 0.10,
       bevelEnabled: true,
       bevelThickness: 0.02,
-      bevelSize: 0.02,
+      bevelSize: 0.015,
+      bevelSegments: 3
+    });
+    luauMoonGeo.center();
+    const luauSquareMoonMesh = new THREE.Mesh(luauMoonGeo, luauWhiteMat);
+
+    const moonLocalX = 11.0 * LUAU_SCALE;
+    const moonLocalY = 11.0 * LUAU_SCALE;
+    const cosT = Math.cos(TILT_ANGLE);
+    const sinT = Math.sin(TILT_ANGLE);
+    const moonRotX = moonLocalX * cosT - moonLocalY * sinT;
+    const moonRotY = moonLocalX * sinT + moonLocalY * cosT;
+
+    registerPart(
+      luauSquareMoonMesh,
+      new THREE.Vector3(moonRotX, moonRotY, 0.24),
+      new THREE.Euler(0, 0, TILT_ANGLE),
+      new THREE.Vector3(moonRotX * 1.35, moonRotY * 1.35 + 0.3, 3.2),
+      new THREE.Euler(0.15, -0.22, TILT_ANGLE + 0.12)
+    );
+
+    // ─────────────────────────────────────────────────────────────
+    // 4. BEVELED 3D "Luau" TYPOGRAPHY (Extruded from Official SVG)
+    // ─────────────────────────────────────────────────────────────
+    const lettersGroup = new THREE.Group();
+    const letterGeoSettings = {
+      depth: 0.10,
+      bevelEnabled: true,
+      bevelThickness: 0.02,
+      bevelSize: 0.015,
       bevelSegments: 3
     };
 
-    const TEXT_SCALE = LUA_SCALE * 0.78;
-    const TEXT_CX = 483.1;
-    const TEXT_CY = 539.5;
-    const TEXT_OFFSET_Y = -0.34;
+    const letters = getLuauLettersShapes(LUAU_SCALE);
+    letters.forEach((s) => {
+      const geo = new THREE.ExtrudeGeometry(s, letterGeoSettings);
+      const m = new THREE.Mesh(geo, luauWhiteMat);
+      lettersGroup.add(m);
+    });
 
-    const shapeL = normalizeSvgShape(parseSvgPathToShapes(pathL)[0], true, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y);
-    const geoL = projectGeometryOntoSphere(new THREE.ExtrudeGeometry(shapeL, letterExtrudeSettings), R_PLANET, 0.022);
-    const meshL = new THREE.Mesh(geoL, luaLettersMat);
     registerPart(
-      meshL,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(-2.4, 0.8, 3.8),
-      new THREE.Euler(0.2, -0.4, 0.1)
-    );
-
-    const shapeU = normalizeSvgShape(parseSvgPathToShapes(pathU)[0], true, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y);
-    const geoU = projectGeometryOntoSphere(new THREE.ExtrudeGeometry(shapeU, letterExtrudeSettings), R_PLANET, 0.022);
-    const meshU = new THREE.Mesh(geoU, luaLettersMat);
-    registerPart(
-      meshU,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, 1.4, 4.2),
-      new THREE.Euler(-0.3, 0, 0)
-    );
-
-    const rawA = parseSvgPathToShapes(pathA);
-    const shapeA = normalizeSvgShape(rawA[0], true, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y);
-    shapeA.holes.push(normalizeSvgShape(rawA[1], false, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y));
-    const geoA = projectGeometryOntoSphere(new THREE.ExtrudeGeometry(shapeA, letterExtrudeSettings), R_PLANET, 0.022);
-    const meshA = new THREE.Mesh(geoA, luaLettersMat);
-    registerPart(
-      meshA,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(2.4, 0.8, 3.8),
-      new THREE.Euler(0.2, 0.4, -0.1)
+      lettersGroup,
+      new THREE.Vector3(0, 0, 0.24),
+      new THREE.Euler(0, 0, TILT_ANGLE),
+      new THREE.Vector3(0, 0.35, 3.4),
+      new THREE.Euler(0.12, -0.15, TILT_ANGLE + 0.05)
     );
 
     // ─────────────────────────────────────────────────────────────
-    // 5. DASHED ORBIT RING & COMPANION SATELLITE MOON
+    // 5. DASHED ORBIT RING & COMPANION SATELLITE
     // ─────────────────────────────────────────────────────────────
-    const luaOrbitGroup = new THREE.Group();
-    const orbitRadius = 2.616;
+    const luauOrbitGroup = new THREE.Group();
+    const orbitRadius = 2.85;
     const dashCount = 28;
     const dashStep = (Math.PI * 2) / dashCount;
     const dashArcLength = dashStep * 0.55;
-    const moonAngle = Math.PI / 4; // +45° upper-right
 
     for (let i = 0; i < dashCount; i++) {
       const startAngle = i * dashStep;
-      if (Math.abs(startAngle - moonAngle) < 0.16) continue;
-
       const dashGeo = new THREE.TorusGeometry(orbitRadius, 0.022, 10, 16, dashArcLength);
-      const dashMesh = new THREE.Mesh(dashGeo, luaOrbitMat);
+      const dashMesh = new THREE.Mesh(dashGeo, luauOrbitMat);
       dashMesh.rotation.z = startAngle;
-      luaOrbitGroup.add(dashMesh);
+      luauOrbitGroup.add(dashMesh);
     }
 
     registerPart(
-      luaOrbitGroup,
+      luauOrbitGroup,
       new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
+      new THREE.Euler(Math.PI * 0.15, -Math.PI * 0.10, 0),
       new THREE.Vector3(0, -1.8, -2.4),
       new THREE.Euler(0.65, 0.35, 0.4)
     );
 
-    // Companion Satellite Moon (Blue sphere on dashed orbit at +45°)
-    const satGeo = new THREE.SphereGeometry(0.542, 32, 32);
-    const luaSatMoon = new THREE.Mesh(satGeo, luaBluePlanetMat);
+    // Companion Satellite (Luau blue orb on dashed orbit)
+    const satGeo = new THREE.SphereGeometry(0.32, 28, 28);
+    const luauSatMoon = new THREE.Mesh(satGeo, luauBlueFrontMat);
+    const satAng = 0.85;
     registerPart(
-      luaSatMoon,
-      new THREE.Vector3(1.85, 1.85, 0.0),
+      luauSatMoon,
+      new THREE.Vector3(orbitRadius * Math.cos(satAng), orbitRadius * Math.sin(satAng), 0.2),
       new THREE.Euler(0, 0, 0),
       new THREE.Vector3(5.6, 5.0, 1.8),
       new THREE.Euler(0.4, -0.5, 0.6)
@@ -1662,6 +1690,11 @@
       }
       if (band) {
         band.rotation.y += 0.006;
+      }
+      if (nucleus) {
+        const coreScale = Math.max(0.001, (1 - easeAssemble) * 1.05);
+        nucleus.scale.set(coreScale, coreScale, coreScale);
+        nucleus.visible = easeAssemble < 0.94;
       }
 
       // Starfield Particle Flow
