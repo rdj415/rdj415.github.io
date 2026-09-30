@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=5.0" />
+  <link rel="stylesheet" href="style.css?v=6.0" />
 
   <!-- Critical Inline Styles for Instant 3D Scrolly HUD Rendering (Zero Cache Lag) -->
   <style>
@@ -105,6 +105,20 @@
       text-align: center;
       max-width: 860px;
       padding: 0 1.5rem;
+    }
+    .hero-stage-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+      margin: 1.2rem 0 1.5rem;
+      flex-wrap: wrap;
+      pointer-events: auto;
+    }
+    .hero-stage-btn {
+      font-size: 0.82rem;
+      padding: 0.55rem 1.2rem;
+      backdrop-filter: blur(8px);
     }
     .stage-1, .stage-2, .stage-3 {
       left: 6vw;
@@ -264,24 +278,37 @@
           </div>
         </div>
 
-        <!-- Stage 0: Hero Intro Title & Prompt (Active when t < 0.15) -->
+        <!-- Stage 0: Master Portfolio Hero (Active when t < 0.15) -->
         <div class="luau-stage-card stage-0 active" data-stage="0">
           <div class="f1-badge">
             <span class="f1-badge-dot"></span>
-            <span>INTERACTIVE 3D ASSEMBLY // 400 LUAU TOKENS</span>
+            <span>SENIOR ROBLOX DEVELOPER // SYSTEMS ARCHITECT</span>
           </div>
 
           <h1 class="f1-hero-title">
-            ANATOMY OF <span class="gradient-accent">LUAU</span>
+            &lt; <span class="gradient-accent">ADAM</span> /&gt;
           </h1>
 
           <p class="f1-hero-desc">
-            Production architecture born from chaos. Scroll down to assemble the core piece by piece.
+            Senior Roblox Developer with 6+ years experience engineering high-concurrency systems, atomic lifecycles, and low-latency Luau architectures.
           </p>
+
+          <div class="hero-stage-cta">
+            <a href="#code-showroom" class="btn btn-primary hero-stage-btn">
+              <span>Inspect Code</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#systems" class="btn btn-outline hero-stage-btn">
+              <span>Architectures</span>
+            </a>
+            <button class="btn btn-glass copy-btn hero-stage-btn" data-copy="rdj_rb" title="Click to copy Discord">
+              <span>Discord: rdj_rb</span>
+            </button>
+          </div>
 
           <div class="f1-scroll-prompt">
             <div class="scroll-crosshair">+</div>
-            <span class="scroll-text">SCROLL DOWN TO ASSEMBLE</span>
+            <span class="scroll-text">SCROLL TO ASSEMBLE 3D ARCHITECTURE</span>
             <div class="scroll-arrow-anim">↓</div>
           </div>
         </div>
@@ -489,7 +516,7 @@
           </div>
 
           <h1 class="hero-title">
-            Hi, I'm <span class="gradient-text">Adam</span> — Senior Roblox Systems Architect
+            Production <span class="gradient-text">Architecture</span> &amp; Systems Engineering
           </h1>
 
           <p class="hero-subtitle">
@@ -2139,7 +2166,7 @@ ZoneService.Metadata = {
   <div class="toast-container" id="toastContainer"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>window.THREE || document.write('<script src="assets/js/three.min.js"><\/script>')</script>
-  <script src="scrolly-luau-engine.js?v=5.0"></script>
-  <script src="script.js?v=5.0"></script>
+  <script src="scrolly-luau-engine.js?v=6.0"></script>
+  <script src="script.js?v=6.0"></script>
 </body>
 </html>

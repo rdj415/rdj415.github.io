@@ -131,7 +131,6 @@
     scene.add(mainGroup);
 
     const modularParts = [];
-    const alignmentLines = [];
 
     function registerPart(mesh, assembledPos, assembledRot, explodedPos, explodedRot, scale = 1) {
       mesh.position.copy(explodedPos);
@@ -147,21 +146,6 @@
         explodedRot: explodedRot.clone()
       };
       modularParts.push(partData);
-
-      // Create CAD Laser Alignment Blueprint Ray
-      const lineGeo = new THREE.BufferGeometry().setFromPoints([
-        explodedPos.clone(),
-        assembledPos.clone()
-      ]);
-      const lineMat = new THREE.LineBasicMaterial({
-        color: 0x00f2fe,
-        transparent: true,
-        opacity: 0.35,
-        blending: THREE.AdditiveBlending
-      });
-      const line = new THREE.Line(lineGeo, lineMat);
-      mainGroup.add(line);
-      alignmentLines.push({ line, partData });
     }
 
     // Material Library
@@ -1079,18 +1063,6 @@
         }
       }
 
-      // Update CAD Laser Alignment Blueprint Rays (Fade out as parts assemble)
-      const lineOpacity = Math.max(0, (1 - easeAssemble) * 0.38);
-      for (let i = 0; i < alignmentLines.length; i++) {
-        const { line, partData } = alignmentLines[i];
-        line.material.opacity = lineOpacity;
-        if (lineOpacity > 0.01) {
-          const posAttr = line.geometry.attributes.position;
-          posAttr.setXYZ(0, partData.mesh.position.x, partData.mesh.position.y, partData.mesh.position.z);
-          posAttr.setXYZ(1, partData.assembledPos.x, partData.assembledPos.y, partData.assembledPos.z);
-          posAttr.needsUpdate = true;
-        }
-      }
 
       // Subtle celestial rotation of elements
       if (quantumLattice) {
