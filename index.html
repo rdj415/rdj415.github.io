@@ -20,7 +20,106 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3.5" />
+
+  <!-- Critical Inline Styles for Instant 3D Scrolly HUD Rendering (Zero Cache Lag) -->
+  <style>
+    .scrolly-luau-container {
+      position: relative;
+      width: 100%;
+      height: 520vh;
+      background: #07090e;
+      z-index: 10;
+    }
+    .scrolly-sticky-viewport {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .webgl-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .luau-hud-header {
+      position: absolute;
+      top: 72px;
+      left: 0;
+      width: 100%;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 2.5rem;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.85) 0%, rgba(7, 9, 14, 0) 100%);
+      pointer-events: auto;
+    }
+    .luau-stage-card {
+      position: absolute;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(28px) scale(0.96);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      will-change: opacity, transform;
+    }
+    .luau-stage-card.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .stage-0 {
+      text-align: center;
+      max-width: 860px;
+      padding: 0 1.5rem;
+    }
+    .stage-1, .stage-2, .stage-3 {
+      left: 6vw;
+      max-width: 480px;
+      width: 90%;
+    }
+    .stage-4 {
+      text-align: center;
+      max-width: 960px;
+      width: 92%;
+    }
+    .stage-5 {
+      text-align: center;
+      max-width: 720px;
+      width: 90%;
+    }
+    .luau-speedometer-hud {
+      position: absolute;
+      right: 2.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 22;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.8rem;
+      pointer-events: none;
+    }
+    .luau-hud-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 25;
+      background: rgba(7, 9, 14, 0.94);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
 </head>
 <body>
 
@@ -43,8 +142,7 @@
       </a>
 
       <nav class="nav-links" id="nav-links">
-        <a href="#scrolly-luau-container" class="nav-link active">3D Анатомия</a>
-        <a href="#hero" class="nav-link">Overview</a>
+        <a href="#hero" class="nav-link active">Overview</a>
         <a href="#systems" class="nav-link">Core Systems & Libraries</a>
         <a href="#code-showroom" class="nav-link">Production Code</a>
         <a href="#services" class="nav-link">Services & Terms</a>
@@ -2017,7 +2115,7 @@ ZoneService.Metadata = {
   <div class="toast-container" id="toastContainer"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>window.THREE || document.write('<script src="assets/js/three.min.js"><\/script>')</script>
-  <script src="scrolly-luau-engine.js"></script>
-  <script src="script.js"></script>
+  <script src="scrolly-luau-engine.js?v=3.5"></script>
+  <script src="script.js?v=3.5"></script>
 </body>
 </html>
