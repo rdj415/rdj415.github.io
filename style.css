@@ -611,17 +611,73 @@ body {
 /* ══════════════════════════════════════════════════════════════
    FEATURED VIDEO SHOWCASE
    ══════════════════════════════════════════════════════════════ */
+.video-showcase-header {
+  margin-bottom: 20px;
+}
+
+.video-showcase-tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.v-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.v-tab:hover {
+  border-color: var(--accent-cyan);
+  color: var(--text-primary);
+  background: rgba(0, 245, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.v-tab.active {
+  border-color: var(--accent-cyan);
+  color: #fff;
+  background: rgba(0, 245, 255, 0.14);
+  box-shadow: 0 0 16px rgba(0, 245, 255, 0.22);
+}
+
+.v-tab-icon {
+  font-size: 1.05rem;
+}
+
 .featured-video-card {
+  display: none;
   background: var(--bg-card);
   border: 1px solid var(--border-bright);
   border-radius: var(--radius-lg);
   overflow: hidden;
   margin-bottom: 36px;
   box-shadow: var(--shadow-glow), var(--shadow-md);
-  display: grid;
   grid-template-columns: 1.35fr 1fr;
   align-items: stretch;
   transition: all 0.3s ease;
+}
+
+.featured-video-card.active {
+  display: grid;
+  animation: fadeInVideo 0.35s ease;
+}
+
+@keyframes fadeInVideo {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .featured-video-wrapper {

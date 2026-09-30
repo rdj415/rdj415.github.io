@@ -265,6 +265,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 2.5 Video Showcase Switcher
+  const videoTabs = document.querySelectorAll('.v-tab');
+  const videoCards = document.querySelectorAll('.featured-video-card');
+
+  videoTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const targetId = tab.getAttribute('data-target');
+      videoTabs.forEach((t) => t.classList.remove('active'));
+      videoCards.forEach((c) => {
+        c.classList.remove('active');
+        const v = c.querySelector('video');
+        if (v) v.pause();
+      });
+
+      tab.classList.add('active');
+      const targetCard = document.getElementById(targetId);
+      if (targetCard) {
+        targetCard.classList.add('active');
+        const activeVideo = targetCard.querySelector('video');
+        if (activeVideo) {
+          activeVideo.currentTime = 0;
+          activeVideo.play().catch(() => {});
+        }
+      }
+    });
+  });
+
   // 3. Code Tabs Switcher
   const codeTabs = document.querySelectorAll('.code-tab');
   const codePanels = document.querySelectorAll('.code-panel');

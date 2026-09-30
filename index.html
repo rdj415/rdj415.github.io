@@ -257,8 +257,26 @@ AIService.Metadata = {
           </p>
         </div>
 
-        <!-- Featured Video Showcase: AI Systems & Physics in Motion -->
-        <div class="featured-video-card">
+        <!-- Featured Video Showcase Switcher -->
+        <div class="video-showcase-header">
+          <div class="video-showcase-tabs">
+            <button class="v-tab active" data-target="video-showcase-ai">
+              <span class="v-tab-icon">🤖</span>
+              <span>AI NPC & Hover Dynamics</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-buggy">
+              <span class="v-tab-icon">🏎️</span>
+              <span>Raycast Suspension Buggy</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-inventory">
+              <span class="v-tab-icon">🎒</span>
+              <span>Radial Inventory & Admin Engine</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Video 1: AI Systems & Physics in Motion -->
+        <div class="featured-video-card active" id="video-showcase-ai">
           <div class="featured-video-wrapper">
             <video class="featured-video" controls autoplay loop muted playsinline poster="assets/videos/ai_npc_poster.jpg">
               <source src="assets/videos/ai_npc_demo.mp4" type="video/mp4">
@@ -285,6 +303,72 @@ AIService.Metadata = {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </a>
               <span class="fv-metric">100% Server Authoritative • Zero Lag Replication</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video 2: Buggy Raycast Suspension -->
+        <div class="featured-video-card" id="video-showcase-buggy">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/buggy_suspension_poster.jpg">
+              <source src="assets/videos/buggy_suspension_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • RAYCAST SUSPENSION & VEHICLE DYNAMICS</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">RAYCAST PHYSICS</span>
+              <span class="fv-tag">SPRING FORCES</span>
+              <span class="fv-tag">60 FPS</span>
+            </div>
+            <h3 class="fv-title">Custom Raycast Spring Suspension & Terrain Obstacle Physics</h3>
+            <p class="fv-desc">
+              In-engine demonstration of custom raycast vehicle physics: 4-wheel independent spring damping, ground contact surface normal calculations, and dynamic chassis orientation over irregular step obstacles, ramps, and high-speed acceleration (0 to 90+ MPH) without Roblox stock constraint glitches.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect Architecture</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Raycast-Driven Springs • 4-Wheel Independent Damping</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video 3: Radial Inventory & Admin UI -->
+        <div class="featured-video-card" id="video-showcase-inventory">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/inventory_admin_poster.jpg">
+              <source src="assets/videos/inventory_admin_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • RADIAL MENU & DATA REPLICATION</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">RADIAL UI</span>
+              <span class="fv-tag">SERVER SYNC</span>
+              <span class="fv-tag">ADMIN ENGINE</span>
+            </div>
+            <h3 class="fv-title">Radial Inventory Wheel & Authoritative Player Data Engine</h3>
+            <p class="fv-desc">
+              Live demonstration of custom UI engineering and server-client data synchronization. Features real-time administrative player data manipulation, atomic inventory item grants, dynamic circular slot wheel navigation (6 item slots with hover indicators), and synchronized item equip/drop mechanics.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect Data Architecture</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Server-Validated Payloads • Instant UI Tweening</span>
             </div>
           </div>
         </div>
@@ -345,6 +429,66 @@ AIService.Metadata = {
                 <span>Instant Displacement</span>
                 <span>Honeypots</span>
                 <span>Players:BanAsync</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System: Raycast Spring Suspension & Vehicle Dynamics -->
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/buggy_suspension_poster.jpg">
+                <source src="assets/videos/buggy_suspension_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Vehicle Physics</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Raycast Spring Suspension & Vehicle Physics</h3>
+                  <span class="system-sub">RaycastVehicle.luau • Independent Damping • Normal Projections</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Custom physics-based vehicle framework bypassing stock Roblox constraints. Implements 4-wheel independent raycast spring compression, terrain normal surface alignment, high-speed lateral friction slip curves, and anti-roll bar torque calculations running at solid 60 FPS.
+              </p>
+
+              <div class="system-tags">
+                <span>RaycastVehicle.luau</span>
+                <span>Spring Physics</span>
+                <span>Independent Damping</span>
+                <span>Normal Projection</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- System: Radial Inventory & Authoritative Data Engine -->
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/inventory_admin_poster.jpg">
+                <source src="assets/videos/inventory_admin_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Radial UI & Data</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Radial Inventory & Synchronized Data Engine</h3>
+                  <span class="system-sub">InventoryService.luau • RadialWheel.luau • Atomic Grants</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                High-polish radial equipment wheel coupled with an authoritative player data backend. Features 6 circular slot allocations, mouse-angle tracking, smooth tweening, synchronized item drops with 3D world interaction prompts, and admin-level atomic stat adjustments.
+              </p>
+
+              <div class="system-tags">
+                <span>InventoryService.luau</span>
+                <span>RadialWheel.luau</span>
+                <span>Atomic Data Grants</span>
+                <span>Server-Client Sync</span>
               </div>
             </div>
           </div>
