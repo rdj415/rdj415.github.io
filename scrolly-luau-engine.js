@@ -988,305 +988,356 @@
     const scriptMatActor = new THREE.MeshStandardMaterial({ map: scriptTexActor, roughness: 0.25, metalness: 0.7 });
 
     // ─────────────────────────────────────────────────────────────
-    // 1. MASTER 3D LUAU CELESTIAL EMBLEM
+    // 1. MASTER 3D OFFICIAL LUA CELESTIAL EMBLEM & ARCHITECTURE
     // ─────────────────────────────────────────────────────────────
 
-    // A: Inner Luminous Nucleus Sphere
-    const nucleusGeo = new THREE.SphereGeometry(0.72, 32, 32);
-    const nucleus = new THREE.Mesh(nucleusGeo, mats.neonCyan);
+    // Master Materials for the Official Lua Logo
+    const luaBluePlanetMat = new THREE.MeshPhysicalMaterial({
+      color: 0x001489,             // Official deep royal navy blue
+      emissive: 0x000624,
+      emissiveIntensity: 0.25,
+      roughness: 0.16,
+      metalness: 0.12,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.08,
+      reflectivity: 0.9
+    });
+
+    const luaWhiteMoonMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,             // Pure stark white lunar disc
+      emissive: 0xffffff,
+      emissiveIntensity: 0.08,
+      roughness: 0.22,
+      metalness: 0.05,
+      clearcoat: 0.7,
+      clearcoatRoughness: 0.1
+    });
+
+    const luaLettersMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,             // Brilliant white 3D beveled letters
+      emissive: 0xffffff,
+      emissiveIntensity: 0.15,
+      roughness: 0.18,
+      metalness: 0.15
+    });
+
+    const luaOrbitMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8,             // Polished metallic dashed orbit track
+      emissive: 0x00f2fe,
+      emissiveIntensity: 0.15,
+      roughness: 0.25,
+      metalness: 0.88
+    });
+
+    // Exact geometric constants from the official Lua logo SVG:
+    // Primary planet: radius R = 1.85 (SVG R = 362)
+    // Scale factor: 1.85 / 362
+    // Center in SVG: (473.5, 473.5)
+    // White Moon: dx = +150, dy = -150 (+45°), radius r = 106 (r = 0.542 in 3D)
+    // Satellite Moon: dx = +362, dy = -362 (+45°), radius r = 106 (r = 0.542 in 3D, dist = 2.616)
+    // Orbit track: radius R_orbit = 2.616, dashed ring
+    const R_PLANET = 1.85;
+    const SVG_R = 362;
+    const LUA_SCALE = R_PLANET / SVG_R;
+    const SVG_CX = 473.5;
+    const SVG_CY = 473.5;
+
+    // Helper: Project flat extruded geometry onto the sphere surface
+    function projectGeometryOntoSphere(geometry, radius, baseOffset) {
+      const pos = geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const z = pos.getZ(i);
+        const r2 = x * x + y * y;
+        if (r2 < radius * radius) {
+          const sphereZ = Math.sqrt(radius * radius - r2);
+          const nx = x / radius, ny = y / radius, nz = sphereZ / radius;
+          const totalOffset = baseOffset + z;
+          pos.setXYZ(i, x + nx * totalOffset, y + ny * totalOffset, sphereZ + nz * totalOffset);
+        }
+      }
+      geometry.computeVertexNormals();
+      return geometry;
+    }
+
+    // Helper: Parse SVG path string with M, h, H, v, V, c, z commands
+    function parseSvgPathToShapes(d) {
+      const shapes = [];
+      let currentPath = null;
+      let cx = 0, cy = 0;
+      const tokens = d.match(/[a-df-z]|[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/gi);
+      if (!tokens) return shapes;
+      let i = 0;
+      let cmd = '';
+      while (i < tokens.length) {
+        const t = tokens[i];
+        if (/^[a-df-z]$/i.test(t)) { cmd = t; i++; }
+        if (cmd === 'M') {
+          const x = parseFloat(tokens[i++]);
+          const y = parseFloat(tokens[i++]);
+          cx = x; cy = y;
+          currentPath = new THREE.Shape();
+          currentPath.moveTo(cx, -cy);
+          shapes.push(currentPath);
+        } else if (cmd === 'h') {
+          const dx = parseFloat(tokens[i++]);
+          cx += dx;
+          currentPath.lineTo(cx, -cy);
+        } else if (cmd === 'H') {
+          cx = parseFloat(tokens[i++]);
+          currentPath.lineTo(cx, -cy);
+        } else if (cmd === 'v') {
+          const dy = parseFloat(tokens[i++]);
+          cy += dy;
+          currentPath.lineTo(cx, -cy);
+        } else if (cmd === 'V') {
+          cy = parseFloat(tokens[i++]);
+          currentPath.lineTo(cx, -cy);
+        } else if (cmd === 'c') {
+          const dx1 = parseFloat(tokens[i++]);
+          const dy1 = parseFloat(tokens[i++]);
+          const dx2 = parseFloat(tokens[i++]);
+          const dy2 = parseFloat(tokens[i++]);
+          const dx = parseFloat(tokens[i++]);
+          const dy = parseFloat(tokens[i++]);
+          currentPath.bezierCurveTo(cx + dx1, -(cy + dy1), cx + dx2, -(cy + dy2), cx + dx, -(cy + dy));
+          cx += dx; cy += dy;
+        } else if (cmd === 'z' || cmd === 'Z') {
+          currentPath.closePath();
+        }
+      }
+      return shapes;
+    }
+
+    // Helper: Normalize SVG curve coordinates to 3D space centered at origin
+    function normalizeSvgShape(rawShape, isShape, scale = LUA_SCALE, cx = SVG_CX, cy = SVG_CY, offsetY = 0) {
+      const res = isShape ? new THREE.Shape() : new THREE.Path();
+      rawShape.curves.forEach((curve, idx) => {
+        if (curve.isLineCurve) {
+          const p1 = new THREE.Vector2((curve.v1.x - cx) * scale, (curve.v1.y + cy) * scale + offsetY);
+          const p2 = new THREE.Vector2((curve.v2.x - cx) * scale, (curve.v2.y + cy) * scale + offsetY);
+          if (idx === 0) res.moveTo(p1.x, p1.y);
+          res.lineTo(p2.x, p2.y);
+        } else if (curve.isCubicBezierCurve) {
+          const p1 = new THREE.Vector2((curve.v0.x - cx) * scale, (curve.v0.y + cy) * scale + offsetY);
+          const cp1 = new THREE.Vector2((curve.v1.x - cx) * scale, (curve.v1.y + cy) * scale + offsetY);
+          const cp2 = new THREE.Vector2((curve.v2.x - cx) * scale, (curve.v2.y + cy) * scale + offsetY);
+          const p2 = new THREE.Vector2((curve.v3.x - cx) * scale, (curve.v3.y + cy) * scale + offsetY);
+          if (idx === 0) res.moveTo(p1.x, p1.y);
+          res.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y);
+        }
+      });
+      return res;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 2. PRIMARY LUA PLANET (Hemispherical Shells with JIT Core)
+    // ─────────────────────────────────────────────────────────────
+
+    // Helper to create solid hemisphere shell
+    function createHemisphereShell(isFront, radius) {
+      const hGroup = new THREE.Group();
+      const domeGeo = new THREE.SphereGeometry(radius, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2);
+      const dome = new THREE.Mesh(domeGeo, luaBluePlanetMat);
+      dome.rotation.x = isFront ? (Math.PI / 2) : (-Math.PI / 2);
+      hGroup.add(dome);
+
+      // Inner seal cap
+      const capGeo = new THREE.CircleGeometry(radius, 48);
+      const capMat = new THREE.MeshStandardMaterial({
+        color: 0x091428,
+        roughness: 0.35,
+        metalness: 0.8
+      });
+      const cap = new THREE.Mesh(capGeo, capMat);
+      if (isFront) cap.rotation.y = Math.PI;
+      hGroup.add(cap);
+
+      return hGroup;
+    }
+
+    const frontHemisphere = createHemisphereShell(true, R_PLANET);
     registerPart(
-      nucleus,
+      frontHemisphere,
       new THREE.Vector3(0, 0, 0),
       new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, 3.4, -4.5),
-      new THREE.Euler(1.1, 0.6, 0)
+      new THREE.Vector3(0, 0.4, 2.2),
+      new THREE.Euler(0.12, -0.18, 0.06)
     );
 
-    // B: Inner Geometric Quantum Icosahedron Lattice
-    const latticeGeo = new THREE.IcosahedronGeometry(0.9, 1);
+    const rearHemisphere = createHemisphereShell(false, R_PLANET);
+    registerPart(
+      rearHemisphere,
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Euler(0, 0, 0),
+      new THREE.Vector3(0, -0.4, -2.5),
+      new THREE.Euler(-0.12, 0.18, -0.06)
+    );
+
+    // Inner Luau Compiler Nucleus (Revealed during disassembly)
+    const nucleusGeo = new THREE.SphereGeometry(0.72, 32, 32);
+    const nucleus = new THREE.Mesh(nucleusGeo, mats.neonCyan);
+
+    const latticeGeo = new THREE.IcosahedronGeometry(0.92, 1);
     const latticeMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
       wireframe: true,
       transparent: true,
-      opacity: 0.65
+      opacity: 0.75
     });
     const quantumLattice = new THREE.Mesh(latticeGeo, latticeMat);
     nucleus.add(quantumLattice);
 
-    // C: Outer Optical Glass Mantle Sphere (With Circuit Map)
-    const mantleGeo = new THREE.SphereGeometry(1.12, 48, 48);
-    const mantle = new THREE.Mesh(mantleGeo, planetMat);
-    registerPart(
-      mantle,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, -3.2, -4.0),
-      new THREE.Euler(-0.8, 0.5, 0.2)
-    );
-
-    // D: Equatorial Compiler Ring Band
-    const bandGeo = new THREE.CylinderGeometry(1.22, 1.22, 0.1, 48, 1, true);
+    const bandGeo = new THREE.CylinderGeometry(1.02, 1.02, 0.08, 48, 1, true);
     const band = new THREE.Mesh(bandGeo, mats.titaniumBody);
+    nucleus.add(band);
+
     registerPart(
-      band,
+      nucleus,
       new THREE.Vector3(0, 0, 0),
       new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(3.5, 2.5, -4.5),
-      new THREE.Euler(0.4, 0.8, -0.6)
-    );
-
-    // E: SCULPTED 3D CRESCENT MOON ARC (Parametric Tapered Geometry)
-    function createCrescentGeometry(outerR, taperDepth, arcSpread) {
-      const shape = new THREE.Shape();
-      const steps = 40;
-
-      // Outer perimeter
-      for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
-        const theta = -arcSpread + t * (2 * arcSpread);
-        const x = Math.cos(theta) * outerR;
-        const y = Math.sin(theta) * outerR;
-        if (i === 0) shape.moveTo(x, y);
-        else shape.lineTo(x, y);
-      }
-
-      // Inner perimeter returning with smooth taper
-      for (let i = steps; i >= 0; i--) {
-        const t = i / steps;
-        const theta = -arcSpread + t * (2 * arcSpread);
-        const taper = Math.sin(t * Math.PI);
-        const r = outerR - taper * taperDepth;
-        const x = Math.cos(theta) * r;
-        const y = Math.sin(theta) * r;
-        shape.lineTo(x, y);
-      }
-      shape.closePath();
-
-      const extrudeSettings = {
-        steps: 1,
-        depth: 0.28,
-        bevelEnabled: true,
-        bevelThickness: 0.05,
-        bevelSize: 0.05,
-        bevelSegments: 4
-      };
-      return new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    }
-
-    const crescentGeo = createCrescentGeometry(1.95, 0.62, Math.PI * 0.76);
-    crescentGeo.center();
-    const crescentMoon = new THREE.Mesh(crescentGeo, mats.titaniumBody);
-
-    // Glowing Neon Edge Ribbon on Crescent
-    const crescentRimGeo = createCrescentGeometry(2.02, 0.18, Math.PI * 0.77);
-    crescentRimGeo.center();
-    const crescentRim = new THREE.Mesh(crescentRimGeo, mats.neonCyan);
-    crescentRim.scale.set(1.01, 1.01, 0.6);
-    crescentMoon.add(crescentRim);
-
-    registerPart(
-      crescentMoon,
       new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, 0, Math.PI * 0.22),
-      new THREE.Vector3(-5.2, 4.5, 3.2),
-      new THREE.Euler(-0.7, 1.1, 0.4)
-    );
-
-    // F: POLISHED GOLD CELESTIAL SATELLITE MOON & DUAL GIMBAL RINGS
-    const satelliteGroup = new THREE.Group();
-    const satSphereGeo = new THREE.SphereGeometry(0.38, 28, 28);
-    const satSphere = new THREE.Mesh(satSphereGeo, mats.goldAccent);
-    satelliteGroup.add(satSphere);
-
-    // Gimbal Ring 1 & 2
-    const gim1Geo = new THREE.TorusGeometry(0.52, 0.02, 16, 48);
-    const gim1 = new THREE.Mesh(gim1Geo, mats.goldAccent);
-    satelliteGroup.add(gim1);
-
-    const gim2Geo = new THREE.TorusGeometry(0.58, 0.018, 16, 48);
-    const gim2 = new THREE.Mesh(gim2Geo, mats.neonCyan);
-    gim2.rotation.x = Math.PI / 2;
-    satelliteGroup.add(gim2);
-
-    registerPart(
-      satelliteGroup,
-      new THREE.Vector3(1.8, 1.4, 0.2),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(6.5, 4.8, -3.5),
-      new THREE.Euler(0.5, -0.9, 0.6)
-    );
-
-    // G: Elliptical Satellite Orbit Track Ring
-    const orbitTrackGeo = new THREE.TorusGeometry(2.35, 0.015, 16, 120);
-    const orbitTrackMat = new THREE.MeshBasicMaterial({
-      color: 0x00f2fe,
-      transparent: true,
-      opacity: 0.35
-    });
-    const orbitTrack = new THREE.Mesh(orbitTrackGeo, orbitTrackMat);
-    orbitTrack.rotation.x = Math.PI * 0.35;
-    orbitTrack.rotation.y = Math.PI * 0.15;
-    registerPart(
-      orbitTrack,
-      new THREE.Vector3(0, 0, 0),
-      orbitTrack.rotation.clone(),
-      new THREE.Vector3(4.8, -3.8, 3.5),
-      new THREE.Euler(1.2, -0.4, 0.8)
-    );
-
-    // H: Concentric Outer Segmented Cyber Rings
-    const ring1Geo = new THREE.TorusGeometry(2.65, 0.045, 16, 80);
-    const ring1 = new THREE.Mesh(ring1Geo, mats.neonCyan);
-    registerPart(
-      ring1,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(Math.PI / 4, 0, 0),
-      new THREE.Vector3(0, -5.5, 4.2),
-      new THREE.Euler(1.3, -0.6, 0)
-    );
-
-    const ring2Geo = new THREE.TorusGeometry(3.1, 0.04, 16, 80);
-    const ring2 = new THREE.Mesh(ring2Geo, mats.neonPurple);
-    registerPart(
-      ring2,
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Euler(0, Math.PI / 3, Math.PI / 6),
-      new THREE.Vector3(4.5, -5.2, -4.0),
-      new THREE.Euler(-1.0, 0.8, 1.2)
+      new THREE.Euler(0, 0, 0)
     );
 
     // ─────────────────────────────────────────────────────────────
-    // 2. SCULPTED 3D TYPE SOLVER TOKENS (< T > AND { })
+    // 3. WHITE LUNAR DISC CAP (Contoured at +45° Upper-Right)
     // ─────────────────────────────────────────────────────────────
+    const moonCx = 150 * LUA_SCALE;    // ~0.7666
+    const moonCy = 149.9 * LUA_SCALE;  // ~0.7661
+    const moonR  = 106 * LUA_SCALE;    // ~0.5417
+    const moonCz = Math.sqrt(R_PLANET * R_PLANET - moonCx * moonCx - moonCy * moonCy);
+    const moonDir = new THREE.Vector3(moonCx, moonCy, moonCz).normalize();
+    const moonAlpha = Math.asin(moonR / R_PLANET); // Angular radius ~0.297 rad
 
-    // A: Parametric Beveled Curly Braces { and }
-    function createBracketGeometry(flip = false) {
-      const sign = flip ? -1 : 1;
-      const pts = [
-        new THREE.Vector2(0.38 * sign, 1.25),
-        new THREE.Vector2(0.18 * sign, 1.20),
-        new THREE.Vector2(0.02 * sign, 0.95),
-        new THREE.Vector2(-0.04 * sign, 0.65),
-        new THREE.Vector2(-0.04 * sign, 0.28),
-        new THREE.Vector2(-0.28 * sign, 0.0), // central cusp
-        new THREE.Vector2(-0.04 * sign, -0.28),
-        new THREE.Vector2(-0.04 * sign, -0.65),
-        new THREE.Vector2(0.02 * sign, -0.95),
-        new THREE.Vector2(0.18 * sign, -1.20),
-        new THREE.Vector2(0.38 * sign, -1.25),
-        // inner contour returning
-        new THREE.Vector2(0.26 * sign, -1.08),
-        new THREE.Vector2(0.12 * sign, -0.85),
-        new THREE.Vector2(0.06 * sign, -0.55),
-        new THREE.Vector2(0.06 * sign, -0.20),
-        new THREE.Vector2(-0.16 * sign, 0.0),
-        new THREE.Vector2(0.06 * sign, 0.20),
-        new THREE.Vector2(0.06 * sign, 0.55),
-        new THREE.Vector2(0.12 * sign, 0.85),
-        new THREE.Vector2(0.26 * sign, 1.08)
-      ];
-      const shape = new THREE.Shape(pts);
-      const extrudeSettings = {
-        steps: 1,
-        depth: 0.16,
-        bevelEnabled: true,
-        bevelThickness: 0.03,
-        bevelSize: 0.03,
-        bevelSegments: 3
-      };
-      const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-      geo.center();
-      return geo;
-    }
+    const moonCapGroup = new THREE.Group();
 
-    const bracketLGeo = createBracketGeometry(false);
-    const bracketL = new THREE.Mesh(bracketLGeo, mats.glassCyan);
+    // Outer spherical convex cap
+    const moonDomeGeo = new THREE.SphereGeometry(R_PLANET + 0.024, 48, 24, 0, Math.PI * 2, 0, moonAlpha);
+    const moonDome = new THREE.Mesh(moonDomeGeo, luaWhiteMoonMat);
+    moonCapGroup.add(moonDome);
+
+    // Beveled rim ring
+    const moonRimGeo = new THREE.TorusGeometry(moonR * 0.99, 0.016, 12, 48);
+    const moonRim = new THREE.Mesh(moonRimGeo, luaWhiteMoonMat);
+    moonRim.position.y = Math.cos(moonAlpha) * (R_PLANET + 0.024);
+    moonRim.rotation.x = Math.PI / 2;
+    moonCapGroup.add(moonRim);
+
+    const moonQuat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), moonDir);
+    const moonAssemEuler = new THREE.Euler().setFromQuaternion(moonQuat);
+    moonCapGroup.rotation.copy(moonAssemEuler);
+
     registerPart(
-      bracketL,
-      new THREE.Vector3(-2.2, -0.9, 0.4),
-      new THREE.Euler(0, 0.25, 0),
-      new THREE.Vector3(-7.2, -4.8, 3.8),
-      new THREE.Euler(0.8, 0.4, 0.9)
+      moonCapGroup,
+      new THREE.Vector3(0, 0, 0),
+      moonAssemEuler,
+      new THREE.Vector3(2.4, 2.4, 3.4),
+      new THREE.Euler(moonAssemEuler.x - 0.25, moonAssemEuler.y + 0.35, moonAssemEuler.z + 0.15)
     );
 
-    const bracketRGeo = createBracketGeometry(true);
-    const bracketR = new THREE.Mesh(bracketRGeo, mats.glassCyan);
+    // ─────────────────────────────────────────────────────────────
+    // 4. BEVELED 3D "Lua" TYPOGRAPHY (Extruded from Official SVG)
+    // ─────────────────────────────────────────────────────────────
+    const pathL = 'M258.1,627.8h117.3v26.7H227.8V417h30.3V627.8z';
+    const pathU = 'M515.5,654.5v-23.8c-16,22.5-31.9,31.3-57,31.3c-33.2,0-54.4-18.2-54.4-46.6V483.8h27v120.9c0,20.5,13.7,33.6,35.2,33.6c28.3,0,46.6-22.8,46.6-57.7v-96.8h27v170.7H515.5z';
+    const pathA = 'M738.4,659.1c-8.8,2.3-13,2.9-18.6,2.9c-17.6,0-26.1-7.8-28-25.1c-19.2,17.6-36.5,25.1-58,25.1c-34.5,0-56-19.5-56-50.5c0-22.2,10.1-37.5,30-45.6c10.4-4.2,16.3-5.5,54.7-10.4c21.5-2.6,28.3-7.5,28.3-18.9v-7.2c0-16.3-13.7-25.4-38.1-25.4c-25.4,0-37.8,9.4-40.1,30.3h-27.4c0.7-16.9,3.9-26.7,11.7-35.5c11.4-12.7,31.9-19.9,56.7-19.9c42,0,64.2,16.3,64.2,46.6v100.4c0,8.5,5.2,13.4,14.7,13.4c1.6,0,2.9,0,5.9-0.7V659.1z M690.8,570.1c-9.1,4.2-15,5.5-43.7,9.4c-29,4.2-41.1,13.4-41.1,31.3c0,17.3,12.4,27.4,33.6,27.4c16,0,29.3-5.2,40.4-15.3c8.1-7.5,10.8-13,10.8-22.2V570.1z';
+
+    const letterExtrudeSettings = {
+      depth: 0.12,
+      bevelEnabled: true,
+      bevelThickness: 0.02,
+      bevelSize: 0.02,
+      bevelSegments: 3
+    };
+
+    const TEXT_SCALE = LUA_SCALE * 0.78;
+    const TEXT_CX = 483.1;
+    const TEXT_CY = 539.5;
+    const TEXT_OFFSET_Y = -0.34;
+
+    const shapeL = normalizeSvgShape(parseSvgPathToShapes(pathL)[0], true, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y);
+    const geoL = projectGeometryOntoSphere(new THREE.ExtrudeGeometry(shapeL, letterExtrudeSettings), R_PLANET, 0.022);
+    const meshL = new THREE.Mesh(geoL, luaLettersMat);
     registerPart(
-      bracketR,
-      new THREE.Vector3(2.2, -0.9, 0.4),
-      new THREE.Euler(0, -0.25, 0),
-      new THREE.Vector3(7.2, -4.5, 4.0),
-      new THREE.Euler(-0.7, -0.5, -0.8)
-    );
-
-    // B: Chamfered Type Chevrons < and >
-    function createChevronToken(flip = false) {
-      const group = new THREE.Group();
-      const armGeo = new THREE.BoxGeometry(0.2, 1.1, 0.2);
-
-      const topArm = new THREE.Mesh(armGeo, mats.neonCyan);
-      topArm.position.set(flip ? 0.32 : -0.32, 0.35, 0);
-      topArm.rotation.z = flip ? Math.PI / 4 : -Math.PI / 4;
-      group.add(topArm);
-
-      const btmArm = new THREE.Mesh(armGeo, mats.neonCyan);
-      btmArm.position.set(flip ? 0.32 : -0.32, -0.35, 0);
-      btmArm.rotation.z = flip ? -Math.PI / 4 : Math.PI / 4;
-      group.add(btmArm);
-
-      // Outer metallic armor casing
-      const armorGeo = new THREE.BoxGeometry(0.24, 1.15, 0.12);
-      const topArmor = new THREE.Mesh(armorGeo, mats.titaniumBody);
-      topArmor.position.copy(topArm.position);
-      topArmor.position.z -= 0.08;
-      topArmor.rotation.copy(topArm.rotation);
-      group.add(topArmor);
-
-      return group;
-    }
-
-    const chevL = createChevronToken(false);
-    registerPart(
-      chevL,
-      new THREE.Vector3(-2.5, 0.2, 0.6),
-      new THREE.Euler(0, 0.2, 0),
-      new THREE.Vector3(-8.5, 3.2, 5.0),
-      new THREE.Euler(0.7, -0.9, 0.4)
-    );
-
-    const chevR = createChevronToken(true);
-    registerPart(
-      chevR,
-      new THREE.Vector3(2.5, 0.2, 0.6),
-      new THREE.Euler(0, -0.2, 0),
-      new THREE.Vector3(8.5, 3.5, 4.8),
-      new THREE.Euler(-0.6, 1.0, -0.3)
-    );
-
-    // C: Beveled Chrome "T" Glyph
-    const tGroup = new THREE.Group();
-    const tBarH = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.22, 0.22), mats.chromeMetal);
-    tBarH.position.y = 0.52;
-    tGroup.add(tBarH);
-    const tBarV = new THREE.Mesh(new THREE.BoxGeometry(0.24, 1.1, 0.22), mats.chromeMetal);
-    tBarV.position.y = 0;
-    tGroup.add(tBarV);
-    registerPart(
-      tGroup,
-      new THREE.Vector3(0, 1.5, 0.7),
+      meshL,
+      new THREE.Vector3(0, 0, 0),
       new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, 7.2, 6.0),
-      new THREE.Euler(1.2, 0.4, -0.5)
+      new THREE.Vector3(-2.4, 0.8, 3.8),
+      new THREE.Euler(0.2, -0.4, 0.1)
+    );
+
+    const shapeU = normalizeSvgShape(parseSvgPathToShapes(pathU)[0], true, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y);
+    const geoU = projectGeometryOntoSphere(new THREE.ExtrudeGeometry(shapeU, letterExtrudeSettings), R_PLANET, 0.022);
+    const meshU = new THREE.Mesh(geoU, luaLettersMat);
+    registerPart(
+      meshU,
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Euler(0, 0, 0),
+      new THREE.Vector3(0, 1.4, 4.2),
+      new THREE.Euler(-0.3, 0, 0)
+    );
+
+    const rawA = parseSvgPathToShapes(pathA);
+    const shapeA = normalizeSvgShape(rawA[0], true, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y);
+    shapeA.holes.push(normalizeSvgShape(rawA[1], false, TEXT_SCALE, TEXT_CX, TEXT_CY, TEXT_OFFSET_Y));
+    const geoA = projectGeometryOntoSphere(new THREE.ExtrudeGeometry(shapeA, letterExtrudeSettings), R_PLANET, 0.022);
+    const meshA = new THREE.Mesh(geoA, luaLettersMat);
+    registerPart(
+      meshA,
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Euler(0, 0, 0),
+      new THREE.Vector3(2.4, 0.8, 3.8),
+      new THREE.Euler(0.2, 0.4, -0.1)
     );
 
     // ─────────────────────────────────────────────────────────────
-    // 3. AUTHENTIC 3D ROBLOX SCRIPT BRICKS WITH CYLINDRICAL STUDS
+    // 5. DASHED ORBIT RING & COMPANION SATELLITE MOON
+    // ─────────────────────────────────────────────────────────────
+    const luaOrbitGroup = new THREE.Group();
+    const orbitRadius = 2.616;
+    const dashCount = 28;
+    const dashStep = (Math.PI * 2) / dashCount;
+    const dashArcLength = dashStep * 0.55;
+    const moonAngle = Math.PI / 4; // +45° upper-right
+
+    for (let i = 0; i < dashCount; i++) {
+      const startAngle = i * dashStep;
+      if (Math.abs(startAngle - moonAngle) < 0.16) continue;
+
+      const dashGeo = new THREE.TorusGeometry(orbitRadius, 0.022, 10, 16, dashArcLength);
+      const dashMesh = new THREE.Mesh(dashGeo, luaOrbitMat);
+      dashMesh.rotation.z = startAngle;
+      luaOrbitGroup.add(dashMesh);
+    }
+
+    registerPart(
+      luaOrbitGroup,
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Euler(0, 0, 0),
+      new THREE.Vector3(0, -1.8, -2.4),
+      new THREE.Euler(0.65, 0.35, 0.4)
+    );
+
+    // Companion Satellite Moon (Blue sphere on dashed orbit at +45°)
+    const satGeo = new THREE.SphereGeometry(0.542, 32, 32);
+    const luaSatMoon = new THREE.Mesh(satGeo, luaBluePlanetMat);
+    registerPart(
+      luaSatMoon,
+      new THREE.Vector3(1.85, 1.85, 0.0),
+      new THREE.Euler(0, 0, 0),
+      new THREE.Vector3(5.6, 5.0, 1.8),
+      new THREE.Euler(0.4, -0.5, 0.6)
+    );
+
+    // ─────────────────────────────────────────────────────────────
+    // 6. AUTHENTIC 3D ROBLOX SCRIPT BRICKS WITH CYLINDRICAL STUDS
     // ─────────────────────────────────────────────────────────────
     function createRobloxScriptBrick(faceMat, studMat, titleText) {
       const brickGroup = new THREE.Group();
       const bodyGeo = new THREE.BoxGeometry(1.5, 1.3, 0.4);
 
-      // Create multi-material box so the front face displays high-res code
       const materials = [
         mats.carbonDark,    // right
         mats.carbonDark,    // left
@@ -1317,173 +1368,46 @@
       return brickGroup;
     }
 
-    // ServerScript Brick (Left Wing)
+    // Left Wing: ServerScript Tablet
     const serverScriptBrick = createRobloxScriptBrick(scriptMatServer, mats.neonCyan, 'ServerScript');
     registerPart(
       serverScriptBrick,
-      new THREE.Vector3(-2.6, 1.3, -0.9),
-      new THREE.Euler(0, 0.35, 0.1),
-      new THREE.Vector3(-9.2, 6.2, -5.2),
-      new THREE.Euler(1.5, -0.9, 0.3)
+      new THREE.Vector3(-3.8, 0.1, -1.2),
+      new THREE.Euler(0, 0.38, 0.04),
+      new THREE.Vector3(-9.2, 5.2, -4.5),
+      new THREE.Euler(1.2, -0.7, 0.3)
     );
 
-    // ModuleScript Brick (Right Wing)
+    // Right Wing: ModuleScript Tablet
     const moduleScriptBrick = createRobloxScriptBrick(scriptMatModule, mats.neonPurple, 'ModuleScript');
     registerPart(
       moduleScriptBrick,
-      new THREE.Vector3(2.6, 1.3, -0.9),
-      new THREE.Euler(0, -0.35, -0.1),
-      new THREE.Vector3(9.5, 6.0, -5.5),
-      new THREE.Euler(-1.3, 1.2, -0.4)
+      new THREE.Vector3(3.8, 0.1, -1.2),
+      new THREE.Euler(0, -0.38, -0.04),
+      new THREE.Vector3(9.2, 5.2, -4.5),
+      new THREE.Euler(-1.2, 0.7, -0.3)
     );
 
-    // Parallel Actor / Worker Brick (Upper Center Rear)
-    const actorScriptBrick = createRobloxScriptBrick(scriptMatActor, mats.neonEmerald, 'ActorWorker');
-    registerPart(
-      actorScriptBrick,
-      new THREE.Vector3(0, 2.4, -1.2),
-      new THREE.Euler(-0.25, 0, 0),
-      new THREE.Vector3(0, 9.5, -6.5),
-      new THREE.Euler(1.8, 0, 0)
-    );
-
-    // ─────────────────────────────────────────────────────────────
-    // 4. LOW-LEVEL VM MEMORY BUFFERS & 3D VECTOR3 RGB GIZMO
-    // ─────────────────────────────────────────────────────────────
-
-    // 6 Hexagonal Prism Memory Buffer Cells
-    const hexGeo = new THREE.CylinderGeometry(0.44, 0.44, 0.65, 6);
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2;
-      const isCyan = i % 2 === 0;
-      const hexMesh = new THREE.Mesh(hexGeo, isCyan ? mats.glassCyan : mats.glassEmerald);
-
-      // Inner glowing core cylinder
-      const innerHexCore = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.25, 0.25, 0.67, 6),
-        isCyan ? mats.neonCyan : mats.neonEmerald
-      );
-      hexMesh.add(innerHexCore);
-
-      const assemP = new THREE.Vector3(Math.cos(angle) * 2.6, Math.sin(angle) * 1.5 - 0.2, -1.4);
-      const assemR = new THREE.Euler(0.2, angle, 0.2);
-
-      const expP = new THREE.Vector3(
-        Math.cos(angle) * 10.5 + (Math.random() - 0.5) * 3,
-        Math.sin(angle) * 8.0 + (Math.random() - 0.5) * 3,
-        (Math.random() - 0.5) * 8
-      );
-      const expR = new THREE.Euler(Math.random() * 3, Math.random() * 3, Math.random() * 3);
-      registerPart(hexMesh, assemP, assemR, expP, expR, 0.72);
-    }
-
-    // 3D Vector3 Coordinate Axes Gizmo (Lower Base)
-    const gizmoGroup = new THREE.Group();
-    const axisPivotGeo = new THREE.SphereGeometry(0.24, 20, 20);
-    const axisPivot = new THREE.Mesh(axisPivotGeo, mats.chromeMetal);
-    gizmoGroup.add(axisPivot);
-
-    function createAxisRod(dir, colorHex) {
-      const rodGroup = new THREE.Group();
-      const shaft = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.04, 0.04, 0.8, 16),
-        new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, emissiveIntensity: 0.6 })
-      );
-      shaft.position.y = 0.4;
-      rodGroup.add(shaft);
-
-      const tip = new THREE.Mesh(
-        new THREE.ConeGeometry(0.09, 0.22, 16),
-        new THREE.MeshStandardMaterial({ color: colorHex, emissive: colorHex, emissiveIntensity: 0.8 })
-      );
-      tip.position.y = 0.88;
-      rodGroup.add(tip);
-
-      if (dir === 'x') {
-        rodGroup.rotation.z = -Math.PI / 2;
-      } else if (dir === 'z') {
-        rodGroup.rotation.x = Math.PI / 2;
-      }
-      return rodGroup;
-    }
-
-    gizmoGroup.add(createAxisRod('x', 0xef4444)); // X = Red
-    gizmoGroup.add(createAxisRod('y', 0x10b981)); // Y = Green
-    gizmoGroup.add(createAxisRod('z', 0x3b82f6)); // Z = Blue
-
-    registerPart(
-      gizmoGroup,
-      new THREE.Vector3(0, -1.2, 0.8),
-      new THREE.Euler(0.2, 0.4, 0),
-      new THREE.Vector3(0, -6.5, 4.5),
-      new THREE.Euler(-0.8, 1.2, 0)
-    );
-
-    // Architectural Base Plate
-    const basePlateGeo = new THREE.BoxGeometry(4.8, 0.38, 2.2);
-    const basePlate = new THREE.Mesh(basePlateGeo, mats.carbonDark);
-    registerPart(
-      basePlate,
-      new THREE.Vector3(0, -2.1, 0),
-      new THREE.Euler(0, 0, 0),
-      new THREE.Vector3(0, -8.2, -6.0),
-      new THREE.Euler(0.6, 0, 0.2)
-    );
-
-    // ─────────────────────────────────────────────────────────────
-    // 5. 150+ CRYSTALLINE & CARBON SHARDS
-    // ─────────────────────────────────────────────────────────────
-    const shardGeos = [
-      new THREE.OctahedronGeometry(0.32, 0),
-      new THREE.TetrahedronGeometry(0.34, 0),
-      new THREE.BoxGeometry(0.48, 0.16, 0.85),
-      new THREE.ConeGeometry(0.26, 0.75, 4)
-    ];
-
-    const shardMaterials = [
-      mats.titaniumBody,
-      mats.neonCyan,
-      mats.chromeMetal,
-      mats.neonPurple,
-      mats.glassCyan
-    ];
-
-    const totalShards = 150;
-    for (let i = 0; i < totalShards; i++) {
-      const geo = shardGeos[i % shardGeos.length];
-      const mat = shardMaterials[i % shardMaterials.length];
-      const shardMesh = new THREE.Mesh(geo, mat);
-
-      const theta = Math.random() * Math.PI * 2;
-      const phi = (Math.random() - 0.5) * Math.PI;
-      const radius = 1.9 + Math.random() * 1.6;
-
-      const assemPos = new THREE.Vector3(
-        radius * Math.cos(phi) * Math.cos(theta),
-        radius * Math.sin(phi),
-        radius * Math.cos(phi) * Math.sin(theta)
-      );
-      const assemRot = new THREE.Euler(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-
-      const expDist = 8.5 + Math.random() * 9.5;
-      const expPos = new THREE.Vector3(
-        assemPos.x * (expDist / radius) + (Math.random() - 0.5) * 4.5,
-        assemPos.y * (expDist / radius) + (Math.random() - 0.5) * 4.5,
-        assemPos.z * (expDist / radius) + (Math.random() - 0.5) * 4.5
-      );
-      const expRot = new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6);
-
-      registerPart(shardMesh, assemPos, assemRot, expPos, expRot, 0.35 + Math.random() * 0.65);
-    }
-
-    // ─────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────
     // 6. SCROLL INTERPOLATION & CAMERA SPLINE
     // ─────────────────────────────────────────────────────────────
     let targetScroll = 0;
     let currentScroll = 0;
     let scrollVelocity = 0;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const testScrollParam = urlParams.get('testScroll');
+    if (testScrollParam !== null) {
+      targetScroll = Math.max(0, Math.min(1, parseFloat(testScrollParam)));
+      currentScroll = targetScroll;
+    }
+
     function updateScrollProgress() {
+      if (testScrollParam !== null) {
+        targetScroll = Math.max(0, Math.min(1, parseFloat(testScrollParam)));
+        currentScroll = targetScroll;
+        return;
+      }
       const rect = container.getBoundingClientRect();
       const scrollHeight = container.offsetHeight - window.innerHeight;
       if (scrollHeight <= 0) return;
@@ -1641,7 +1565,11 @@
       const elapsed = clock.getElapsedTime();
 
       const prevScroll = currentScroll;
-      currentScroll += (targetScroll - currentScroll) * 0.075;
+      if (testScrollParam !== null) {
+        currentScroll = targetScroll;
+      } else {
+        currentScroll += (targetScroll - currentScroll) * 0.075;
+      }
       scrollVelocity = Math.abs(currentScroll - prevScroll);
 
       mouse.x += (mouse.targetX - mouse.x) * 0.05;
@@ -1727,24 +1655,13 @@
       }
 
 
-      // Subtle celestial rotation of elements
+      // Subtle celestial rotation of internal elements
       if (quantumLattice) {
         quantumLattice.rotation.x = elapsed * 0.25;
         quantumLattice.rotation.y = elapsed * 0.35;
       }
-      if (ring1) ring1.rotation.z += 0.008;
-      if (ring2) ring2.rotation.x += 0.01;
-      if (band) band.rotation.y += 0.006;
-      if (crescentMoon) crescentMoon.rotation.y += 0.004;
-
-      // Orbiting Golden Satellite Moon
-      if (satelliteGroup) {
-        const satAngle = elapsed * 1.5;
-        satelliteGroup.position.x = Math.cos(satAngle) * 2.35;
-        satelliteGroup.position.z = Math.sin(satAngle) * 2.35;
-        satelliteGroup.position.y = Math.sin(satAngle * 2) * 0.35 + 0.9;
-        gim1.rotation.y += 0.02;
-        gim2.rotation.z += 0.025;
+      if (band) {
+        band.rotation.y += 0.006;
       }
 
       // Starfield Particle Flow
