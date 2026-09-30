@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=4.0" />
+  <link rel="stylesheet" href="style.css?v=5.0" />
 
   <!-- Critical Inline Styles for Instant 3D Scrolly HUD Rendering (Zero Cache Lag) -->
   <style>
@@ -62,6 +62,30 @@
       padding: 0.8rem 2.5rem;
       background: linear-gradient(180deg, rgba(7, 9, 14, 0.85) 0%, rgba(7, 9, 14, 0) 100%);
       pointer-events: auto;
+    }
+    .hud-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      padding: 0.35rem 0.85rem;
+      border-radius: 4px;
+    }
+    .hud-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00f2fe;
+      box-shadow: 0 0 10px #00f2fe;
+      animation: pulseBeacon 2s infinite ease-in-out;
+    }
+    .hud-status-txt {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.08em;
     }
     .luau-stage-card {
       position: absolute;
@@ -207,10 +231,10 @@
           </div>
 
           <div class="hud-right">
-            <button type="button" class="hud-audio-btn" id="hudAudioToggle" title="Toggle Sound FX">
-              <span class="audio-icon">🔊</span>
-              <span class="audio-text">FX SOUND</span>
-            </button>
+            <div class="hud-status-badge">
+              <span class="hud-pulse-dot"></span>
+              <span class="hud-status-txt">VM ENGINE // NOMINAL</span>
+            </div>
           </div>
         </div>
 
@@ -2115,7 +2139,7 @@ ZoneService.Metadata = {
   <div class="toast-container" id="toastContainer"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>window.THREE || document.write('<script src="assets/js/three.min.js"><\/script>')</script>
-  <script src="scrolly-luau-engine.js?v=4.0"></script>
-  <script src="script.js?v=4.0"></script>
+  <script src="scrolly-luau-engine.js?v=5.0"></script>
+  <script src="script.js?v=5.0"></script>
 </body>
 </html>
