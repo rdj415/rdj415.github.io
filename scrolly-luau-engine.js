@@ -152,11 +152,11 @@
     // COSMIC SOLAR SYSTEM ENGINE (Background Celestial System)
     // ═════════════════════════════════════════════════════════════
     const solarSystemGroup = new THREE.Group();
-    // Positioned in the celestial background elevated above hero text
-    solarSystemGroup.position.set(0, 5.2, -19);
-    solarSystemGroup.rotation.x = 0.40;
-    solarSystemGroup.rotation.y = -0.06;
-    solarSystemGroup.rotation.z = 0.04;
+    // Positioned in deep celestial background for panoramic framing behind typography
+    solarSystemGroup.position.set(0, 3.2, -25);
+    solarSystemGroup.rotation.x = 0.38;
+    solarSystemGroup.rotation.y = -0.05;
+    solarSystemGroup.rotation.z = 0.03;
     scene.add(solarSystemGroup);
 
     // --- PROCEDURAL PLANETARY TEXTURE GENERATORS ---
@@ -489,8 +489,8 @@
     const sunTexture = createSunTexture();
     const sunRaysTexture = createSunRaysTexture();
 
-    // Balanced Sun Core (Radius 1.85, non-intrusive, majestic)
-    const sunGeo = new THREE.SphereGeometry(1.85, 36, 36);
+    // Balanced Sun Core (Radius 1.65, non-intrusive, majestic crown)
+    const sunGeo = new THREE.SphereGeometry(1.65, 36, 36);
     const sunMat = new THREE.MeshBasicMaterial({
       map: sunTexture
     });
@@ -498,7 +498,7 @@
     sunGroup.add(sunCore);
 
     // Glowing Inner Chromosphere
-    const sunInnerHaloGeo = new THREE.SphereGeometry(2.15, 32, 32);
+    const sunInnerHaloGeo = new THREE.SphereGeometry(1.95, 32, 32);
     const sunInnerHaloMat = new THREE.MeshBasicMaterial({
       color: 0xf59e0b,
       transparent: true,
@@ -509,7 +509,7 @@
     sunGroup.add(sunCorona);
 
     // Outer Radiant Ray Corona (Billboard rotating plane)
-    const sunRaysGeo = new THREE.PlaneGeometry(8.5, 8.5);
+    const sunRaysGeo = new THREE.PlaneGeometry(7.2, 7.2);
     const sunRaysMat = new THREE.MeshBasicMaterial({
       map: sunRaysTexture,
       transparent: true,
@@ -522,7 +522,7 @@
     sunGroup.add(sunRays);
 
     // Warm Stellar Point Light
-    const sunLight = new THREE.PointLight(0xfff5e6, 5.2, 130);
+    const sunLight = new THREE.PointLight(0xfff5e6, 5.5, 120);
     sunGroup.add(sunLight);
 
     solarSystemGroup.add(sunGroup);
@@ -552,55 +552,55 @@
     // Planetary Cache
     const solarPlanets = [];
 
-    // 1. Mercury (Speed: 0.72)
-    const mercOrbit = 5.2;
-    solarSystemGroup.add(createOrbitPath(mercOrbit, 0x94a3b8, 0.18));
+    // 1. Mercury (Speed: 0.75)
+    const mercOrbit = 3.2;
+    solarSystemGroup.add(createOrbitPath(mercOrbit, 0x94a3b8, 0.20));
     const mercMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.24, 24, 24),
+      new THREE.SphereGeometry(0.18, 24, 24),
       new THREE.MeshStandardMaterial({ map: createMercuryTexture(), roughness: 0.88, metalness: 0.15 })
     );
     solarSystemGroup.add(mercMesh);
-    solarPlanets.push({ mesh: mercMesh, orbitRadius: mercOrbit, speed: 0.72, angle: Math.random() * Math.PI * 2, rotSpeed: 0.4 });
+    solarPlanets.push({ mesh: mercMesh, orbitRadius: mercOrbit, speed: 0.75, angle: Math.random() * Math.PI * 2, rotSpeed: 0.4 });
 
-    // 2. Venus (Speed: 0.52)
-    const venusOrbit = 7.8;
-    solarSystemGroup.add(createOrbitPath(venusOrbit, 0xfde047, 0.18));
+    // 2. Venus (Speed: 0.55)
+    const venusOrbit = 4.6;
+    solarSystemGroup.add(createOrbitPath(venusOrbit, 0xfde047, 0.20));
     const venusMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.38, 26, 26),
+      new THREE.SphereGeometry(0.28, 26, 26),
       new THREE.MeshStandardMaterial({ map: createVenusTexture(), roughness: 0.35, metalness: 0.1 })
     );
     solarSystemGroup.add(venusMesh);
-    solarPlanets.push({ mesh: venusMesh, orbitRadius: venusOrbit, speed: 0.52, angle: Math.random() * Math.PI * 2, rotSpeed: 0.3 });
+    solarPlanets.push({ mesh: venusMesh, orbitRadius: venusOrbit, speed: 0.55, angle: Math.random() * Math.PI * 2, rotSpeed: 0.3 });
 
-    // 3. Earth & Orbiting Moon (Speed: 0.38)
-    const earthOrbit = 11.2;
-    solarSystemGroup.add(createOrbitPath(earthOrbit, 0x38bdf8, 0.22));
+    // 3. Earth & Orbiting Moon (Speed: 0.40)
+    const earthOrbit = 6.2;
+    solarSystemGroup.add(createOrbitPath(earthOrbit, 0x38bdf8, 0.24));
     const earthGroup = new THREE.Group();
 
     // Earth Base Sphere
     const earthMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.48, 30, 30),
+      new THREE.SphereGeometry(0.35, 30, 30),
       new THREE.MeshStandardMaterial({ map: createEarthTexture(), roughness: 0.45, metalness: 0.15 })
     );
     earthGroup.add(earthMesh);
 
     // Earth Swirling Cloud Layer
     const earthCloudsMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.495, 28, 28),
+      new THREE.SphereGeometry(0.365, 28, 28),
       new THREE.MeshStandardMaterial({ map: createEarthCloudsTexture(), transparent: true, opacity: 0.55, roughness: 0.8 })
     );
     earthGroup.add(earthCloudsMesh);
 
     // Earth Atmosphere Rim Glow
     const earthAtmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.52, 24, 24),
+      new THREE.SphereGeometry(0.385, 24, 24),
       new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, side: THREE.BackSide })
     );
     earthGroup.add(earthAtmosphere);
 
     // Earth's Moon
     const moonMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.14, 18, 18),
+      new THREE.SphereGeometry(0.10, 18, 18),
       new THREE.MeshStandardMaterial({ map: createMoonTexture(), roughness: 0.85 })
     );
     earthGroup.add(moonMesh);
@@ -609,28 +609,28 @@
     solarPlanets.push({
       mesh: earthGroup,
       orbitRadius: earthOrbit,
-      speed: 0.38,
+      speed: 0.40,
       angle: Math.random() * Math.PI * 2,
       selfRotate: earthMesh,
       clouds: earthCloudsMesh,
       rotSpeed: 0.8,
       moonMesh: moonMesh,
-      moonOrbit: 1.1,
+      moonOrbit: 0.82,
       moonAngle: 0
     });
 
-    // 4. Mars (Speed: 0.28)
-    const marsOrbit = 15.0;
-    solarSystemGroup.add(createOrbitPath(marsOrbit, 0xf87171, 0.18));
+    // 4. Mars (Speed: 0.30)
+    const marsOrbit = 7.8;
+    solarSystemGroup.add(createOrbitPath(marsOrbit, 0xf87171, 0.20));
     const marsMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.32, 24, 24),
+      new THREE.SphereGeometry(0.24, 24, 24),
       new THREE.MeshStandardMaterial({ map: createMarsTexture(), roughness: 0.75 })
     );
     solarSystemGroup.add(marsMesh);
-    solarPlanets.push({ mesh: marsMesh, orbitRadius: marsOrbit, speed: 0.28, angle: Math.random() * Math.PI * 2, rotSpeed: 0.7 });
+    solarPlanets.push({ mesh: marsMesh, orbitRadius: marsOrbit, speed: 0.30, angle: Math.random() * Math.PI * 2, rotSpeed: 0.7 });
 
     // 5. Main Asteroid Belt (Between Mars & Jupiter)
-    const asteroidCount = 320;
+    const asteroidCount = 260;
     const asteroidGeo = new THREE.BufferGeometry();
     const asteroidPos = new Float32Array(asteroidCount * 3);
     const asteroidColors = new Float32Array(asteroidCount * 3);
@@ -638,9 +638,9 @@
 
     for (let i = 0; i < asteroidCount; i++) {
       const aAng = Math.random() * Math.PI * 2;
-      const aRad = 17.5 + (Math.random() - 0.5) * 2.8;
+      const aRad = 9.2 + (Math.random() - 0.5) * 1.5;
       asteroidPos[i * 3] = Math.cos(aAng) * aRad;
-      asteroidPos[i * 3 + 1] = (Math.random() - 0.5) * 0.9;
+      asteroidPos[i * 3 + 1] = (Math.random() - 0.5) * 0.6;
       asteroidPos[i * 3 + 2] = Math.sin(aAng) * aRad;
 
       const col = astPalette[Math.floor(Math.random() * astPalette.length)];
@@ -653,7 +653,7 @@
     const asteroidBelt = new THREE.Points(
       asteroidGeo,
       new THREE.PointsMaterial({
-        size: 0.28,
+        size: 0.22,
         map: pointSpriteTexture,
         vertexColors: true,
         transparent: true,
@@ -663,28 +663,28 @@
     );
     solarSystemGroup.add(asteroidBelt);
 
-    // 6. Jupiter with Banded Atmosphere & Great Red Spot (Speed: 0.16)
-    const jupOrbit = 22.8;
-    solarSystemGroup.add(createOrbitPath(jupOrbit, 0xfbbf24, 0.18));
+    // 6. Jupiter with Banded Atmosphere & Great Red Spot (Speed: 0.18)
+    const jupOrbit = 11.5;
+    solarSystemGroup.add(createOrbitPath(jupOrbit, 0xfbbf24, 0.20));
     const jupMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(1.15, 34, 34),
+      new THREE.SphereGeometry(0.72, 34, 34),
       new THREE.MeshStandardMaterial({ map: createJupiterTexture(), roughness: 0.45, metalness: 0.1 })
     );
     solarSystemGroup.add(jupMesh);
-    solarPlanets.push({ mesh: jupMesh, orbitRadius: jupOrbit, speed: 0.16, angle: Math.random() * Math.PI * 2, rotSpeed: 1.4 });
+    solarPlanets.push({ mesh: jupMesh, orbitRadius: jupOrbit, speed: 0.18, angle: Math.random() * Math.PI * 2, rotSpeed: 1.4 });
 
-    // 7. Saturn & High-Fidelity Ring System (Speed: 0.11)
-    const satOrbit = 29.5;
-    solarSystemGroup.add(createOrbitPath(satOrbit, 0xfde68a, 0.18));
+    // 7. Saturn & High-Fidelity Ring System (Speed: 0.12)
+    const satOrbit = 14.0;
+    solarSystemGroup.add(createOrbitPath(satOrbit, 0xfde68a, 0.20));
     const saturnGroup = new THREE.Group();
     const saturnSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.92, 32, 32),
+      new THREE.SphereGeometry(0.60, 32, 32),
       new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.45, metalness: 0.15 })
     );
     saturnGroup.add(saturnSphere);
 
     // Multi-Ring Disk
-    const satRingGeo = new THREE.RingGeometry(1.22, 2.55, 96);
+    const satRingGeo = new THREE.RingGeometry(0.80, 1.70, 96);
     const satRingMat = new THREE.MeshStandardMaterial({
       map: createSaturnRingTexture(),
       side: THREE.DoubleSide,
@@ -698,32 +698,32 @@
     saturnGroup.add(satRing);
 
     solarSystemGroup.add(saturnGroup);
-    solarPlanets.push({ mesh: saturnGroup, orbitRadius: satOrbit, speed: 0.11, angle: Math.random() * Math.PI * 2, selfRotate: saturnSphere, rotSpeed: 1.2 });
+    solarPlanets.push({ mesh: saturnGroup, orbitRadius: satOrbit, speed: 0.12, angle: Math.random() * Math.PI * 2, selfRotate: saturnSphere, rotSpeed: 1.2 });
 
-    // 8. Uranus with Tilted Vertical Rings (Speed: 0.075)
-    const uranOrbit = 36.5;
-    solarSystemGroup.add(createOrbitPath(uranOrbit, 0x67e8f9, 0.16));
+    // 8. Uranus with Tilted Vertical Rings (Speed: 0.08)
+    const uranOrbit = 16.5;
+    solarSystemGroup.add(createOrbitPath(uranOrbit, 0x67e8f9, 0.18));
     const uranGroup = new THREE.Group();
     const uranSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.65, 28, 28),
+      new THREE.SphereGeometry(0.42, 28, 28),
       new THREE.MeshStandardMaterial({ map: createUranusTexture(), roughness: 0.3, metalness: 0.1 })
     );
     uranGroup.add(uranSphere);
 
     const uranRing = new THREE.Mesh(
-      new THREE.RingGeometry(0.85, 1.22, 48),
+      new THREE.RingGeometry(0.55, 0.82, 48),
       new THREE.MeshBasicMaterial({ color: 0xa5f3fc, side: THREE.DoubleSide, transparent: true, opacity: 0.45 })
     );
     uranRing.rotation.x = Math.PI * 0.48; // Extreme Axial Tilt (~85°)
     uranGroup.add(uranRing);
     solarSystemGroup.add(uranGroup);
-    solarPlanets.push({ mesh: uranGroup, orbitRadius: uranOrbit, speed: 0.075, angle: Math.random() * Math.PI * 2, selfRotate: uranSphere, rotSpeed: 0.8 });
+    solarPlanets.push({ mesh: uranGroup, orbitRadius: uranOrbit, speed: 0.08, angle: Math.random() * Math.PI * 2, selfRotate: uranSphere, rotSpeed: 0.8 });
 
     // 9. Neptune with Methane Storms (Speed: 0.05)
-    const nepOrbit = 43.0;
-    solarSystemGroup.add(createOrbitPath(nepOrbit, 0x60a5fa, 0.15));
+    const nepOrbit = 19.0;
+    solarSystemGroup.add(createOrbitPath(nepOrbit, 0x60a5fa, 0.16));
     const nepMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.62, 28, 28),
+      new THREE.SphereGeometry(0.40, 28, 28),
       new THREE.MeshStandardMaterial({ map: createNeptuneTexture(), roughness: 0.3, metalness: 0.15 })
     );
     solarSystemGroup.add(nepMesh);
@@ -1669,9 +1669,12 @@
       if (currentScroll < 0.12) {
         // Pure Stage 0: ONLY Solar System is visible!
         solarSystemGroup.visible = true;
-        solarSystemGroup.position.set(0, 5.2, -19);
+        solarSystemGroup.position.set(0, 3.2, -25);
         solarSystemGroup.scale.set(1, 1, 1);
 
+        keyLight.intensity = 0.35;
+        rimLight.intensity = 0.35;
+        frontFillLight.intensity = 0.45;
         mainGroup.visible = false;
         gridHelper.visible = false;
         ground.visible = false;
@@ -1680,9 +1683,12 @@
         // Transition between Stage 0 and Stage 1
         const tExit = (currentScroll - 0.12) / 0.12; // 0.0 -> 1.0
         solarSystemGroup.visible = true;
-        solarSystemGroup.position.set(0, 5.2 + tExit * 2.0, -19 - tExit * 50);
+        solarSystemGroup.position.set(0, 3.2 + tExit * 2.0, -25 - tExit * 50);
         solarSystemGroup.scale.setScalar(Math.max(0.01, 1 - tExit * 0.75));
 
+        keyLight.intensity = 0.35 + tExit * 2.25;
+        rimLight.intensity = 0.35 + tExit * 2.65;
+        frontFillLight.intensity = 0.45 + tExit * 0.85;
         mainGroup.visible = true;
         mainGroup.scale.setScalar(Math.min(1, tExit * 1.05));
         gridHelper.visible = true;
@@ -1691,6 +1697,9 @@
       } else {
         // Stages 1-5: Full Luau Assembly (Solar system completely hidden)
         solarSystemGroup.visible = false;
+        keyLight.intensity = 2.6;
+        rimLight.intensity = 3.0;
+        frontFillLight.intensity = 1.3;
         mainGroup.visible = true;
         mainGroup.scale.set(1, 1, 1);
         gridHelper.visible = true;
