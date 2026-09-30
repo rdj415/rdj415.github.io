@@ -46,6 +46,7 @@
         <a href="#hero" class="nav-link active">Overview</a>
         <a href="#systems" class="nav-link">Core Systems & Libraries</a>
         <a href="#code-showroom" class="nav-link">Production Code</a>
+        <a href="#services" class="nav-link">Services & Terms</a>
         <a href="#technologies" class="nav-link">Tech Stack</a>
         <a href="#contact" class="nav-link">Contact</a>
       </nav>
@@ -143,7 +144,7 @@
             </div>
 
             <div class="terminal-code">
-              <pre><code><span class="t-comment">-- [SBAC / ServerModules / AIService.luau]</span>
+              <pre><code><span class="t-comment">-- [ProductionCore / ServerModules / AIService.luau]</span>
 <span class="t-comment">-- Multi-agent autonomous navigation, raycast obstacle steering & vehicle torque physics</span>
 <span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
 <span class="t-kw">local</span> <span class="t-def">Workspace</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Workspace"</span>)
@@ -233,7 +234,7 @@ AIService.Metadata = {
             </div>
             
             <div class="terminal-footer">
-              <span class="term-status"><span class="pulse-circle"></span> Source: SBAC / ServerModules / AIService.luau</span>
+              <span class="term-status"><span class="pulse-circle"></span> Source: ProductionCore / ServerModules / AIService.luau</span>
               <span class="term-lang">Real Production Code</span>
             </div>
           </div>
@@ -449,7 +450,7 @@ AIService.Metadata = {
           <span class="section-tag">// PRODUCTION CODE BASE</span>
           <h2 class="section-title">Production Code Showcase</h2>
           <p class="section-desc">
-            Direct implementations extracted from the <code>SBAC/MainGameMode/src</code> codebase. Demonstrates type safety, algorithmic rigor, and resilient server-side design.
+            Direct implementations extracted from production codebase architecture. Demonstrates type safety, algorithmic rigor, and resilient server-side design.
           </p>
         </div>
 
@@ -495,7 +496,7 @@ AIService.Metadata = {
               <span>Source: src/shared/SharedModules/AtomicBinding.luau • Recursive tree pattern binder & destructor lifecycle</span>
               <button class="btn-copy-code" data-clipboard-target="#raw-atomic">Copy Code</button>
             </div>
-            <pre><code id="raw-atomic"><span class="t-comment">-- [SBAC / Shared / SharedModules / AtomicBinding.luau]</span>
+            <pre><code id="raw-atomic"><span class="t-comment">-- [ProductionCore / Shared / SharedModules / AtomicBinding.luau]</span>
 <span class="t-comment">-- Custom pattern-matching library: Resolves hierarchical instance trees with automated destructors</span>
 <span class="t-kw">local</span> RootAlias = <span class="t-str">"root"</span>
 
@@ -639,7 +640,7 @@ AtomicBinding.__index = AtomicBinding
               <span>Source: src/shared/ModuleLoader.luau • Phased lifecycle orchestration (Init / Start) & boot pacing</span>
               <button class="btn-copy-code" data-clipboard-target="#raw-loader">Copy Code</button>
             </div>
-            <pre><code id="raw-loader"><span class="t-comment">-- [SBAC / Shared / ModuleLoader.luau]</span>
+            <pre><code id="raw-loader"><span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
 <span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and progress states</span>
 <span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
 <span class="t-kw">local</span> <span class="t-def">ReplicatedStorage</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"ReplicatedStorage"</span>)
@@ -705,7 +706,7 @@ AtomicBinding.__index = AtomicBinding
               <button class="btn-copy-code" data-clipboard-target="#raw-anticheat">Copy Code</button>
             </div>
             <pre><code id="raw-anticheat"><span class="t-comment">--!strict</span>
-<span class="t-comment">-- [SBAC / ServerModules / AntiCheatService.luau]</span>
+<span class="t-comment">-- [ProductionCore / ServerModules / AntiCheatService.luau]</span>
 <span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
 <span class="t-kw">local</span> <span class="t-def">RunService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"RunService"</span>)
 
@@ -801,7 +802,7 @@ AntiCheatService.Metadata = {
               <button class="btn-copy-code" data-clipboard-target="#raw-buffer">Copy Code</button>
             </div>
             <pre><code id="raw-buffer"><span class="t-comment">--!strict</span>
-<span class="t-comment">-- [SBAC / Shared / Packages / BufferUtil.luau]</span>
+<span class="t-comment">-- [ProductionCore / Shared / Packages / BufferUtil.luau]</span>
 <span class="t-kw">local</span> BufferUtil = {}
 
 <span class="t-kw">function</span> BufferUtil.<span class="t-fn">WriteVector3</span>(b: <span class="t-type">buffer</span>, offset: <span class="t-type">number</span>, v: <span class="t-type">Vector3</span>): <span class="t-type">number</span>
@@ -855,7 +856,7 @@ AntiCheatService.Metadata = {
               <button class="btn-copy-code" data-clipboard-target="#raw-ai">Copy Code</button>
             </div>
             <pre><code id="raw-ai"><span class="t-comment">--!strict</span>
-<span class="t-comment">-- [SBAC / ServerModules / AIService.luau]</span>
+<span class="t-comment">-- [ProductionCore / ServerModules / AIService.luau]</span>
 <span class="t-kw">local function</span> <span class="t-fn">_isValidTargetForStrategy</span>(npc: <span class="t-type">Model</span>, targetChar: <span class="t-type">Model</span>): <span class="t-type">boolean</span>
     <span class="t-kw">local</span> data = _npcs[npc]
     <span class="t-kw">if not</span> data <span class="t-kw">then return true end</span>
@@ -1252,6 +1253,164 @@ ZoneService.Metadata = {
 <span class="t-kw">return</span> ZoneService</code></pre>
           </div>
 
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ENGINEERING SERVICES & COMMISSIONS
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="section" id="services">
+      <div class="container">
+        
+        <div class="section-header">
+          <span class="section-tag">// FREELANCE COMMISSIONS & LONG-TERM ROLES</span>
+          <h2 class="section-title">Engineering Services & Standards</h2>
+          <p class="section-desc">
+            Production-tested backend and client systems delivered on milestone-based schedules with strict security and zero memory leaks.
+          </p>
+        </div>
+
+        <div class="services-grid">
+
+          <div class="service-card">
+            <div class="service-icon">⚔️</div>
+            <div class="service-body">
+              <h3 class="service-title">Combat & Weapon Systems</h3>
+              <p class="service-desc">
+                Server-validated raycast hitboxes, lag compensation, combo state machines, stun/knockback physics, and modular ability pipelines with cooldown managers.
+              </p>
+              <div class="service-tags">
+                <span>Hitboxes</span>
+                <span>State Machines</span>
+                <span>Raycasting</span>
+                <span>Ability Pipelining</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">🛡️</div>
+            <div class="service-body">
+              <h3 class="service-title">Anti-Cheat & Exploit Defense</h3>
+              <p class="service-desc">
+                Authoritative server audits catching speed hacks, teleportation, noclip, flight, and suspicious remote injection with automated universe ban logs.
+              </p>
+              <div class="service-tags">
+                <span>Server Sanity Checks</span>
+                <span>Displacement Validation</span>
+                <span>Rate-Limiting</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">💾</div>
+            <div class="service-body">
+              <h3 class="service-title">Data Architecture & Economy</h3>
+              <p class="service-desc">
+                Production-grade data stores via session-locking ProfileService, anti-dupe item transactions, cross-server inventory syncing, and global leaderboards.
+              </p>
+              <div class="service-tags">
+                <span>ProfileService</span>
+                <span>Anti-Dupe</span>
+                <span>Trading Engines</span>
+                <span>Data Migration</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">⚡</div>
+            <div class="service-body">
+              <h3 class="service-title">Network & Buffer Optimization</h3>
+              <p class="service-desc">
+                Low-latency multiplayer replication using raw Luau <code>buffer</code> manipulation, spatial grid indexing for zone queries, and zero-allocation loops.
+              </p>
+              <div class="service-tags">
+                <span>Buffer API</span>
+                <span>Spatial Indexing</span>
+                <span>MicroProfiler</span>
+                <span>Zero-GC</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">🏰</div>
+            <div class="service-body">
+              <h3 class="service-title">Core Gameplay & Progression</h3>
+              <p class="service-desc">
+                Round managers, clan/guild structures with persistent upgrades, player leveling/XP curves, daily rewards, dynamic shops, and live admin panels.
+              </p>
+              <div class="service-tags">
+                <span>Clan Systems</span>
+                <span>Round Loops</span>
+                <span>Admin Dashboards</span>
+                <span>XP Engines</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="service-card">
+            <div class="service-icon">📱</div>
+            <div class="service-body">
+              <h3 class="service-title">Cross-Platform UI & Keybinds</h3>
+              <p class="service-desc">
+                Unified input abstraction seamlessly supporting PC, Mac, Console (Gamepad), and Mobile touch devices, complete with responsive HUDs and setting suites.
+              </p>
+              <div class="service-tags">
+                <span>ContextActionService</span>
+                <span>Gamepad</span>
+                <span>Mobile UX</span>
+                <span>Dynamic Scaling</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Working Standards & Trust Badges -->
+        <div class="standards-banner">
+          <div class="standards-header">
+            <span class="standards-title">Collaboration Standards & Guarantee</span>
+            <span class="standards-subtitle">How I collaborate with studio owners & indie teams</span>
+          </div>
+
+          <div class="standards-grid">
+            <div class="standard-item">
+              <span class="standard-icon">🔒</span>
+              <div class="standard-text">
+                <strong>Milestone / Escrow Payouts</strong>
+                <p>50% upfront or verified RoDevs Middleman / Escrow supported. Zero surprise terms.</p>
+              </div>
+            </div>
+
+            <div class="standard-item">
+              <span class="standard-icon">⏱️</span>
+              <div class="standard-text">
+                <strong>Fast Turnaround</strong>
+                <p>1–3 days for mechanics and systems; 1–2 weeks for comprehensive frameworks.</p>
+              </div>
+            </div>
+
+            <div class="standard-item">
+              <span class="standard-icon">💎</span>
+              <div class="standard-text">
+                <strong>Type-Strict Architecture</strong>
+                <p>100% <code>--!strict</code> Luau coverage, modular separation, and zero dangling connections.</p>
+              </div>
+            </div>
+
+            <div class="standard-item">
+              <span class="standard-icon">📡</span>
+              <div class="standard-text">
+                <strong>Transparent Communication</strong>
+                <p>Daily commits, Discord screen shares, and detailed API documentation included.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
