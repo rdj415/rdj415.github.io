@@ -1,26 +1,3 @@
-/**
- * ══════════════════════════════════════════════════════════════
- * SCROLLY-LUAU-ENGINE.JS (v5.0 - Master Luau Monument)
- * 3D Scrollytelling Exploded-View Assembly Engine (Three.js)
- * 
- * Features:
- *   - Iconic 3D Luau Celestial Core (Dual-Shell Planet, Quantum Icosahedron,
- *     High-Refraction Optical Mantle with Circuit Traces)
- *   - Sculpted 3D Extruded Crescent Moon with Cyan Neon Edge Piping
- *   - Orbiting Polished Gold Celestial Moon with Dual Gimbal Rings & Orbit Track
- *   - Sculpted 3D Type System Glyphs: Beveled < T > & Parametric Curly Braces { }
- *   - Authentic 3D Roblox Architectural Blocks with Real Cylindrical Studs &
- *     512x512 Hi-Res Luau Syntax Textures (ServerScript, ModuleScript, Parallel Actor)
- *   - Low-Level VM Memory Hex Prisms (buffer.create / SIMD) & Vector3 RGB Axis Gizmo
- *   - Dynamic Laser Blueprint Alignment Rays (Exploded CAD Engineering Schematic)
- *   - 150+ Holographic Shards & 550 Starfield Particles
- *   - Calibrated 3D Camera Spline (Balanced Focal Length, Zero Clipping)
- *   - Damped Inertia Lerp Loop (Fluid 60-120 FPS)
- *   - Cyberpunk Telemetry Speedometer & LED Gauge Sync
- *   - PURE SILENT OPERATION (Zero Audio / Sound Effects)
- * ══════════════════════════════════════════════════════════════
- */
-
 (function () {
   'use strict';
 
@@ -36,7 +13,6 @@
       const stage = document.getElementById('webgl-stage');
       if (!container || !stage) return;
 
-    // --- Three.js Scene Setup ---
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x07090e, 0.012);
 
@@ -54,7 +30,6 @@
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.25;
 
-    // --- Lighting Rig ---
     const ambientLight = new THREE.AmbientLight(0x0e1422, 1.5);
     scene.add(ambientLight);
 
@@ -74,7 +49,6 @@
     coreLight.position.set(0, 0.9, 0);
     scene.add(coreLight);
 
-    // --- Floor Grid & Dark Stage Plate ---
     const gridHelper = new THREE.GridHelper(120, 60, 0x00f2fe, 0x111c2e);
     gridHelper.position.y = -4.5;
     scene.add(gridHelper);
@@ -90,7 +64,6 @@
     ground.position.y = -4.52;
     scene.add(ground);
 
-    // --- Starfield & Cyber Dust Particles ---
     const particleCount = 550;
     const particleGeo = new THREE.BufferGeometry();
     const particlePos = new Float32Array(particleCount * 3);
@@ -117,7 +90,6 @@
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
     particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
 
-    // Soft Circular Glow Texture for Starfield & Dust Sprites
     function createPointSpriteTexture() {
       const cv = document.createElement('canvas');
       cv.width = 64;
@@ -148,20 +120,14 @@
     const starfield = new THREE.Points(particleGeo, particleMat);
     scene.add(starfield);
 
-    // ═════════════════════════════════════════════════════════════
-    // COSMIC SOLAR SYSTEM ENGINE (Background Celestial System)
-    // ═════════════════════════════════════════════════════════════
     const solarSystemGroup = new THREE.Group();
-    // Positioned in deep celestial background for panoramic framing behind typography
+    
     solarSystemGroup.position.set(0, 3.2, -25);
     solarSystemGroup.rotation.x = 0.38;
     solarSystemGroup.rotation.y = -0.05;
     solarSystemGroup.rotation.z = 0.03;
     scene.add(solarSystemGroup);
 
-    // --- PROCEDURAL PLANETARY TEXTURE GENERATORS ---
-
-    // 1. Procedural Sun Texture (Granulation, Plasma Turbulence, Sunspots)
     function createSunTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512;
@@ -177,7 +143,6 @@
       c.fillStyle = grad;
       c.fillRect(0, 0, 512, 256);
 
-      // Convective granules and plasma filaments
       for (let i = 0; i < 140; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 256;
@@ -192,7 +157,6 @@
         c.fill();
       }
 
-      // Dark Sunspots with glowing penumbra
       for (let s = 0; s < 7; s++) {
         const sx = 60 + Math.random() * 390;
         const sy = 40 + Math.random() * 175;
@@ -209,7 +173,6 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 2. Procedural Sun Rays & Coronal Streamers Texture
     function createSunRaysTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512;
@@ -228,7 +191,6 @@
       c.arc(cx, cy, 250, 0, Math.PI * 2);
       c.fill();
 
-      // 12 Coronal Streamer Rays
       for (let r = 0; r < 12; r++) {
         const ang = (r / 12) * Math.PI * 2;
         const len = 150 + (r % 3) * 60;
@@ -244,7 +206,6 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 3. Mercury Cratered Texture
     function createMercuryTexture() {
       const cv = document.createElement('canvas');
       cv.width = 256;
@@ -268,7 +229,6 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 4. Venus Atmosphere Texture
     function createVenusTexture() {
       const cv = document.createElement('canvas');
       cv.width = 256;
@@ -291,16 +251,14 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 5. Earth Surface & Clouds Textures
     function createEarthTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512;
       cv.height = 256;
       const c = cv.getContext('2d');
-      c.fillStyle = '#0369a1'; // Deep Blue Oceans
+      c.fillStyle = '#0369a1'; 
       c.fillRect(0, 0, 512, 256);
 
-      // Continents
       c.fillStyle = '#15803d';
       c.beginPath();
       c.ellipse(120, 75, 45, 30, -0.2, 0, Math.PI * 2);
@@ -318,13 +276,11 @@
       c.ellipse(410, 175, 25, 18, -0.1, 0, Math.PI * 2);
       c.fill();
 
-      // Deserts
       c.fillStyle = '#ca8a04';
       c.beginPath();
       c.ellipse(270, 115, 28, 14, 0, 0, Math.PI * 2);
       c.fill();
 
-      // Ice caps
       c.fillStyle = '#f8fafc';
       c.fillRect(0, 0, 512, 14);
       c.fillRect(0, 242, 512, 14);
@@ -350,7 +306,6 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 6. Moon Texture
     function createMoonTexture() {
       const cv = document.createElement('canvas');
       cv.width = 128;
@@ -366,23 +321,20 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 7. Mars Texture
     function createMarsTexture() {
       const cv = document.createElement('canvas');
       cv.width = 256;
       cv.height = 128;
       const c = cv.getContext('2d');
-      c.fillStyle = '#c2410c'; // Rust Red
+      c.fillStyle = '#c2410c'; 
       c.fillRect(0, 0, 256, 128);
 
-      // Dark volcanic highlands
       c.fillStyle = '#7c2d12';
       c.beginPath();
       c.ellipse(120, 64, 45, 22, -0.15, 0, Math.PI * 2);
       c.ellipse(200, 80, 28, 16, 0.2, 0, Math.PI * 2);
       c.fill();
 
-      // White polar ice caps
       c.fillStyle = '#ffffff';
       c.fillRect(0, 0, 256, 7);
       c.fillRect(0, 121, 256, 7);
@@ -390,7 +342,6 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 8. Jupiter Banded Atmosphere with Great Red Spot
     function createJupiterTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512;
@@ -404,7 +355,6 @@
         c.fillRect(0, y, 512, 1);
       }
 
-      // Turbulent cloud swirls
       for (let i = 0; i < 30; i++) {
         c.fillStyle = 'rgba(254, 243, 199, 0.35)';
         c.beginPath();
@@ -412,7 +362,6 @@
         c.fill();
       }
 
-      // The Great Red Spot
       c.fillStyle = '#991b1b';
       c.beginPath();
       c.ellipse(360, 168, 38, 20, -0.08, 0, Math.PI * 2);
@@ -425,7 +374,6 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // 9. Saturn Ring Texture (Cassini Division, Multi-Ringlets)
     function createSaturnRingTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512;
@@ -433,20 +381,19 @@
       const c = cv.getContext('2d');
       const grad = c.createLinearGradient(0, 0, 512, 0);
       grad.addColorStop(0.00, 'rgba(120, 53, 15, 0)');
-      grad.addColorStop(0.12, 'rgba(217, 119, 6, 0.45)');   // C Ring
-      grad.addColorStop(0.32, 'rgba(254, 240, 138, 0.88)');  // B Ring Inner
-      grad.addColorStop(0.60, 'rgba(253, 230, 138, 0.98)');  // B Ring Bright
-      grad.addColorStop(0.66, 'rgba(7, 9, 14, 0.08)');       // Cassini Division
-      grad.addColorStop(0.72, 'rgba(254, 243, 199, 0.85)');  // A Ring
-      grad.addColorStop(0.85, 'rgba(245, 158, 11, 0.75)');  // A Ring Outer
-      grad.addColorStop(0.94, 'rgba(217, 119, 6, 0.35)');   // F Ring
+      grad.addColorStop(0.12, 'rgba(217, 119, 6, 0.45)');   
+      grad.addColorStop(0.32, 'rgba(254, 240, 138, 0.88)');  
+      grad.addColorStop(0.60, 'rgba(253, 230, 138, 0.98)');  
+      grad.addColorStop(0.66, 'rgba(7, 9, 14, 0.08)');       
+      grad.addColorStop(0.72, 'rgba(254, 243, 199, 0.85)');  
+      grad.addColorStop(0.85, 'rgba(245, 158, 11, 0.75)');  
+      grad.addColorStop(0.94, 'rgba(217, 119, 6, 0.35)');   
       grad.addColorStop(1.00, 'rgba(120, 53, 15, 0)');
       c.fillStyle = grad;
       c.fillRect(0, 0, 512, 16);
       return new THREE.CanvasTexture(cv);
     }
 
-    // 10. Uranus & Neptune Textures
     function createUranusTexture() {
       const cv = document.createElement('canvas');
       cv.width = 256;
@@ -482,14 +429,10 @@
       return new THREE.CanvasTexture(cv);
     }
 
-    // --- CELESTIAL ASSETS & MESHES ---
-
-    // 1. The Sun (Central Radiant Star)
     const sunGroup = new THREE.Group();
     const sunTexture = createSunTexture();
     const sunRaysTexture = createSunRaysTexture();
 
-    // Balanced Sun Core (Radius 1.65, non-intrusive, majestic crown)
     const sunGeo = new THREE.SphereGeometry(1.65, 36, 36);
     const sunMat = new THREE.MeshBasicMaterial({
       map: sunTexture
@@ -497,7 +440,6 @@
     const sunCore = new THREE.Mesh(sunGeo, sunMat);
     sunGroup.add(sunCore);
 
-    // Glowing Inner Chromosphere
     const sunInnerHaloGeo = new THREE.SphereGeometry(1.95, 32, 32);
     const sunInnerHaloMat = new THREE.MeshBasicMaterial({
       color: 0xf59e0b,
@@ -508,7 +450,6 @@
     const sunCorona = new THREE.Mesh(sunInnerHaloGeo, sunInnerHaloMat);
     sunGroup.add(sunCorona);
 
-    // Outer Radiant Ray Corona (Billboard rotating plane)
     const sunRaysGeo = new THREE.PlaneGeometry(7.2, 7.2);
     const sunRaysMat = new THREE.MeshBasicMaterial({
       map: sunRaysTexture,
@@ -521,13 +462,11 @@
     const sunRays = new THREE.Mesh(sunRaysGeo, sunRaysMat);
     sunGroup.add(sunRays);
 
-    // Warm Stellar Point Light
     const sunLight = new THREE.PointLight(0xfff5e6, 5.5, 120);
     sunGroup.add(sunLight);
 
     solarSystemGroup.add(sunGroup);
 
-    // Helper: High-Tech Holographic Orbit Line
     function createOrbitPath(radius, color = 0x38bdf8, opacity = 0.16) {
       const segments = 180;
       const pts = [];
@@ -549,10 +488,8 @@
       return line;
     }
 
-    // Planetary Cache
     const solarPlanets = [];
 
-    // 1. Mercury (Speed: 0.75)
     const mercOrbit = 3.2;
     solarSystemGroup.add(createOrbitPath(mercOrbit, 0x94a3b8, 0.20));
     const mercMesh = new THREE.Mesh(
@@ -562,7 +499,6 @@
     solarSystemGroup.add(mercMesh);
     solarPlanets.push({ mesh: mercMesh, orbitRadius: mercOrbit, speed: 0.75, angle: Math.random() * Math.PI * 2, rotSpeed: 0.4 });
 
-    // 2. Venus (Speed: 0.55)
     const venusOrbit = 4.6;
     solarSystemGroup.add(createOrbitPath(venusOrbit, 0xfde047, 0.20));
     const venusMesh = new THREE.Mesh(
@@ -572,33 +508,28 @@
     solarSystemGroup.add(venusMesh);
     solarPlanets.push({ mesh: venusMesh, orbitRadius: venusOrbit, speed: 0.55, angle: Math.random() * Math.PI * 2, rotSpeed: 0.3 });
 
-    // 3. Earth & Orbiting Moon (Speed: 0.40)
     const earthOrbit = 6.2;
     solarSystemGroup.add(createOrbitPath(earthOrbit, 0x38bdf8, 0.24));
     const earthGroup = new THREE.Group();
 
-    // Earth Base Sphere
     const earthMesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.35, 30, 30),
       new THREE.MeshStandardMaterial({ map: createEarthTexture(), roughness: 0.45, metalness: 0.15 })
     );
     earthGroup.add(earthMesh);
 
-    // Earth Swirling Cloud Layer
     const earthCloudsMesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.365, 28, 28),
       new THREE.MeshStandardMaterial({ map: createEarthCloudsTexture(), transparent: true, opacity: 0.55, roughness: 0.8 })
     );
     earthGroup.add(earthCloudsMesh);
 
-    // Earth Atmosphere Rim Glow
     const earthAtmosphere = new THREE.Mesh(
       new THREE.SphereGeometry(0.385, 24, 24),
       new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, side: THREE.BackSide })
     );
     earthGroup.add(earthAtmosphere);
 
-    // Earth's Moon
     const moonMesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.10, 18, 18),
       new THREE.MeshStandardMaterial({ map: createMoonTexture(), roughness: 0.85 })
@@ -619,7 +550,6 @@
       moonAngle: 0
     });
 
-    // 4. Mars (Speed: 0.30)
     const marsOrbit = 7.8;
     solarSystemGroup.add(createOrbitPath(marsOrbit, 0xf87171, 0.20));
     const marsMesh = new THREE.Mesh(
@@ -629,7 +559,6 @@
     solarSystemGroup.add(marsMesh);
     solarPlanets.push({ mesh: marsMesh, orbitRadius: marsOrbit, speed: 0.30, angle: Math.random() * Math.PI * 2, rotSpeed: 0.7 });
 
-    // 5. Main Asteroid Belt (Between Mars & Jupiter)
     const asteroidCount = 260;
     const asteroidGeo = new THREE.BufferGeometry();
     const asteroidPos = new Float32Array(asteroidCount * 3);
@@ -663,7 +592,6 @@
     );
     solarSystemGroup.add(asteroidBelt);
 
-    // 6. Jupiter with Banded Atmosphere & Great Red Spot (Speed: 0.18)
     const jupOrbit = 11.5;
     solarSystemGroup.add(createOrbitPath(jupOrbit, 0xfbbf24, 0.20));
     const jupMesh = new THREE.Mesh(
@@ -673,7 +601,6 @@
     solarSystemGroup.add(jupMesh);
     solarPlanets.push({ mesh: jupMesh, orbitRadius: jupOrbit, speed: 0.18, angle: Math.random() * Math.PI * 2, rotSpeed: 1.4 });
 
-    // 7. Saturn & High-Fidelity Ring System (Speed: 0.12)
     const satOrbit = 14.0;
     solarSystemGroup.add(createOrbitPath(satOrbit, 0xfde68a, 0.20));
     const saturnGroup = new THREE.Group();
@@ -683,7 +610,6 @@
     );
     saturnGroup.add(saturnSphere);
 
-    // Multi-Ring Disk
     const satRingGeo = new THREE.RingGeometry(0.80, 1.70, 96);
     const satRingMat = new THREE.MeshStandardMaterial({
       map: createSaturnRingTexture(),
@@ -694,13 +620,12 @@
     });
     const satRing = new THREE.Mesh(satRingGeo, satRingMat);
     satRing.rotation.x = Math.PI * 0.42;
-    saturnGroup.rotation.z = 0.35; // Axial Tilt
+    saturnGroup.rotation.z = 0.35; 
     saturnGroup.add(satRing);
 
     solarSystemGroup.add(saturnGroup);
     solarPlanets.push({ mesh: saturnGroup, orbitRadius: satOrbit, speed: 0.12, angle: Math.random() * Math.PI * 2, selfRotate: saturnSphere, rotSpeed: 1.2 });
 
-    // 8. Uranus with Tilted Vertical Rings (Speed: 0.08)
     const uranOrbit = 16.5;
     solarSystemGroup.add(createOrbitPath(uranOrbit, 0x67e8f9, 0.18));
     const uranGroup = new THREE.Group();
@@ -714,12 +639,11 @@
       new THREE.RingGeometry(0.55, 0.82, 48),
       new THREE.MeshBasicMaterial({ color: 0xa5f3fc, side: THREE.DoubleSide, transparent: true, opacity: 0.45 })
     );
-    uranRing.rotation.x = Math.PI * 0.48; // Extreme Axial Tilt (~85°)
+    uranRing.rotation.x = Math.PI * 0.48; 
     uranGroup.add(uranRing);
     solarSystemGroup.add(uranGroup);
     solarPlanets.push({ mesh: uranGroup, orbitRadius: uranOrbit, speed: 0.08, angle: Math.random() * Math.PI * 2, selfRotate: uranSphere, rotSpeed: 0.8 });
 
-    // 9. Neptune with Methane Storms (Speed: 0.05)
     const nepOrbit = 19.0;
     solarSystemGroup.add(createOrbitPath(nepOrbit, 0x60a5fa, 0.16));
     const nepMesh = new THREE.Mesh(
@@ -729,7 +653,6 @@
     solarSystemGroup.add(nepMesh);
     solarPlanets.push({ mesh: nepMesh, orbitRadius: nepOrbit, speed: 0.05, angle: Math.random() * Math.PI * 2, rotSpeed: 0.8 });
 
-    // --- 3D Modular Assembly Core ---
     const mainGroup = new THREE.Group();
     mainGroup.position.set(0, 0.9, 0);
     scene.add(mainGroup);
@@ -752,7 +675,6 @@
       modularParts.push(partData);
     }
 
-    // Material Library
     const mats = {
       carbonDark: new THREE.MeshStandardMaterial({
         color: 0x0f172a,
@@ -820,11 +742,6 @@
       })
     };
 
-    // ─────────────────────────────────────────────────────────────
-    // TEXTURE GENERATORS (512x512 High-Definition Textures)
-    // ─────────────────────────────────────────────────────────────
-
-    // 1. Procedural Spherical Planet Grid & Circuit Texture
     function createPlanetCircuitTexture() {
       const cv = document.createElement('canvas');
       cv.width = 512;
@@ -834,7 +751,6 @@
       c.fillStyle = '#061325';
       c.fillRect(0, 0, 512, 256);
 
-      // Latitudes & Longitudes
       c.strokeStyle = 'rgba(0, 242, 254, 0.18)';
       c.lineWidth = 1.5;
       for (let y = 32; y < 256; y += 32) {
@@ -850,7 +766,6 @@
         c.stroke();
       }
 
-      // Tech Markings
       c.fillStyle = '#00f2fe';
       c.font = 'bold 16px monospace';
       c.fillText('LUAU COMPILER // JIT VM v2', 40, 120);
@@ -858,7 +773,6 @@
       c.fillText('STRICT TYPE SOLVER 100%', 290, 120);
       c.fillText('ATOMIC BINDING RUNTIME', 290, 145);
 
-      // Circuit Dots
       c.fillStyle = '#a855f7';
       for (let i = 0; i < 20; i++) {
         const cx = Math.random() * 512;
@@ -884,28 +798,23 @@
       clearcoat: 1.0
     });
 
-    // 2. High-Res Roblox Script Face Textures
     function createRobloxScriptTexture(mode) {
       const cv = document.createElement('canvas');
       cv.width = 512;
       cv.height = 512;
       const c = cv.getContext('2d');
 
-      // Studio IDE Background
       c.fillStyle = '#090d16';
       c.fillRect(0, 0, 512, 512);
 
-      // Outer Bevel Rim
       const rimColor = mode === 'server' ? '#00f2fe' : mode === 'module' ? '#a855f7' : '#10b981';
       c.strokeStyle = rimColor;
       c.lineWidth = 8;
       c.strokeRect(4, 4, 504, 504);
 
-      // Title Bar
       c.fillStyle = '#111827';
       c.fillRect(8, 8, 496, 68);
 
-      // Window Dots
       c.fillStyle = '#ef4444';
       c.beginPath(); c.arc(32, 42, 7, 0, Math.PI * 2); c.fill();
       c.fillStyle = '#f59e0b';
@@ -913,7 +822,6 @@
       c.fillStyle = '#10b981';
       c.beginPath(); c.arc(76, 42, 7, 0, Math.PI * 2); c.fill();
 
-      // Title Text
       c.fillStyle = '#ffffff';
       c.font = 'bold 22px monospace';
       c.textAlign = 'left';
@@ -922,7 +830,6 @@
                                         'ActorWorker // ParallelEngine.luau';
       c.fillText(title, 105, 48);
 
-      // Code Lines
       c.font = '19px monospace';
       let lines = [];
       if (mode === 'server') {
@@ -987,13 +894,8 @@
     const scriptMatModule = new THREE.MeshStandardMaterial({ map: scriptTexModule, roughness: 0.25, metalness: 0.7 });
     const scriptMatActor = new THREE.MeshStandardMaterial({ map: scriptTexActor, roughness: 0.25, metalness: 0.7 });
 
-    // ─────────────────────────────────────────────────────────────
-    // 1. MASTER 3D OFFICIAL ROBLOX LUAU ARCHITECTURAL EMBLEM
-    // ─────────────────────────────────────────────────────────────
-
-    // Master Materials for the Official Roblox Luau Monument
     const luauBlueFrontMat = new THREE.MeshPhysicalMaterial({
-      color: 0x1d4ed8,             // Radiant Official Luau Royal Blue
+      color: 0x1d4ed8,             
       roughness: 0.16,
       metalness: 0.28,
       clearcoat: 1.0,
@@ -1002,34 +904,31 @@
     });
 
     const luauBlueRearMat = new THREE.MeshPhysicalMaterial({
-      color: 0x0f2050,             // Deep Aerospace Dark Navy Backplate
+      color: 0x0f2050,             
       roughness: 0.25,
       metalness: 0.78,
       clearcoat: 0.8
     });
 
     const luauWhiteMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,             // Ceramic studio white
+      color: 0xffffff,             
       roughness: 0.15,
       clearcoat: 0.9,
       clearcoatRoughness: 0.08
     });
 
     const luauOrbitMat = new THREE.MeshStandardMaterial({
-      color: 0x94a3b8,             // Polished metallic dashed orbit track
+      color: 0x94a3b8,             
       emissive: 0x00f2fe,
       emissiveIntensity: 0.15,
       roughness: 0.25,
       metalness: 0.88
     });
 
-    // Geometric constants for official Luau emblem:
-    // Scale factor: 0.095 (40 units in SVG -> 3.80 in 3D)
-    // Signature Roblox tilt: -15° clockwise (Math.PI * -15 / 180)
     const LUAU_SCALE = 0.095;
-    const BOX_SIZE = 40 * LUAU_SCALE; // 3.80
-    const BOX_R = 2.0 * LUAU_SCALE;    // 0.19
-    const TILT_ANGLE = -15 * Math.PI / 180; // Clockwise 15° tilt
+    const BOX_SIZE = 40 * LUAU_SCALE; 
+    const BOX_R = 2.0 * LUAU_SCALE;    
+    const TILT_ANGLE = -15 * Math.PI / 180; 
 
     function createRoundedRectShape(w, h, r) {
       const shape = new THREE.Shape();
@@ -1047,11 +946,10 @@
       return shape;
     }
 
-    // Auto-generated unrotated Luau letter shapes from official SVG (ALL SOLID)
 function getLuauLettersShapes(scale) {
   const shapes = [];
   let s = null;
-  // Shape 0
+  
   s = new THREE.Shape();
   s.moveTo((-8.2766) * scale, (-12.5911) * scale);
   s.lineTo((-8.2767) * scale, (-14.0000) * scale);
@@ -1060,7 +958,7 @@ function getLuauLettersShapes(scale) {
   s.lineTo((-8.2766) * scale, (-12.5911) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 1
+  
   s = new THREE.Shape();
   s.moveTo((-12.9566) * scale, (-3.6914) * scale);
   s.lineTo((-12.9565) * scale, (-14.0000) * scale);
@@ -1069,7 +967,7 @@ function getLuauLettersShapes(scale) {
   s.lineTo((-12.9566) * scale, (-3.6914) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 2
+  
   s = new THREE.Shape();
   s.moveTo((-2.6904) * scale, (-12.1945) * scale);
   s.lineTo((-2.6904) * scale, (-6.3393) * scale);
@@ -1079,7 +977,7 @@ function getLuauLettersShapes(scale) {
   s.lineTo((-2.6904) * scale, (-12.1945) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 3
+  
   s = new THREE.Shape();
   s.moveTo((-2.4497) * scale, (-10.6016) * scale);
   s.lineTo((-1.8762) * scale, (-10.5874) * scale);
@@ -1103,7 +1001,7 @@ function getLuauLettersShapes(scale) {
   s.bezierCurveTo((-2.5111) * scale, (-11.3732) * scale, (-2.4497) * scale, (-11.0075) * scale, (-2.4497) * scale, (-10.6016) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 4
+  
   s = new THREE.Shape();
   s.moveTo((5.0906) * scale, (-12.4636) * scale);
   s.lineTo((5.0905) * scale, (-8.8103) * scale);
@@ -1130,7 +1028,7 @@ function getLuauLettersShapes(scale) {
   s.bezierCurveTo((5.1118) * scale, (-13.0111) * scale, (5.0906) * scale, (-12.7326) * scale, (5.0906) * scale, (-12.4636) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 5
+  
   s = new THREE.Shape();
   s.moveTo((5.3384) * scale, (-9.3413) * scale);
   s.lineTo((5.3525) * scale, (-10.3962) * scale);
@@ -1160,7 +1058,7 @@ function getLuauLettersShapes(scale) {
   s.lineTo((5.3384) * scale, (-9.3413) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 6
+  
   s = new THREE.Shape();
   s.moveTo((13.1973) * scale, (-12.1946) * scale);
   s.lineTo((13.1972) * scale, (-6.3394) * scale);
@@ -1170,7 +1068,7 @@ function getLuauLettersShapes(scale) {
   s.lineTo((13.1973) * scale, (-12.1946) * scale);
   s.closePath();
   shapes.push(s);
-  // Shape 7
+  
   s = new THREE.Shape();
   s.moveTo((13.4380) * scale, (-10.6015) * scale);
   s.lineTo((14.0115) * scale, (-10.5874) * scale);
@@ -1197,11 +1095,6 @@ function getLuauLettersShapes(scale) {
   return shapes;
 }
 
-    // ─────────────────────────────────────────────────────────────
-    // 2. PRIMARY LUAU MONUMENT (Dual-Shell 15° Tilted Slabs)
-    // ─────────────────────────────────────────────────────────────
-
-    // Front Luau Plate
     const luauBodyShape = createRoundedRectShape(BOX_SIZE, BOX_SIZE, BOX_R);
     const luauFrontGeo = new THREE.ExtrudeGeometry(luauBodyShape, {
       depth: 0.22,
@@ -1220,7 +1113,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(0.12, -0.18, TILT_ANGLE + 0.06)
     );
 
-    // Rear Luau Backplate
     const luauRearGeo = new THREE.ExtrudeGeometry(luauBodyShape, {
       depth: 0.22,
       bevelEnabled: true,
@@ -1238,7 +1130,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(-0.12, 0.18, TILT_ANGLE - 0.06)
     );
 
-    // Inner Luau Compiler Core (Revealed during disassembly)
     const nucleusGeo = new THREE.SphereGeometry(0.72, 32, 32);
     const nucleus = new THREE.Mesh(nucleusGeo, mats.neonCyan);
 
@@ -1264,9 +1155,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(0.2, 0.3, 0.1)
     );
 
-    // ─────────────────────────────────────────────────────────────
-    // 3. WHITE SQUARE MOON (Upper-Right Corner, tilted 15°)
-    // ─────────────────────────────────────────────────────────────
     const MOON_SIZE = 8.0 * LUAU_SCALE;
     const MOON_R = 0.5 * LUAU_SCALE;
     const luauMoonShape = createRoundedRectShape(MOON_SIZE, MOON_SIZE, MOON_R);
@@ -1295,9 +1183,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(0.15, -0.22, TILT_ANGLE + 0.12)
     );
 
-    // ─────────────────────────────────────────────────────────────
-    // 4. BEVELED 3D "Luau" TYPOGRAPHY (Extruded from Official SVG)
-    // ─────────────────────────────────────────────────────────────
     const lettersGroup = new THREE.Group();
     const letterGeoSettings = {
       depth: 0.10,
@@ -1322,9 +1207,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(0.12, -0.15, TILT_ANGLE + 0.05)
     );
 
-    // ─────────────────────────────────────────────────────────────
-    // 5. DASHED ORBIT RING & COMPANION SATELLITE
-    // ─────────────────────────────────────────────────────────────
     const luauOrbitGroup = new THREE.Group();
     const orbitRadius = 2.85;
     const dashCount = 28;
@@ -1347,7 +1229,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(0.65, 0.35, 0.4)
     );
 
-    // Companion Satellite (Luau blue orb on dashed orbit)
     const satGeo = new THREE.SphereGeometry(0.32, 28, 28);
     const luauSatMoon = new THREE.Mesh(satGeo, luauBlueFrontMat);
     const satAng = 0.85;
@@ -1359,25 +1240,21 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(0.4, -0.5, 0.6)
     );
 
-    // ─────────────────────────────────────────────────────────────
-    // 6. AUTHENTIC 3D ROBLOX SCRIPT BRICKS WITH CYLINDRICAL STUDS
-    // ─────────────────────────────────────────────────────────────
     function createRobloxScriptBrick(faceMat, studMat, titleText) {
       const brickGroup = new THREE.Group();
       const bodyGeo = new THREE.BoxGeometry(1.5, 1.3, 0.4);
 
       const materials = [
-        mats.carbonDark,    // right
-        mats.carbonDark,    // left
-        mats.carbonDark,    // top
-        mats.carbonDark,    // bottom
-        faceMat,            // front (+Z)
-        mats.carbonDark     // back (-Z)
+        mats.carbonDark,    
+        mats.carbonDark,    
+        mats.carbonDark,    
+        mats.carbonDark,    
+        faceMat,            
+        mats.carbonDark     
       ];
       const body = new THREE.Mesh(bodyGeo, materials);
       brickGroup.add(body);
 
-      // 4 Authentic Cylindrical Roblox Studs on Top Face
       const studGeo = new THREE.CylinderGeometry(0.16, 0.16, 0.12, 18);
       const studPositions = [-0.48, -0.16, 0.16, 0.48];
       studPositions.forEach((posX) => {
@@ -1385,7 +1262,6 @@ function getLuauLettersShapes(scale) {
         stud.position.set(posX, 0.65 + 0.06, 0);
         brickGroup.add(stud);
 
-        // Top inset stud ring
         const studRingGeo = new THREE.RingGeometry(0.06, 0.14, 16);
         const studRing = new THREE.Mesh(studRingGeo, mats.chromeMetal);
         studRing.rotation.x = -Math.PI / 2;
@@ -1396,7 +1272,6 @@ function getLuauLettersShapes(scale) {
       return brickGroup;
     }
 
-    // Left Wing: ServerScript Tablet
     const serverScriptBrick = createRobloxScriptBrick(scriptMatServer, mats.neonCyan, 'ServerScript');
     registerPart(
       serverScriptBrick,
@@ -1406,7 +1281,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(1.2, -0.7, 0.3)
     );
 
-    // Right Wing: ModuleScript Tablet
     const moduleScriptBrick = createRobloxScriptBrick(scriptMatModule, mats.neonPurple, 'ModuleScript');
     registerPart(
       moduleScriptBrick,
@@ -1416,9 +1290,6 @@ function getLuauLettersShapes(scale) {
       new THREE.Euler(-1.2, 0.7, -0.3)
     );
 
-        // ─────────────────────────────────────────────────────────────
-    // 6. SCROLL INTERPOLATION & CAMERA SPLINE
-    // ─────────────────────────────────────────────────────────────
     let targetScroll = 0;
     let currentScroll = 0;
     let scrollVelocity = 0;
@@ -1453,14 +1324,12 @@ function getLuauLettersShapes(scale) {
     });
     updateScrollProgress();
 
-    // Mouse Parallax Rig
     const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
     window.addEventListener('mousemove', (e) => {
       mouse.targetX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouse.targetY = (e.clientY / window.innerHeight - 0.5) * 2;
     });
 
-    // Camera Spline (Balanced focal framing across stages)
     const cameraWaypoints = [
       { pos: new THREE.Vector3(0, 2.2, 17.5), lookAt: new THREE.Vector3(0, 0.8, 0) },
       { pos: new THREE.Vector3(-3.2, 1.4, 9.8), lookAt: new THREE.Vector3(-1.2, 0.6, 0) },
@@ -1489,9 +1358,6 @@ function getLuauLettersShapes(scale) {
       return { pos, lookAt };
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 7. HUD SYNCHRONIZATION (Silent, Pure Visual Telemetry)
-    // ─────────────────────────────────────────────────────────────
     const speedEl = document.getElementById('f1SpeedVal');
     const stageValEl = document.getElementById('f1StageVal');
     const progressFillEl = document.getElementById('f1ProgressFill');
@@ -1551,9 +1417,6 @@ function getLuauLettersShapes(scale) {
       }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 8. INTERACTIVE BUTTON CONTROLS
-    // ─────────────────────────────────────────────────────────────
     const resetBtn = document.getElementById('btnAssembleReset');
     if (resetBtn) {
       resetBtn.addEventListener('click', (e) => {
@@ -1581,9 +1444,6 @@ function getLuauLettersShapes(scale) {
       });
     });
 
-    // ─────────────────────────────────────────────────────────────
-    // 9. ANIMATION & RENDER LOOP
-    // ─────────────────────────────────────────────────────────────
     let clock = new THREE.Clock();
 
     function renderLoop() {
@@ -1615,15 +1475,8 @@ function getLuauLettersShapes(scale) {
       );
       camera.lookAt(lookTarget);
 
-      // ═════════════════════════════════════════════════════════════
-      // STAGE 0 vs STAGES 1-5 VISIBILITY & TRANSITION LOGIC
-      // Stage 0: ONLY the 3D Solar System + Starfield + Hero text!
-      // (NO floor grid, NO ground plate, NO Luau parts, NO shards)
-      // Stages 1-5: Solar System dives into deep space and turns off;
-      // Luau architecture appears, fades in and begins assembly!
-      // ═════════════════════════════════════════════════════════════
       if (currentScroll < 0.12) {
-        // Pure Stage 0: ONLY Solar System is visible!
+        
         solarSystemGroup.visible = true;
         solarSystemGroup.position.set(0, 3.2, -25);
         solarSystemGroup.scale.set(1, 1, 1);
@@ -1636,8 +1489,8 @@ function getLuauLettersShapes(scale) {
         ground.visible = false;
         coreLight.intensity = 0;
       } else if (currentScroll < 0.24) {
-        // Transition between Stage 0 and Stage 1
-        const tExit = (currentScroll - 0.12) / 0.12; // 0.0 -> 1.0
+        
+        const tExit = (currentScroll - 0.12) / 0.12; 
         solarSystemGroup.visible = true;
         solarSystemGroup.position.set(0, 3.2 + tExit * 2.0, -25 - tExit * 50);
         solarSystemGroup.scale.setScalar(Math.max(0.01, 1 - tExit * 0.75));
@@ -1651,7 +1504,7 @@ function getLuauLettersShapes(scale) {
         ground.visible = true;
         coreLight.intensity = 2.8 * Math.min(1, tExit);
       } else {
-        // Stages 1-5: Full Luau Assembly (Solar system completely hidden)
+        
         solarSystemGroup.visible = false;
         keyLight.intensity = 2.6;
         rimLight.intensity = 3.0;
@@ -1663,7 +1516,6 @@ function getLuauLettersShapes(scale) {
         coreLight.intensity = 2.8 + Math.sin(elapsed * 3) * 0.7;
       }
 
-      // Morphing from exploded to assembled
       const assembleFactor = Math.min(Math.max((currentScroll - 0.08) / 0.84, 0), 1);
       const easeAssemble = 1 - Math.pow(1 - assembleFactor, 3);
 
@@ -1682,8 +1534,6 @@ function getLuauLettersShapes(scale) {
         }
       }
 
-
-      // Subtle celestial rotation of internal elements
       if (quantumLattice) {
         quantumLattice.rotation.x = elapsed * 0.25;
         quantumLattice.rotation.y = elapsed * 0.35;
@@ -1697,7 +1547,6 @@ function getLuauLettersShapes(scale) {
         nucleus.visible = easeAssemble < 0.94;
       }
 
-      // Starfield Particle Flow
       const positions = starfield.geometry.attributes.position.array;
       const speedMult = 1 + scrollVelocity * 45;
       for (let i = 2; i < positions.length; i += 3) {
@@ -1709,7 +1558,6 @@ function getLuauLettersShapes(scale) {
 
       coreLight.intensity = 2.8 + Math.sin(elapsed * 3) * 0.7;
 
-      // Orbiting Solar System Animation
       if (typeof solarPlanets !== 'undefined') {
         solarPlanets.forEach((p) => {
           p.angle += delta * p.speed * 0.45;
@@ -1752,7 +1600,6 @@ function getLuauLettersShapes(scale) {
         solarSystemGroup.rotation.y += delta * 0.008;
       }
 
-      // Live Render FPS Tracker
       frameCount++;
       const now = performance.now();
       if (now - lastFpsTime >= 500) {

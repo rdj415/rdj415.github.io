@@ -1,7 +1,3 @@
-/* ══════════════════════════════════════════════════════════════
-   ROBLOX LUAU SYSTEMS ARCHITECT - MODERN CYBER STYLESHEET
-   ══════════════════════════════════════════════════════════════ */
-
 :root {
   --bg-primary: #07090e;
   --bg-secondary: #0c0f17;
@@ -64,9 +60,6 @@ body {
 ::-webkit-scrollbar-thumb { background: #1e2435; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
 
-/* ══════════════════════════════════════════════════════════════
-   DYNAMIC BACKGROUND EFFECTS
-   ══════════════════════════════════════════════════════════════ */
 .bg-grid-pattern {
   position: fixed;
   inset: 0;
@@ -178,7 +171,6 @@ body {
   display: inline-block;
 }
 
-/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -239,7 +231,6 @@ body {
   width: 100%;
 }
 
-/* Navbar */
 .navbar {
   position: fixed;
   top: 0;
@@ -387,9 +378,6 @@ body {
   background: #fff;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   HERO SECTION
-   ══════════════════════════════════════════════════════════════ */
 .hero-section {
   padding-top: 140px;
   padding-bottom: 80px;
@@ -442,7 +430,6 @@ body {
   margin-bottom: 36px;
 }
 
-/* Proof Bar */
 .proof-bar {
   display: inline-flex;
   align-items: center;
@@ -496,7 +483,6 @@ body {
   box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
 }
 
-/* Terminal Card */
 .terminal-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
@@ -566,7 +552,6 @@ body {
   margin-right: 6px;
 }
 
-/* Syntax Highlighting */
 .t-comment { color: #526079; font-style: italic; }
 .t-kw { color: #c084fc; font-weight: 700; }
 .t-def { color: #38bdf8; }
@@ -575,9 +560,6 @@ body {
 .t-type { color: #fbbf24; }
 .t-num { color: #f472b6; }
 
-/* ══════════════════════════════════════════════════════════════
-   SECTION COMMON
-   ══════════════════════════════════════════════════════════════ */
 .section {
   padding: 95px 0;
 }
@@ -605,12 +587,6 @@ body {
   color: var(--text-secondary);
 }
 
-/* ══════════════════════════════════════════════════════════════
-   ENGINEERED SYSTEMS
-   ══════════════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════════════
-   FEATURED VIDEO SHOWCASE
-   ══════════════════════════════════════════════════════════════ */
 .video-showcase-header {
   margin-bottom: 20px;
 }
@@ -896,9 +872,6 @@ body {
   padding-top: 6px;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   PRODUCTION CODE SHOWROOM (LARGE VIEW)
-   ══════════════════════════════════════════════════════════════ */
 .code-showroom-card {
   background: var(--bg-card);
   border: 1px solid var(--border-bright);
@@ -983,9 +956,6 @@ body {
   max-height: 520px;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   TECHNICAL COMPETENCIES
-   ══════════════════════════════════════════════════════════════ */
 .tech-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1021,9 +991,6 @@ body {
   color: #fff;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   CONTACT
-   ══════════════════════════════════════════════════════════════ */
 .contact-box {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -1179,9 +1146,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SERVICES & COMMISSIONS GRID
-   ══════════════════════════════════════════════════════════════ */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
@@ -1250,7 +1214,6 @@ body {
   border-radius: 4px;
 }
 
-/* Standards Banner */
 .standards-banner {
   background: linear-gradient(135deg, rgba(17, 21, 32, 0.95) 0%, rgba(12, 15, 23, 0.98) 100%);
   border: 1px solid var(--border-bright);
@@ -1309,7 +1272,6 @@ body {
   line-height: 1.45;
 }
 
-/* Footer */
 .footer {
   border-top: 1px solid var(--border-subtle);
   padding: 34px 0;
@@ -1335,7 +1297,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Toast */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -1367,7 +1328,6 @@ body {
   opacity: 1;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .hero-container {
     grid-template-columns: 1fr;
@@ -1421,9 +1381,6 @@ body {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   3D SCROLLYTELLING: ANATOMY OF LUAU & CYBERPUNK F1 HUD
-   ══════════════════════════════════════════════════════════════ */
 .scrolly-luau-container {
   position: relative;
   width: 100%;
@@ -1453,7 +1410,6 @@ body {
   pointer-events: none;
 }
 
-/* Top HUD Header */
 .luau-hud-header {
   position: absolute;
   top: 72px;
@@ -1565,7 +1521,6 @@ body {
   letter-spacing: 0.08em;
 }
 
-/* Speedometer / Telemetry HUD on the Right */
 .luau-speedometer-hud {
   position: absolute;
   right: 2.5rem;
@@ -1644,7 +1599,6 @@ body {
   letter-spacing: 0.1em;
 }
 
-/* Floating Stage Cards */
 .luau-stage-card {
   position: absolute;
   z-index: 20;
@@ -1661,7 +1615,6 @@ body {
   pointer-events: auto;
 }
 
-/* Stage 0 (Hero Title) */
 .stage-0 {
   text-align: center;
   max-width: 880px;
@@ -1769,7 +1722,6 @@ body {
   50% { transform: translateY(6px); opacity: 1; }
 }
 
-/* Stage 1, 2, 3 Spec Panels */
 .stage-1, .stage-2, .stage-3 {
   left: 6vw;
   max-width: 480px;
@@ -1873,7 +1825,6 @@ body {
   margin-top: 0.15rem;
 }
 
-/* Stage 4: Telemetry Benchmarks */
 .stage-4 {
   text-align: center;
   max-width: 960px;
@@ -1931,7 +1882,6 @@ body {
   line-height: 1.4;
 }
 
-/* Stage 5: Finale Launch */
 .stage-5 {
   text-align: center;
   max-width: 720px;
@@ -2017,7 +1967,6 @@ body {
   box-shadow: 0 0 50px rgba(0, 242, 254, 0.65);
 }
 
-/* Bottom Telemetry Ticker */
 .luau-hud-footer {
   position: absolute;
   bottom: 0;
@@ -2075,7 +2024,6 @@ body {
   100% { transform: translateX(-50%); }
 }
 
-/* Responsive Overrides */
 @media (max-width: 1024px) {
   .f1-telemetry-grid {
     grid-template-columns: repeat(2, 1fr);

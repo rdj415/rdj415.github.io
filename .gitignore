@@ -1,0 +1,5 @@
+# Local generated cards & assets
+roblox_dev_card_*.png
+roblox_dev_*.jpg
+fonts/
+*.py

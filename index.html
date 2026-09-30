@@ -5,24 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Adam | Senior Roblox Developer & Systems Architect</title>
   <meta name="description" content="Adam — Senior Roblox Developer & Systems Architect with 6+ years of experience. Core libraries, architectural orchestrators, server-authoritative anti-cheat, and autonomous AI." />
-  
-  <!-- Favicon -->
+
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23080b11'/><path d='M8 10h16v3H11v4h11v3H11v6H8z' fill='%2300f2fe'/></svg>" />
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Adam — Senior Roblox Developer & Systems Architect" />
   <meta property="og:description" content="Adam • 6+ years of Senior Roblox & Luau development. Production architectures: AtomicBinding, ModuleLoader, AntiCheatService, AIService." />
   <meta property="og:theme-color" content="#00f2fe" />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css?v=12.0" />
 
-  <!-- Critical Inline Styles for Instant 3D Scrolly HUD Rendering (Zero Cache Lag) -->
   <style>
     .scrolly-luau-container {
       position: relative;
@@ -161,7 +157,6 @@
 </head>
 <body>
 
-  <!-- Dynamic Ambient & Interactive Background -->
   <div class="bg-grid-pattern"></div>
   <div class="bg-glow-orb bg-glow-orb-1"></div>
   <div class="bg-glow-orb bg-glow-orb-2"></div>
@@ -169,7 +164,6 @@
   <div class="bg-spotlight" id="bgSpotlight"></div>
   <canvas id="bg-canvas"></canvas>
 
-  <!-- Sticky Navbar -->
   <header class="navbar" id="navbar">
     <div class="nav-container">
       <a href="#hero" class="nav-logo">
@@ -218,16 +212,12 @@
   </header>
 
   <main>
-    <!-- ══════════════════════════════════════════════════════════════
-         3D SCROLLYTELLING: ANATOMY OF LUAU & SYSTEMS ARCHITECTURE
-         Interactive Exploded 3D Assembly & Cyberpunk HUD Engine
-    ══════════════════════════════════════════════════════════════ -->
+    
     <div class="scrolly-luau-container" id="scrolly-luau-container">
       <div class="scrolly-sticky-viewport">
-        <!-- Three.js Canvas -->
+        
         <canvas id="webgl-stage" class="webgl-stage"></canvas>
 
-        <!-- Top Cyberpunk / F1 Navigation HUD -->
         <div class="luau-hud-header">
           <div class="hud-left">
             <span class="hud-tag">LUAU // ARCHITECT v6.4</span>
@@ -252,7 +242,6 @@
           </div>
         </div>
 
-        <!-- Right Side: Speedometer & Telemetry LED HUD -->
         <div class="luau-speedometer-hud">
           <div class="speed-readout">
             <span class="speed-num" id="f1SpeedVal">000</span>
@@ -278,7 +267,6 @@
           </div>
         </div>
 
-        <!-- Stage 0: Master Portfolio Hero (Active when t < 0.15) -->
         <div class="luau-stage-card stage-0 active" data-stage="0">
           <div class="f1-badge">
             <span class="f1-badge-dot"></span>
@@ -313,7 +301,6 @@
           </div>
         </div>
 
-        <!-- Stage 1: Type Solver Spec Card (Active when 0.15 <= t < 0.38) -->
         <div class="luau-stage-card stage-1" data-stage="1">
           <div class="spec-panel">
             <div class="spec-panel-header">
@@ -345,7 +332,6 @@
           </div>
         </div>
 
-        <!-- Stage 2: Runtime & Bytecode (Active when 0.38 <= t < 0.62) -->
         <div class="luau-stage-card stage-2" data-stage="2">
           <div class="spec-panel">
             <div class="spec-panel-header">
@@ -377,7 +363,6 @@
           </div>
         </div>
 
-        <!-- Stage 3: Modular Architecture & Lifecycle (Active when 0.62 <= t < 0.82) -->
         <div class="luau-stage-card stage-3" data-stage="3">
           <div class="spec-panel">
             <div class="spec-panel-header">
@@ -409,7 +394,6 @@
           </div>
         </div>
 
-        <!-- Stage 4: Telemetry Benchmarks Grid (Active when 0.82 <= t < 0.94) -->
         <div class="luau-stage-card stage-4" data-stage="4">
           <div class="f1-badge">
             <span class="f1-badge-dot"></span>
@@ -443,7 +427,6 @@
           </div>
         </div>
 
-        <!-- Stage 5: Finale / Fully Assembled Monolith (Active when t >= 0.94) -->
         <div class="luau-stage-card stage-5" data-stage="5">
           <div class="f1-badge assembled-badge">
             <span class="f1-badge-dot pulse-green"></span>
@@ -468,7 +451,6 @@
           </div>
         </div>
 
-        <!-- Bottom Telemetry Live Ticker Bar -->
         <div class="luau-hud-footer">
           <div class="f1-progress-bar">
             <div class="f1-progress-fill" id="f1ProgressFill"></div>
@@ -503,9 +485,6 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         HERO SECTION
-    ══════════════════════════════════════════════════════════════ -->
     <section class="hero-section" id="hero">
       <div class="container hero-container">
         
@@ -537,7 +516,6 @@
             </button>
           </div>
 
-          <!-- Verified Experience Metric -->
           <div class="proof-bar">
             <div class="proof-item">
               <div class="proof-val">6+ <span class="proof-unit">Years</span></div>
@@ -549,7 +527,6 @@
           </div>
         </div>
 
-        <!-- Terminal Widget Featuring Substantial User Code -->
         <div class="hero-terminal-wrapper">
           <div class="terminal-card">
             <div class="terminal-header">
@@ -665,9 +642,6 @@ AIService.Metadata = {
       </div>
     </section>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         ENGINEERED SYSTEMS & CORE LIBRARIES
-    ══════════════════════════════════════════════════════════════ -->
     <section class="section" id="systems">
       <div class="container">
         
@@ -679,7 +653,6 @@ AIService.Metadata = {
           </p>
         </div>
 
-        <!-- Featured Video Showcase Switcher -->
         <div class="video-showcase-header">
           <div class="video-showcase-tabs">
             <button class="v-tab active" data-target="video-showcase-ai">
@@ -693,7 +666,6 @@ AIService.Metadata = {
           </div>
         </div>
 
-        <!-- Video 1: AI Systems & Physics in Motion -->
         <div class="featured-video-card active" id="video-showcase-ai">
           <div class="featured-video-wrapper">
             <video class="featured-video" controls autoplay loop muted playsinline poster="assets/videos/ai_npc_poster.jpg">
@@ -725,7 +697,6 @@ AIService.Metadata = {
           </div>
         </div>
 
-        <!-- Video 3: Radial Inventory & Admin UI -->
         <div class="featured-video-card" id="video-showcase-inventory">
           <div class="featured-video-wrapper">
             <video class="featured-video" controls loop muted playsinline poster="assets/videos/inventory_admin_poster.jpg">
@@ -760,7 +731,6 @@ AIService.Metadata = {
 
         <div class="systems-grid">
 
-          <!-- System 1: Autonomous AI & Vehicle Navigation -->
           <div class="system-card">
             <div class="system-media">
               <video class="system-video" autoplay loop muted playsinline poster="assets/videos/ai_npc_poster.jpg">
@@ -790,7 +760,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System 2: Combat & Hitbox Validation -->
           <div class="system-card">
             <div class="system-media">
               <img src="assets/images/combat_system_banner.jpg" alt="Combat & Lag Compensation" class="system-img" />
@@ -818,7 +787,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System: Radial Inventory & Authoritative Data Engine -->
           <div class="system-card">
             <div class="system-media">
               <video class="system-video" autoplay loop muted playsinline poster="assets/videos/inventory_admin_poster.jpg">
@@ -848,7 +816,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System 3: Atomic Tree Pattern Binding Library -->
           <div class="system-card system-card-plain">
             <div class="system-card-content">
               <div class="system-card-header">
@@ -872,7 +839,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System 4: Phased Lifecycle & Boot Orchestrator -->
           <div class="system-card system-card-plain">
             <div class="system-card-content">
               <div class="system-card-header">
@@ -896,7 +862,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System 5: Character Ability & Action Pipeline -->
           <div class="system-card system-card-plain">
             <div class="system-card-content">
               <div class="system-card-header">
@@ -920,7 +885,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System 6: Proximity Interaction & Dynamic Prompts -->
           <div class="system-card system-card-plain">
             <div class="system-card-content">
               <div class="system-card-header">
@@ -944,7 +908,6 @@ AIService.Metadata = {
             </div>
           </div>
 
-          <!-- System 7: Dynamic Spatial Zone & Storm Orchestrator -->
           <div class="system-card system-card-plain">
             <div class="system-card-content">
               <div class="system-card-header">
@@ -973,9 +936,6 @@ AIService.Metadata = {
       </div>
     </section>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         CODE SHOWROOM (AUTHENTIC PROJECT MODULES)
-    ══════════════════════════════════════════════════════════════ -->
     <section class="section" id="code-showroom">
       <div class="container">
         
@@ -1023,7 +983,6 @@ AIService.Metadata = {
             </button>
           </div>
 
-          <!-- Tab 1: AtomicBinding.luau -->
           <div class="code-panel active" id="code-atomic">
             <div class="code-panel-meta">
               <span>Source: src/shared/SharedModules/AtomicBinding.luau • Recursive tree pattern binder & destructor lifecycle</span>
@@ -1167,7 +1126,6 @@ AtomicBinding.__index = AtomicBinding
 <span class="t-kw">return</span> AtomicBinding</code></pre>
           </div>
 
-          <!-- Tab 2: ModuleLoader.luau -->
           <div class="code-panel" id="code-loader">
             <div class="code-panel-meta">
               <span>Source: src/shared/ModuleLoader.luau • Phased lifecycle orchestration (Init / Start) & boot pacing</span>
@@ -1232,7 +1190,6 @@ AtomicBinding.__index = AtomicBinding
 <span class="t-kw">return</span> ModuleLoader</code></pre>
           </div>
 
-          <!-- Tab 3: AntiCheatService.luau -->
           <div class="code-panel" id="code-anticheat">
             <div class="code-panel-meta">
               <span>Source: src/server/ServerModules/AntiCheatService.luau • Suspicion decay, displacement auditing & universe bans</span>
@@ -1328,7 +1285,6 @@ AntiCheatService.Metadata = {
 <span class="t-kw">return</span> AntiCheatService</code></pre>
           </div>
 
-          <!-- Tab 4: BufferUtil.luau -->
           <div class="code-panel" id="code-buffer">
             <div class="code-panel-meta">
               <span>Source: src/shared/Packages/BufferUtil.luau • Binary cursor writer & Vector3 bitpacking</span>
@@ -1382,7 +1338,6 @@ AntiCheatService.Metadata = {
 <span class="t-kw">return</span> BufferUtil</code></pre>
           </div>
 
-          <!-- Tab 5: AIService.luau -->
           <div class="code-panel" id="code-ai">
             <div class="code-panel-meta">
               <span>Source: src/server/ServerModules/AIService.luau • Tactical target checks & anti-stuck jumps</span>
@@ -1455,7 +1410,6 @@ AntiCheatService.Metadata = {
 <span class="t-kw">end</span></code></pre>
           </div>
 
-          <!-- Tab 6: AbilityService.luau -->
           <div class="code-panel" id="code-ability">
             <div class="code-panel-meta">
               <span>Source: src/server/ServerModules/AbilityService.luau • Cooldown rate-limiting, server validation & AntiCheat coordination</span>
@@ -1544,7 +1498,6 @@ AbilityService.Metadata = {
 <span class="t-kw">return</span> AbilityService</code></pre>
           </div>
 
-          <!-- Tab 7: InteractionController.luau -->
           <div class="code-panel" id="code-interaction">
             <div class="code-panel-meta">
               <span>Source: src/client/Controllers/InteractionController.luau • Proximity prompts, TagService dynamic binding & throttled Heartbeat</span>
@@ -1642,7 +1595,6 @@ AbilityService.Metadata = {
 <span class="t-kw">return</span> InteractionController</code></pre>
           </div>
 
-          <!-- Tab 8: ZoneService.luau -->
           <div class="code-panel" id="code-zone">
             <div class="code-panel-meta">
               <span>Source: src/server/ServerModules/ZoneService.luau • Phased danger zone shrinking, smoothstep interpolation & radial damage</span>
@@ -1791,9 +1743,6 @@ ZoneService.Metadata = {
       </div>
     </section>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         ENGINEERING SERVICES & COMMISSIONS
-    ══════════════════════════════════════════════════════════════ -->
     <section class="section" id="services">
       <div class="container">
         
@@ -1904,7 +1853,6 @@ ZoneService.Metadata = {
 
         </div>
 
-        <!-- Working Standards & Trust Badges -->
         <div class="standards-banner">
           <div class="standards-header">
             <span class="standards-title">Collaboration Standards & Guarantee</span>
@@ -1949,9 +1897,6 @@ ZoneService.Metadata = {
       </div>
     </section>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         TECHNICAL ARSENAL
-    ══════════════════════════════════════════════════════════════ -->
     <section class="section" id="technologies">
       <div class="container">
         
@@ -2006,9 +1951,6 @@ ZoneService.Metadata = {
       </div>
     </section>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         CONTACT
-    ══════════════════════════════════════════════════════════════ -->
     <section class="section" id="contact">
       <div class="container">
         
@@ -2099,7 +2041,7 @@ ZoneService.Metadata = {
   <div class="toast-container" id="toastContainer"></div>
   <script src="assets/js/three.min.js"></script>
   <script>window.THREE || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>')</script>
-  <script src="scrolly-luau-engine.js?v=14.0"></script>
-  <script src="script.js?v=14.0"></script>
+  <script src="scrolly-luau-engine.js?v=15.0"></script>
+  <script src="script.js?v=15.0"></script>
 </body>
 </html>

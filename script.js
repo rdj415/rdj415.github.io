@@ -1,11 +1,5 @@
-/**
- * ROBLOX LUAU SYSTEMS ARCHITECT - SCRIPT ENGINE
- * Background Particle Canvas, Code Showroom Tabs, Clipboard Feedback
- */
-
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 1. High-Performance Interactive Background Engine
   const canvas = document.getElementById('bg-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -26,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     resize();
     window.addEventListener('resize', resize);
 
-    // Mouse Interaction
     const mouse = {
       x: null,
       y: null,
@@ -49,10 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const colors = [
-      { r: 0, g: 242, b: 254 },   // Cyan
-      { r: 168, g: 85, b: 247 },  // Purple
-      { r: 56, g: 189, b: 248 },  // Sky
-      { r: 16, g: 185, b: 129 }   // Emerald
+      { r: 0, g: 242, b: 254 },   
+      { r: 168, g: 85, b: 247 },  
+      { r: 56, g: 189, b: 248 },  
+      { r: 16, g: 185, b: 129 }   
     ];
 
     const particleCount = Math.min(Math.floor(window.innerWidth / 18), 75);
@@ -71,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       update() {
-        // Mouse Repulsion
+        
         if (mouse.active && mouse.x !== null) {
           const dx = mouse.x - this.x;
           const dy = mouse.y - this.y;
@@ -88,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Wrap edges smoothly
         if (this.x < -10) this.x = width + 10;
         if (this.x > width + 10) this.x = -10;
         if (this.y < -10) this.y = height + 10;
@@ -115,14 +107,12 @@ document.addEventListener('DOMContentLoaded', () => {
       particles.push(new Particle());
     }
 
-    // Traveling Data Packets
     let pulseT = 0;
 
     function animate() {
       ctx.clearRect(0, 0, width, height);
       pulseT += 0.012;
 
-      // 1. Connect nearby particles
       const connectionDist = 135;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -141,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 0.8;
             ctx.stroke();
 
-            // Occasional traveling data pulse between linked nodes
             if ((i + j) % 6 === 0 && dist < 110) {
               const packetPos = (Math.sin(pulseT * 2 + i) + 1) / 2;
               const px = p1.x + (p2.x - p1.x) * packetPos;
@@ -155,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 2. Connect particles to mouse cursor when active
       if (mouse.active && mouse.x !== null) {
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
@@ -172,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineWidth = 1.2;
             ctx.stroke();
 
-            // Glow on connected node
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius * 1.6, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(0, 242, 254, ${alpha * 0.8})`;
@@ -181,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 3. Update & render particles
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw();
@@ -192,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
     animate();
   }
 
-  // 2. Toast Notifications & Clipboard
   const toastContainer = document.getElementById('toastContainer');
 
   function showToast(message, icon = '📋') {
@@ -265,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 2.5 Video Showcase Switcher
   const videoTabs = document.querySelectorAll('.v-tab');
   const videoCards = document.querySelectorAll('.featured-video-card');
 
@@ -292,7 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 3. Code Tabs Switcher
   const codeTabs = document.querySelectorAll('.code-tab');
   const codePanels = document.querySelectorAll('.code-panel');
 
@@ -308,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Mobile Navigation
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('nav-links');
 
@@ -324,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Scroll Spy
   const sections = document.querySelectorAll('#scrolly-luau-container, section[id]');
   const navItems = document.querySelectorAll('.nav-link');
 
