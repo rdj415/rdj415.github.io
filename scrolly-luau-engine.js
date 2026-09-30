@@ -36,7 +36,7 @@
 
     // --- Three.js Scene Setup ---
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x07090e, 0.022);
+    scene.fog = new THREE.FogExp2(0x07090e, 0.012);
 
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 2.0, 18);
@@ -124,6 +124,264 @@
     });
     const starfield = new THREE.Points(particleGeo, particleMat);
     scene.add(starfield);
+
+    // ═════════════════════════════════════════════════════════════
+    // COSMIC SOLAR SYSTEM ENGINE (Background Celestial System)
+    // ═════════════════════════════════════════════════════════════
+    const solarSystemGroup = new THREE.Group();
+    // Positioned in the celestial background with an elegant orbital perspective
+    solarSystemGroup.position.set(0, 0.6, -16);
+    solarSystemGroup.rotation.x = 0.28;
+    solarSystemGroup.rotation.y = -0.12;
+    scene.add(solarSystemGroup);
+
+    // 1. The Sun (Central Star of the Solar System)
+    const sunGroup = new THREE.Group();
+    const sunGeo = new THREE.SphereGeometry(2.4, 32, 32);
+    const sunMat = new THREE.MeshStandardMaterial({
+      color: 0xfff176,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 1.6,
+      roughness: 0.1,
+      metalness: 0.1
+    });
+    const sunCore = new THREE.Mesh(sunGeo, sunMat);
+    sunGroup.add(sunCore);
+
+    // Sun Inner Corona
+    const sunCoronaGeo = new THREE.SphereGeometry(3.0, 32, 32);
+    const sunCoronaMat = new THREE.MeshBasicMaterial({
+      color: 0xfbbf24,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending
+    });
+    const sunCorona = new THREE.Mesh(sunCoronaGeo, sunCoronaMat);
+    sunGroup.add(sunCorona);
+
+    // Sun Outer Radiant Atmosphere Aura
+    const sunFlareGeo = new THREE.SphereGeometry(3.8, 24, 24);
+    const sunFlareMat = new THREE.MeshBasicMaterial({
+      color: 0xf97316,
+      transparent: true,
+      opacity: 0.18,
+      blending: THREE.AdditiveBlending
+    });
+    const sunFlare = new THREE.Mesh(sunFlareGeo, sunFlareMat);
+    sunGroup.add(sunFlare);
+
+    // Sun Radial Light
+    const sunLight = new THREE.PointLight(0xfbbf24, 3.2, 90);
+    sunGroup.add(sunLight);
+
+    solarSystemGroup.add(sunGroup);
+
+    // Helper: Orbit Line
+    function createOrbitPath(radius, color = 0x38bdf8, opacity = 0.16) {
+      const segments = 128;
+      const pts = [];
+      for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(theta) * radius, 0, Math.sin(theta) * radius));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const mat = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: opacity,
+        blending: THREE.AdditiveBlending
+      });
+      return new THREE.Line(geo, mat);
+    }
+
+    // Helper: Jupiter Atmospheric Bands Texture
+    function createJupiterBandTexture() {
+      const cv = document.createElement('canvas');
+      cv.width = 256;
+      cv.height = 128;
+      const c = cv.getContext('2d');
+      const grad = c.createLinearGradient(0, 0, 0, 128);
+      grad.addColorStop(0.0, '#78350f');
+      grad.addColorStop(0.18, '#d97706');
+      grad.addColorStop(0.35, '#fef3c7');
+      grad.addColorStop(0.50, '#b45309');
+      grad.addColorStop(0.65, '#fde68a');
+      grad.addColorStop(0.82, '#d97706');
+      grad.addColorStop(1.0, '#78350f');
+      c.fillStyle = grad;
+      c.fillRect(0, 0, 256, 128);
+
+      // Great Red Spot
+      c.fillStyle = '#b91c1c';
+      c.beginPath();
+      c.ellipse(175, 82, 22, 13, 0, 0, Math.PI * 2);
+      c.fill();
+      return new THREE.CanvasTexture(cv);
+    }
+
+    // Helper: Saturn Ring Texture
+    function createSaturnRingsTexture() {
+      const cv = document.createElement('canvas');
+      cv.width = 256;
+      cv.height = 16;
+      const c = cv.getContext('2d');
+      const grad = c.createLinearGradient(0, 0, 256, 0);
+      grad.addColorStop(0.0, 'rgba(180, 83, 9, 0)');
+      grad.addColorStop(0.15, 'rgba(253, 230, 138, 0.75)');
+      grad.addColorStop(0.42, 'rgba(245, 158, 11, 0.9)');
+      grad.addColorStop(0.60, 'rgba(15, 23, 42, 0.25)'); // Cassini Division
+      grad.addColorStop(0.72, 'rgba(254, 243, 199, 0.85)');
+      grad.addColorStop(0.95, 'rgba(217, 119, 6, 0.5)');
+      grad.addColorStop(1.0, 'rgba(180, 83, 9, 0)');
+      c.fillStyle = grad;
+      c.fillRect(0, 0, 256, 16);
+      return new THREE.CanvasTexture(cv);
+    }
+
+    const jupiterTexture = createJupiterBandTexture();
+    const saturnRingsTexture = createSaturnRingsTexture();
+
+    // Planets Configuration
+    const solarPlanets = [];
+
+    // 1. Mercury
+    const mercOrbit = 5.2;
+    solarSystemGroup.add(createOrbitPath(mercOrbit, 0x94a3b8, 0.18));
+    const mercMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.24, 20, 20),
+      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.85, metalness: 0.2 })
+    );
+    solarSystemGroup.add(mercMesh);
+    solarPlanets.push({ mesh: mercMesh, orbitRadius: mercOrbit, speed: 0.75, angle: Math.random() * Math.PI * 2 });
+
+    // 2. Venus
+    const venusOrbit = 7.8;
+    solarSystemGroup.add(createOrbitPath(venusOrbit, 0xfde047, 0.18));
+    const venusMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.38, 24, 24),
+      new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0x854d0e, emissiveIntensity: 0.25, roughness: 0.4 })
+    );
+    solarSystemGroup.add(venusMesh);
+    solarPlanets.push({ mesh: venusMesh, orbitRadius: venusOrbit, speed: 0.52, angle: Math.random() * Math.PI * 2 });
+
+    // 3. Earth & Orbiting Moon
+    const earthOrbit = 11.2;
+    solarSystemGroup.add(createOrbitPath(earthOrbit, 0x38bdf8, 0.22));
+    const earthGroup = new THREE.Group();
+    const earthMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.48, 28, 28),
+      new THREE.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0369a1, emissiveIntensity: 0.35, roughness: 0.35, metalness: 0.2 })
+    );
+    earthGroup.add(earthMesh);
+
+    // Earth's Moon
+    const moonMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.85 })
+    );
+    earthGroup.add(moonMesh);
+    solarSystemGroup.add(earthGroup);
+    solarPlanets.push({
+      mesh: earthGroup,
+      orbitRadius: earthOrbit,
+      speed: 0.38,
+      angle: Math.random() * Math.PI * 2,
+      moonMesh: moonMesh,
+      moonOrbit: 1.05,
+      moonAngle: 0
+    });
+
+    // 4. Mars
+    const marsOrbit = 15.0;
+    solarSystemGroup.add(createOrbitPath(marsOrbit, 0xef4444, 0.18));
+    const marsMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.32, 22, 22),
+      new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0x991b1b, emissiveIntensity: 0.25, roughness: 0.75 })
+    );
+    solarSystemGroup.add(marsMesh);
+    solarPlanets.push({ mesh: marsMesh, orbitRadius: marsOrbit, speed: 0.28, angle: Math.random() * Math.PI * 2 });
+
+    // 5. Asteroid Belt (Between Mars & Jupiter)
+    const asteroidCount = 140;
+    const asteroidGeo = new THREE.BufferGeometry();
+    const asteroidPos = new Float32Array(asteroidCount * 3);
+    for (let i = 0; i < asteroidCount; i++) {
+      const aAng = Math.random() * Math.PI * 2;
+      const aRad = 17.5 + (Math.random() - 0.5) * 2.2;
+      asteroidPos[i * 3] = Math.cos(aAng) * aRad;
+      asteroidPos[i * 3 + 1] = (Math.random() - 0.5) * 0.8;
+      asteroidPos[i * 3 + 2] = Math.sin(aAng) * aRad;
+    }
+    asteroidGeo.setAttribute('position', new THREE.BufferAttribute(asteroidPos, 3));
+    const asteroidBelt = new THREE.Points(
+      asteroidGeo,
+      new THREE.PointsMaterial({ size: 0.18, color: 0x94a3b8, transparent: true, opacity: 0.65 })
+    );
+    solarSystemGroup.add(asteroidBelt);
+
+    // 6. Jupiter
+    const jupOrbit = 22.5;
+    solarSystemGroup.add(createOrbitPath(jupOrbit, 0xf59e0b, 0.18));
+    const jupMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1.15, 32, 32),
+      new THREE.MeshStandardMaterial({ map: jupiterTexture, roughness: 0.45, metalness: 0.15 })
+    );
+    solarSystemGroup.add(jupMesh);
+    solarPlanets.push({ mesh: jupMesh, orbitRadius: jupOrbit, speed: 0.16, angle: Math.random() * Math.PI * 2 });
+
+    // 7. Saturn & Glorious Rings
+    const satOrbit = 29.5;
+    solarSystemGroup.add(createOrbitPath(satOrbit, 0xfde68a, 0.18));
+    const saturnGroup = new THREE.Group();
+    const saturnSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.92, 30, 30),
+      new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.45, metalness: 0.2 })
+    );
+    saturnGroup.add(saturnSphere);
+
+    // Saturn Ring Disk
+    const satRingGeo = new THREE.RingGeometry(1.25, 2.35, 64);
+    const satRingMat = new THREE.MeshStandardMaterial({
+      map: saturnRingsTexture,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.88,
+      roughness: 0.3
+    });
+    const satRing = new THREE.Mesh(satRingGeo, satRingMat);
+    satRing.rotation.x = Math.PI * 0.45;
+    saturnGroup.add(satRing);
+
+    solarSystemGroup.add(saturnGroup);
+    solarPlanets.push({ mesh: saturnGroup, orbitRadius: satOrbit, speed: 0.11, angle: Math.random() * Math.PI * 2 });
+
+    // 8. Uranus
+    const uranOrbit = 36.5;
+    solarSystemGroup.add(createOrbitPath(uranOrbit, 0x67e8f9, 0.16));
+    const uranGroup = new THREE.Group();
+    const uranSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.65, 26, 26),
+      new THREE.MeshStandardMaterial({ color: 0x67e8f9, emissive: 0x0891b2, emissiveIntensity: 0.2, roughness: 0.3 })
+    );
+    uranGroup.add(uranSphere);
+    const uranRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.85, 1.15, 36),
+      new THREE.MeshBasicMaterial({ color: 0xa5f3fc, side: THREE.DoubleSide, transparent: true, opacity: 0.4 })
+    );
+    uranRing.rotation.x = Math.PI * 0.15;
+    uranGroup.add(uranRing);
+    solarSystemGroup.add(uranGroup);
+    solarPlanets.push({ mesh: uranGroup, orbitRadius: uranOrbit, speed: 0.075, angle: Math.random() * Math.PI * 2 });
+
+    // 9. Neptune
+    const nepOrbit = 43.0;
+    solarSystemGroup.add(createOrbitPath(nepOrbit, 0x3b82f6, 0.15));
+    const nepMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.62, 26, 26),
+      new THREE.MeshStandardMaterial({ color: 0x2563eb, emissive: 0x1d4ed8, emissiveIntensity: 0.25, roughness: 0.3 })
+    );
+    solarSystemGroup.add(nepMesh);
+    solarPlanets.push({ mesh: nepMesh, orbitRadius: nepOrbit, speed: 0.05, angle: Math.random() * Math.PI * 2 });
 
     // --- 3D Modular Assembly Core ---
     const mainGroup = new THREE.Group();
@@ -1095,6 +1353,36 @@
       starfield.rotation.y = elapsed * 0.015;
 
       coreLight.intensity = 2.8 + Math.sin(elapsed * 3) * 0.7;
+
+      // Orbiting Solar System Animation
+      if (typeof solarPlanets !== 'undefined') {
+        solarPlanets.forEach((p) => {
+          p.angle += delta * p.speed * 0.45;
+          p.mesh.position.x = Math.cos(p.angle) * p.orbitRadius;
+          p.mesh.position.z = Math.sin(p.angle) * p.orbitRadius;
+          p.mesh.rotation.y += delta * 1.2;
+
+          if (p.moonMesh) {
+            p.moonAngle += delta * 2.2;
+            p.moonMesh.position.x = Math.cos(p.moonAngle) * p.moonOrbit;
+            p.moonMesh.position.z = Math.sin(p.moonAngle) * p.moonOrbit;
+          }
+        });
+      }
+
+      if (sunCorona) {
+        sunCorona.rotation.y += delta * 0.15;
+        sunCorona.scale.setScalar(1 + Math.sin(elapsed * 2.5) * 0.04);
+      }
+      if (sunFlare) {
+        sunFlare.rotation.z += delta * 0.08;
+      }
+      if (asteroidBelt) {
+        asteroidBelt.rotation.y += delta * 0.06;
+      }
+      if (solarSystemGroup) {
+        solarSystemGroup.rotation.y += delta * 0.012;
+      }
 
       syncHUD(currentScroll);
 
