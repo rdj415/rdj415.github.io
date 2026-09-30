@@ -115,12 +115,33 @@
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
     particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
 
+    // Soft Circular Glow Texture for Starfield & Dust Sprites
+    function createPointSpriteTexture() {
+      const cv = document.createElement('canvas');
+      cv.width = 64;
+      cv.height = 64;
+      const c = cv.getContext('2d');
+      const g = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+      g.addColorStop(0.25, 'rgba(255, 255, 255, 0.75)');
+      g.addColorStop(0.60, 'rgba(255, 255, 255, 0.2)');
+      g.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+      c.fillStyle = g;
+      c.beginPath();
+      c.arc(32, 32, 32, 0, Math.PI * 2);
+      c.fill();
+      return new THREE.CanvasTexture(cv);
+    }
+    const pointSpriteTexture = createPointSpriteTexture();
+
     const particleMat = new THREE.PointsMaterial({
-      size: 0.22,
+      size: 0.28,
+      map: pointSpriteTexture,
       vertexColors: true,
       transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
     });
     const starfield = new THREE.Points(particleGeo, particleMat);
     scene.add(starfield);
@@ -129,11 +150,11 @@
     // COSMIC SOLAR SYSTEM ENGINE (Background Celestial System)
     // ═════════════════════════════════════════════════════════════
     const solarSystemGroup = new THREE.Group();
-    // Positioned in the celestial background with an elegant orbital perspective
-    solarSystemGroup.position.set(0, 1.2, -18);
-    solarSystemGroup.rotation.x = 0.38;
+    // Positioned in the celestial background elevated above hero text
+    solarSystemGroup.position.set(0, 5.2, -19);
+    solarSystemGroup.rotation.x = 0.40;
     solarSystemGroup.rotation.y = -0.06;
-    solarSystemGroup.rotation.z = 0.05;
+    solarSystemGroup.rotation.z = 0.04;
     scene.add(solarSystemGroup);
 
     // --- PROCEDURAL PLANETARY TEXTURE GENERATORS ---
@@ -513,7 +534,6 @@
         pts.push(new THREE.Vector3(Math.cos(theta) * radius, 0, Math.sin(theta) * radius));
       }
       const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      geo.computeLineDistances();
       const mat = new THREE.LineDashedMaterial({
         color: color,
         dashSize: 0.85,
@@ -630,7 +650,14 @@
     asteroidGeo.setAttribute('color', new THREE.BufferAttribute(asteroidColors, 3));
     const asteroidBelt = new THREE.Points(
       asteroidGeo,
-      new THREE.PointsMaterial({ size: 0.22, vertexColors: true, transparent: true, opacity: 0.75 })
+      new THREE.PointsMaterial({
+        size: 0.28,
+        map: pointSpriteTexture,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.82,
+        depthWrite: false
+      })
     );
     solarSystemGroup.add(asteroidBelt);
 
@@ -1490,9 +1517,10 @@
     ];
 
     function getInterpolatedCamera(t) {
+      const safeT = (isNaN(t) || t < 0) ? 0 : (t > 1 ? 1 : t);
       const segCount = cameraWaypoints.length - 1;
-      const scaled = t * segCount;
-      const idx = Math.min(Math.floor(scaled), segCount - 1);
+      const scaled = safeT * segCount;
+      const idx = Math.min(Math.max(0, Math.floor(scaled)), segCount - 1);
       const alpha = scaled - idx;
       const smoothAlpha = alpha * alpha * (3 - 2 * alpha);
 
@@ -1639,7 +1667,7 @@
       if (currentScroll < 0.12) {
         // Pure Stage 0: ONLY Solar System is visible!
         solarSystemGroup.visible = true;
-        solarSystemGroup.position.set(0, 1.2, -18);
+        solarSystemGroup.position.set(0, 5.2, -19);
         solarSystemGroup.scale.set(1, 1, 1);
 
         mainGroup.visible = false;
@@ -1650,7 +1678,7 @@
         // Transition between Stage 0 and Stage 1
         const tExit = (currentScroll - 0.12) / 0.12; // 0.0 -> 1.0
         solarSystemGroup.visible = true;
-        solarSystemGroup.position.set(0, 1.2 + tExit * 2.0, -18 - tExit * 50);
+        solarSystemGroup.position.set(0, 5.2 + tExit * 2.0, -19 - tExit * 50);
         solarSystemGroup.scale.setScalar(Math.max(0.01, 1 - tExit * 0.75));
 
         mainGroup.visible = true;
