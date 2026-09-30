@@ -130,18 +130,18 @@
     // ═════════════════════════════════════════════════════════════
     const solarSystemGroup = new THREE.Group();
     // Positioned in the celestial background with an elegant orbital perspective
-    solarSystemGroup.position.set(0, 0.6, -16);
-    solarSystemGroup.rotation.x = 0.28;
-    solarSystemGroup.rotation.y = -0.12;
+    solarSystemGroup.position.set(-2.5, 1.4, -16);
+    solarSystemGroup.rotation.x = 0.26;
+    solarSystemGroup.rotation.y = -0.14;
     scene.add(solarSystemGroup);
 
     // 1. The Sun (Central Star of the Solar System)
     const sunGroup = new THREE.Group();
-    const sunGeo = new THREE.SphereGeometry(2.4, 32, 32);
+    const sunGeo = new THREE.SphereGeometry(2.8, 32, 32);
     const sunMat = new THREE.MeshStandardMaterial({
-      color: 0xfff176,
+      color: 0xffea00,
       emissive: 0xf59e0b,
-      emissiveIntensity: 1.6,
+      emissiveIntensity: 1.8,
       roughness: 0.1,
       metalness: 0.1
     });
@@ -149,29 +149,29 @@
     sunGroup.add(sunCore);
 
     // Sun Inner Corona
-    const sunCoronaGeo = new THREE.SphereGeometry(3.0, 32, 32);
+    const sunCoronaGeo = new THREE.SphereGeometry(3.6, 32, 32);
     const sunCoronaMat = new THREE.MeshBasicMaterial({
       color: 0xfbbf24,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.38,
       blending: THREE.AdditiveBlending
     });
     const sunCorona = new THREE.Mesh(sunCoronaGeo, sunCoronaMat);
     sunGroup.add(sunCorona);
 
     // Sun Outer Radiant Atmosphere Aura
-    const sunFlareGeo = new THREE.SphereGeometry(3.8, 24, 24);
+    const sunFlareGeo = new THREE.SphereGeometry(4.8, 24, 24);
     const sunFlareMat = new THREE.MeshBasicMaterial({
       color: 0xf97316,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.20,
       blending: THREE.AdditiveBlending
     });
     const sunFlare = new THREE.Mesh(sunFlareGeo, sunFlareMat);
     sunGroup.add(sunFlare);
 
     // Sun Radial Light
-    const sunLight = new THREE.PointLight(0xfbbf24, 3.2, 90);
+    const sunLight = new THREE.PointLight(0xfbbf24, 3.8, 95);
     sunGroup.add(sunLight);
 
     solarSystemGroup.add(sunGroup);
@@ -1301,6 +1301,45 @@
         camTarget.lookAt.z
       );
       camera.lookAt(lookTarget);
+
+      // ═════════════════════════════════════════════════════════════
+      // STAGE 0 vs STAGES 1-5 VISIBILITY & TRANSITION LOGIC
+      // Stage 0: ONLY the 3D Solar System + Starfield + Hero text!
+      // (NO floor grid, NO ground plate, NO Luau parts, NO shards)
+      // Stages 1-5: Solar System dives into deep space and turns off;
+      // Luau architecture appears, fades in and begins assembly!
+      // ═════════════════════════════════════════════════════════════
+      if (currentScroll < 0.12) {
+        // Pure Stage 0: ONLY Solar System is visible!
+        solarSystemGroup.visible = true;
+        solarSystemGroup.position.set(-2.5, 1.4, -16);
+        solarSystemGroup.scale.set(1, 1, 1);
+
+        mainGroup.visible = false;
+        gridHelper.visible = false;
+        ground.visible = false;
+        coreLight.intensity = 0;
+      } else if (currentScroll < 0.24) {
+        // Transition between Stage 0 and Stage 1
+        const tExit = (currentScroll - 0.12) / 0.12; // 0.0 -> 1.0
+        solarSystemGroup.visible = true;
+        solarSystemGroup.position.set(-2.5, 1.4 + tExit * 2.0, -16 - tExit * 50);
+        solarSystemGroup.scale.setScalar(Math.max(0.01, 1 - tExit * 0.75));
+
+        mainGroup.visible = true;
+        mainGroup.scale.setScalar(Math.min(1, tExit * 1.05));
+        gridHelper.visible = true;
+        ground.visible = true;
+        coreLight.intensity = 2.8 * Math.min(1, tExit);
+      } else {
+        // Stages 1-5: Full Luau Assembly (Solar system completely hidden)
+        solarSystemGroup.visible = false;
+        mainGroup.visible = true;
+        mainGroup.scale.set(1, 1, 1);
+        gridHelper.visible = true;
+        ground.visible = true;
+        coreLight.intensity = 2.8 + Math.sin(elapsed * 3) * 0.7;
+      }
 
       // Morphing from exploded to assembled
       const assembleFactor = Math.min(Math.max((currentScroll - 0.08) / 0.84, 0), 1);
