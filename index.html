@@ -43,7 +43,8 @@
       </a>
 
       <nav class="nav-links" id="nav-links">
-        <a href="#hero" class="nav-link active">Overview</a>
+        <a href="#scrolly-luau-container" class="nav-link active">3D Анатомия</a>
+        <a href="#hero" class="nav-link">Overview</a>
         <a href="#systems" class="nav-link">Core Systems & Libraries</a>
         <a href="#code-showroom" class="nav-link">Production Code</a>
         <a href="#services" class="nav-link">Services & Terms</a>
@@ -81,6 +82,278 @@
   </header>
 
   <main>
+    <!-- ══════════════════════════════════════════════════════════════
+         3D SCROLLYTELLING: ANATOMY OF LUAU & SYSTEMS ARCHITECTURE
+         Interactive Exploded 3D Assembly & Cyberpunk HUD Engine
+    ══════════════════════════════════════════════════════════════ -->
+    <div class="scrolly-luau-container" id="scrolly-luau-container">
+      <div class="scrolly-sticky-viewport">
+        <!-- Three.js Canvas -->
+        <canvas id="webgl-stage" class="webgl-stage"></canvas>
+
+        <!-- Top Cyberpunk / F1 Navigation HUD -->
+        <div class="luau-hud-header">
+          <div class="hud-left">
+            <span class="hud-tag">LUAU // ARCHITECT v6.4</span>
+            <div class="hud-beacon">
+              <span class="hud-beacon-dot"></span>
+              <span class="hud-beacon-text">RUNTIME ACTIVE</span>
+            </div>
+          </div>
+
+          <div class="hud-nav-links">
+            <button type="button" class="hud-jump-link" data-jump="0.22">01 // ТИПЫ</button>
+            <button type="button" class="hud-jump-link" data-jump="0.50">02 // РАНТАЙМ</button>
+            <button type="button" class="hud-jump-link" data-jump="0.72">03 // АРХИТЕКТУРА</button>
+            <button type="button" class="hud-jump-link" data-jump="1.00">04 // СТАРТ</button>
+          </div>
+
+          <div class="hud-right">
+            <button type="button" class="hud-audio-btn" id="hudAudioToggle" title="Toggle Sound FX">
+              <span class="audio-icon">🔊</span>
+              <span class="audio-text">FX SOUND</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Side: Speedometer & Telemetry LED HUD -->
+        <div class="luau-speedometer-hud">
+          <div class="speed-readout">
+            <span class="speed-num" id="f1SpeedVal">000</span>
+            <span class="speed-unit">FPS / OPS</span>
+          </div>
+
+          <div class="speed-meter-column">
+            <div class="led-meter">
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+              <div class="led-segment"></div>
+            </div>
+            <div class="stage-readout" id="f1StageVal">00 // 05</div>
+          </div>
+        </div>
+
+        <!-- Stage 0: Hero Intro Title & Prompt (Active when t < 0.15) -->
+        <div class="luau-stage-card stage-0 active" data-stage="0">
+          <div class="f1-badge">
+            <span class="f1-badge-dot"></span>
+            <span>ИНТЕРАКТИВНАЯ 3D-СБОРКА // 400 ДЕТАЛЕЙ LUAU</span>
+          </div>
+
+          <h1 class="f1-hero-title">
+            АНАТОМИЯ <span class="gradient-accent">LUAU</span>
+          </h1>
+
+          <p class="f1-hero-desc">
+            Архитектура языка рождается из хаоса. Листайте вниз — и соберите систему своими руками.
+          </p>
+
+          <div class="f1-scroll-prompt">
+            <div class="scroll-crosshair">+</div>
+            <span class="scroll-text">ЛИСТАЙ ВНИЗ ДЛЯ СБОРКИ</span>
+            <div class="scroll-arrow-anim">↓</div>
+          </div>
+        </div>
+
+        <!-- Stage 1: Type Solver Spec Card (Active when 0.15 <= t < 0.38) -->
+        <div class="luau-stage-card stage-1" data-stage="1">
+          <div class="spec-panel">
+            <div class="spec-panel-header">
+              <span class="spec-panel-index">01 // ЭТАП СБОРКИ</span>
+              <span class="spec-panel-code">&lt;T&gt; :: STRICT</span>
+            </div>
+            <h2 class="spec-panel-title">СИСТЕМА ТИПОВ: Strict Type Solver</h2>
+            <p class="spec-panel-desc">
+              Строгая типизация Luau гарантирует полное устранение runtime-ошибок еще до запуска кода на сервере. Оптимизированный анализ абстрактных типов, дженерики и предикаты.
+            </p>
+            <div class="spec-grid">
+              <div class="spec-item">
+                <span class="spec-val">100%</span>
+                <span class="spec-lbl">Type Safety</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">0.00 ns</span>
+                <span class="spec-lbl">Runtime Cost</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">&lt;T, U&gt;</span>
+                <span class="spec-lbl">Generics</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">Compile</span>
+                <span class="spec-lbl">Validation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 2: Runtime & Bytecode (Active when 0.38 <= t < 0.62) -->
+        <div class="luau-stage-card stage-2" data-stage="2">
+          <div class="spec-panel">
+            <div class="spec-panel-header">
+              <span class="spec-panel-index">02 // ЭТАП СБОРКИ</span>
+              <span class="spec-panel-code">SIMD // BUFFER</span>
+            </div>
+            <h2 class="spec-panel-title">РАНТАЙМ: Bytecode & SIMD Vector</h2>
+            <p class="spec-panel-desc">
+              Специализированная виртуальная машина Luau с нативными SIMD-инструкциями для векторной 3D-математики (Raycast, физика пружин) и прямым управлением буферами памяти без пауз GC.
+            </p>
+            <div class="spec-grid">
+              <div class="spec-item">
+                <span class="spec-val">Native</span>
+                <span class="spec-lbl">SIMD Vector</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">Direct</span>
+                <span class="spec-lbl">Buffer Memory</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">0.02 ms</span>
+                <span class="spec-lbl">Tick Execution</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">Zero</span>
+                <span class="spec-lbl">GC Spikes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 3: Modular Architecture & Lifecycle (Active when 0.62 <= t < 0.82) -->
+        <div class="luau-stage-card stage-3" data-stage="3">
+          <div class="spec-panel">
+            <div class="spec-panel-header">
+              <span class="spec-panel-index">03 // ЭТАП СБОРКИ</span>
+              <span class="spec-panel-code">ATOMIC // LIFECYCLE</span>
+            </div>
+            <h2 class="spec-panel-title">АРХИТЕКТУРА: AtomicBinding & Modules</h2>
+            <p class="spec-panel-desc">
+              Отказоустойчивая архитектура компонентов с фазовым жизненным циклом (Init → Start → Destroy), серверным авторитетом и иммунитетом к репликационным эксплойтам.
+            </p>
+            <div class="spec-grid">
+              <div class="spec-item">
+                <span class="spec-val">Phased</span>
+                <span class="spec-lbl">Lifecycle Flow</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">Atomic</span>
+                <span class="spec-lbl">Instance Binder</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">100%</span>
+                <span class="spec-lbl">Server Authority</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-val">Delta</span>
+                <span class="spec-lbl">Replication</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 4: Telemetry Benchmarks Grid (Active when 0.82 <= t < 0.94) -->
+        <div class="luau-stage-card stage-4" data-stage="4">
+          <div class="f1-badge">
+            <span class="f1-badge-dot"></span>
+            <span>ТЕЛЕМЕТРИЯ СИСТЕМЫ // РЕЗУЛЬТАТЫ БЕНЧМАРКОВ</span>
+          </div>
+
+          <h2 class="telemetry-hero-title">
+            6+ ЛЕТ ИНЖЕНЕРНОЙ ЯРОСТИ
+          </h2>
+
+          <div class="f1-telemetry-grid">
+            <div class="f1-telemetry-box">
+              <div class="telemetry-val">6+ <span class="telemetry-unit">Лет</span></div>
+              <div class="telemetry-lbl">Опыт Senior разработки в Luau & Roblox</div>
+            </div>
+
+            <div class="f1-telemetry-box">
+              <div class="telemetry-val">2,035+ <span class="telemetry-unit">Строк</span></div>
+              <div class="telemetry-lbl">В ключевом модуле AIService.luau</div>
+            </div>
+
+            <div class="f1-telemetry-box">
+              <div class="telemetry-val">60 <span class="telemetry-unit">FPS</span></div>
+              <div class="telemetry-lbl">Стабильный игровой тикрейт под нагрузкой</div>
+            </div>
+
+            <div class="f1-telemetry-box">
+              <div class="telemetry-val">0.02 <span class="telemetry-unit">мс</span></div>
+              <div class="telemetry-lbl">Среднее время тика серверного цикла</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 5: Finale / Fully Assembled Monolith (Active when t >= 0.94) -->
+        <div class="luau-stage-card stage-5" data-stage="5">
+          <div class="f1-badge assembled-badge">
+            <span class="f1-badge-dot pulse-green"></span>
+            <span>СБОРКА 100% // ЯДРО СИНХРОНИЗИРОВАНО</span>
+          </div>
+
+          <h2 class="f1-launch-title">
+            ПОЕХАЛИ
+          </h2>
+
+          <p class="f1-launch-desc">
+            Все 400 элементов архитектуры Luau объединены в монолитное производительное ядро.
+          </p>
+
+          <div class="f1-actions-row">
+            <button type="button" class="f1-btn f1-btn-reset" id="btnAssembleReset">
+              <span>↺</span> СОБРАТЬ ЗАНОВО
+            </button>
+            <button type="button" class="f1-btn f1-btn-primary" id="btnInspectPortfolio">
+              <span>⚡</span> ПЕРЕЙТИ К ПОРТФОЛИО
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom Telemetry Live Ticker Bar -->
+        <div class="luau-hud-footer">
+          <div class="f1-progress-bar">
+            <div class="f1-progress-fill" id="f1ProgressFill"></div>
+          </div>
+          <div class="hud-ticker-wrap">
+            <div class="hud-ticker-content">
+              <span class="ticker-highlight">СБОРКА ЯДРА: <strong id="tickerAssemblyVal">0%</strong></span>
+              <span class="ticker-sep">///</span>
+              <span>СТРОГАЯ ТИПИЗАЦИЯ LUAU</span>
+              <span class="ticker-sep">///</span>
+              <span>ZERO GC OVERHEAD</span>
+              <span class="ticker-sep">///</span>
+              <span>60 FPS TICKRATE</span>
+              <span class="ticker-sep">///</span>
+              <span>ROJO + WALLY + GIT</span>
+              <span class="ticker-sep">///</span>
+              <span>6+ ЛЕТ ОПЫТА</span>
+              <span class="ticker-sep">///</span>
+              <span>СЕРВЕРНЫЙ АВТОРИТЕТ</span>
+              <span class="ticker-sep">///</span>
+              <span>2035 СТРОК АРХИТЕКТУРЫ</span>
+              <span class="ticker-sep">///</span>
+              <span>АВТОНОМНЫЕ СИСТЕМЫ</span>
+              <span class="ticker-sep">///</span>
+              <span>ПИТ-СТОП 1.9 С</span>
+              <span class="ticker-sep">///</span>
+              <span>V-MAX 360 OPS</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════════
          HERO SECTION
     ══════════════════════════════════════════════════════════════ -->
@@ -1742,6 +2015,9 @@ ZoneService.Metadata = {
   </footer>
 
   <div class="toast-container" id="toastContainer"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>window.THREE || document.write('<script src="assets/js/three.min.js"><\/script>')</script>
+  <script src="scrolly-luau-engine.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

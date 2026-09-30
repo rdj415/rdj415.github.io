@@ -1420,3 +1420,668 @@ body {
     gap: 14px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   3D SCROLLYTELLING: ANATOMY OF LUAU & CYBERPUNK F1 HUD
+   ══════════════════════════════════════════════════════════════ */
+.scrolly-luau-container {
+  position: relative;
+  width: 100%;
+  height: 520vh;
+  background: #07090e;
+  z-index: 10;
+}
+
+.scrolly-sticky-viewport {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.webgl-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Top HUD Header */
+.luau-hud-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2.5rem;
+  background: linear-gradient(180deg, rgba(7, 9, 14, 0.88) 0%, rgba(7, 9, 14, 0) 100%);
+  pointer-events: auto;
+}
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.hud-tag {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #f8fafc;
+  text-transform: uppercase;
+}
+
+.hud-beacon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #34d399;
+}
+
+.hud-beacon-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: beaconPulse 1.8s infinite;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.hud-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hud-jump-link {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.05em;
+}
+
+.hud-jump-link:hover {
+  background: rgba(0, 242, 254, 0.15);
+  border-color: #00f2fe;
+  color: #00f2fe;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+}
+
+.hud-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-audio-btn:hover {
+  border-color: #a855f7;
+  color: #c084fc;
+}
+
+.hud-audio-btn.muted {
+  opacity: 0.6;
+}
+
+/* Speedometer / Telemetry HUD on the Right */
+.luau-speedometer-hud {
+  position: absolute;
+  right: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 22;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.8rem;
+  pointer-events: none;
+}
+
+.speed-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.speed-num {
+  font-family: var(--font-mono);
+  font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 0.95;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 25px rgba(0, 242, 254, 0.45);
+}
+
+.speed-unit {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.speed-meter-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.led-meter {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 3px;
+  width: 22px;
+}
+
+.led-segment {
+  width: 100%;
+  height: 5px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.led-segment.active {
+  background: #00f2fe;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.8);
+}
+
+.led-segment:nth-child(n+10).active {
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.9);
+}
+
+.stage-readout {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.1em;
+}
+
+/* Floating Stage Cards */
+.luau-stage-card {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(28px) scale(0.96);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.luau-stage-card.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Stage 0 (Hero Title) */
+.stage-0 {
+  text-align: center;
+  max-width: 860px;
+  padding: 0 1.5rem;
+}
+
+.f1-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.1rem;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #f87171;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.f1-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.f1-hero-title {
+  font-family: var(--font-sans);
+  font-size: clamp(3rem, 7.5vw, 6.2rem);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 1.4rem;
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, #00f2fe 0%, #38bdf8 45%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 35px rgba(0, 242, 254, 0.4));
+}
+
+.f1-hero-desc {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: #94a3b8;
+  max-width: 640px;
+  margin: 0 auto 2.8rem;
+  line-height: 1.6;
+}
+
+.f1-scroll-prompt {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #00f2fe;
+}
+
+.scroll-crosshair {
+  font-size: 1.2rem;
+  color: #00f2fe;
+  opacity: 0.8;
+}
+
+.scroll-arrow-anim {
+  font-size: 1.3rem;
+  animation: scrollBounce 1.6s infinite ease-in-out;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+/* Stage 1, 2, 3 Spec Panels */
+.stage-1, .stage-2, .stage-3 {
+  left: 6vw;
+  max-width: 480px;
+  width: 90%;
+}
+
+.spec-panel {
+  background: rgba(11, 15, 25, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 242, 254, 0.28);
+  border-left: 3px solid #00f2fe;
+  border-radius: 12px;
+  padding: 1.8rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(0, 242, 254, 0.1);
+}
+
+.stage-2 .spec-panel {
+  border-left-color: #a855f7;
+  border-color: rgba(168, 85, 247, 0.32);
+}
+
+.stage-3 .spec-panel {
+  border-left-color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.32);
+}
+
+.spec-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.spec-panel-index {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #ef4444;
+  text-transform: uppercase;
+}
+
+.spec-panel-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #00f2fe;
+  background: rgba(0, 242, 254, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.spec-panel-title {
+  font-family: var(--font-sans);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 0.85rem;
+}
+
+.spec-panel-desc {
+  font-size: 0.92rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 1.4rem;
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+}
+
+.spec-item {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-val {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #00f2fe;
+}
+
+.stage-2 .spec-val {
+  color: #c084fc;
+}
+
+.spec-lbl {
+  font-size: 0.74rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
+}
+
+/* Stage 4: Telemetry Benchmarks */
+.stage-4 {
+  text-align: center;
+  max-width: 960px;
+  width: 92%;
+}
+
+.telemetry-hero-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+}
+
+.f1-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+}
+
+.f1-telemetry-box {
+  background: rgba(11, 15, 25, 0.88);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid #ef4444;
+  border-radius: 8px;
+  padding: 1.8rem 1.2rem;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.telemetry-val {
+  font-family: var(--font-mono);
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.telemetry-unit {
+  font-size: 0.95rem;
+  color: #ef4444;
+  font-weight: 700;
+  margin-left: 0.2rem;
+}
+
+.telemetry-lbl {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-top: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Stage 5: Finale Launch */
+.stage-5 {
+  text-align: center;
+  max-width: 720px;
+  width: 90%;
+}
+
+.assembled-badge {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #34d399;
+}
+
+.pulse-green {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+
+.f1-launch-title {
+  font-family: var(--font-sans);
+  font-size: clamp(3.8rem, 8.5vw, 6.8rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 0 45px rgba(0, 242, 254, 0.55);
+}
+
+.f1-launch-desc {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: #94a3b8;
+  max-width: 580px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+}
+
+.f1-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.f1-btn {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 1rem 1.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.f1-btn-reset {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+
+.f1-btn-reset:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #f87171;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.35);
+  transform: translateY(-2px);
+}
+
+.f1-btn-primary {
+  background: linear-gradient(135deg, #00f2fe 0%, #38bdf8 50%, #818cf8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #07090e;
+  box-shadow: 0 0 35px rgba(0, 242, 254, 0.4);
+}
+
+.f1-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 50px rgba(0, 242, 254, 0.65);
+}
+
+/* Bottom Telemetry Ticker */
+.luau-hud-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 25;
+  background: rgba(7, 9, 14, 0.94);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.f1-progress-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.f1-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #00f2fe 0%, #a855f7 100%);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.8);
+  transition: width 0.08s linear;
+}
+
+.hud-ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.7rem 1.5rem;
+}
+
+.hud-ticker-content {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.12em;
+  animation: tickerSlide 35s linear infinite;
+}
+
+.ticker-highlight {
+  color: #00f2fe;
+}
+
+.ticker-sep {
+  color: #ef4444;
+  margin: 0 0.8rem;
+  opacity: 0.7;
+}
+
+@keyframes tickerSlide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .f1-telemetry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stage-1, .stage-2, .stage-3 {
+    left: 4vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .luau-hud-header {
+    padding: 1rem 1.25rem;
+  }
+  .hud-nav-links {
+    display: none;
+  }
+  .luau-speedometer-hud {
+    right: 1.25rem;
+  }
+  .stage-1, .stage-2, .stage-3 {
+    left: 1.25rem;
+    right: 1.25rem;
+    max-width: none;
+    width: auto;
+  }
+  .f1-actions-row {
+    flex-direction: column;
+    width: 100%;
+  }
+  .f1-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 5. Scroll Spy
-  const sections = document.querySelectorAll('section[id]');
+  const sections = document.querySelectorAll('#scrolly-luau-container, section[id]');
   const navItems = document.querySelectorAll('.nav-link');
 
   window.addEventListener('scroll', () => {
