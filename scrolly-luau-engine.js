@@ -30,9 +30,11 @@
       return;
     }
 
-    const container = document.getElementById('scrolly-luau-container');
-    const stage = document.getElementById('webgl-stage');
-    if (!container || !stage) return;
+    try {
+      console.log('[Luau Engine] Initializing 3D Solar System & Assembly Engine...');
+      const container = document.getElementById('scrolly-luau-container');
+      const stage = document.getElementById('webgl-stage');
+      if (!container || !stage) return;
 
     // --- Three.js Scene Setup ---
     const scene = new THREE.Scene();
@@ -1806,6 +1808,9 @@
     }
 
     renderLoop();
+    } catch (err) {
+      console.error('[Luau Engine Critical Error]', err);
+    }
   }
 
   if (document.readyState === 'loading') {
