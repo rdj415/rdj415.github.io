@@ -1303,6 +1303,10 @@ function getLuauLettersShapes(scale) {
     }
 
     function updateScrollProgress() {
+      if (window.innerWidth <= 768) {
+        // Mobile 1-screen hero mode: normal free scrolling down the page
+        return;
+      }
       if (testScrollParam !== null) {
         targetScroll = Math.max(0, Math.min(1, parseFloat(testScrollParam)));
         currentScroll = targetScroll;
@@ -1313,7 +1317,6 @@ function getLuauLettersShapes(scale) {
       if (scrollHeight <= 0) return;
 
       const progress = -rect.top / scrollHeight;
-      targetScroll = Math.max(0, Math.min(1, progress));
     }
 
     window.addEventListener('scroll', updateScrollProgress, { passive: true });
@@ -1416,6 +1419,86 @@ function getLuauLettersShapes(scale) {
           }
         });
       }
+    }
+
+
+    // Mobile Stage Stepper & Horizontal Touch Swipe
+    const stageTargets = [0.00, 0.22, 0.50, 0.72, 0.90, 1.00];
+    let mobileCurrentStage = 0;
+
+    function goToStage(idx) {
+      idx = Math.max(0, Math.min(stageTargets.length - 1, idx));
+      mobileCurrentStage = idx;
+      targetScroll = stageTargets[idx];
+      syncHUD(targetScroll);
+      updateMobilePills(idx);
+    }
+
+    function updateMobilePills(idx) {
+      const pills = document.querySelectorAll(".m-stage-pill");
+      pills.forEach((p) => {
+        const s = parseInt(p.getAttribute("data-stage"), 10);
+        if (s === idx) {
+          p.classList.add("active");
+          p.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        } else {
+          p.classList.remove("active");
+        }
+      });
+    }
+
+    document.querySelectorAll(".m-stage-pill").forEach((pill) => {
+      pill.addEventListener("click", (e) => {
+        e.preventDefault();
+        const s = parseInt(pill.getAttribute("data-stage"), 10);
+        goToStage(s);
+      });
+    });
+
+    const mPrev = document.getElementById("mStagePrev");
+    if (mPrev) {
+      mPrev.addEventListener("click", (e) => {
+        e.preventDefault();
+        goToStage(mobileCurrentStage - 1);
+      });
+    }
+
+    const mNext = document.getElementById("mStageNext");
+    if (mNext) {
+      mNext.addEventListener("click", (e) => {
+        e.preventDefault();
+        goToStage(mobileCurrentStage + 1);
+      });
+    }
+
+    // Touch swipe left/right on viewport to switch stages without blocking page vertical scroll
+    let touchStartX = null;
+    let touchStartY = null;
+    const viewportEl = document.querySelector(".scrolly-sticky-viewport");
+    if (viewportEl) {
+      viewportEl.addEventListener("touchstart", (e) => {
+        if (window.innerWidth <= 768 && e.touches && e.touches[0]) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      viewportEl.addEventListener("touchend", (e) => {
+        if (window.innerWidth <= 768 && touchStartX !== null && e.changedTouches && e.changedTouches[0]) {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          const dy = e.changedTouches[0].clientY - touchStartY;
+          // Only trigger if horizontal swipe is prominent
+          if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+            if (dx < 0) {
+              goToStage(mobileCurrentStage + 1);
+            } else {
+              goToStage(mobileCurrentStage - 1);
+            }
+          }
+          touchStartX = null;
+          touchStartY = null;
+        }
+      }, { passive: true });
     }
 
     const resetBtn = document.getElementById('btnAssembleReset');
