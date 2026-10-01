@@ -2,6 +2,7 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local KeyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 
 local framework = ReplicatedStorage:WaitForChild("CombatFramework")
@@ -52,6 +53,53 @@ function CombatController.SetupAnimationsForCharacter(char: Model)
                 local track = animator:LoadAnimation(anim)
                 track.Priority = Enum.AnimationPriority.Action
                 loadedTracks[idx] = track
+            end
+        end
+    end
+end
+
+function CombatController.UpdateFirstPersonArms()
+    local player = Players.LocalPlayer
+    if not player then return end
+    local char = player.Character
+    if not char then return end
+    local head = char:FindFirstChild("Head") :: BasePart?
+    local cam = workspace.CurrentCamera
+    if not head or not cam then return end
+    
+    local dist = (cam.CFrame.Position - head.Position).Magnitude
+    local isFirstPerson = (dist < 1.6) or ((cam.Focus.Position - cam.CFrame.Position).Magnitude < 0.8)
+    
+    if isFirstPerson then
+        local armNames = {
+            "Left Arm", "Right Arm",
+            "LeftUpperArm", "LeftLowerArm", "LeftHand",
+            "RightUpperArm", "RightLowerArm", "RightHand"
+        }
+        for _, name in ipairs(armNames) do
+            local armPart = char:FindFirstChild(name) :: BasePart?
+            if armPart then
+                armPart.LocalTransparencyModifier = 0
+            end
+        end
+        for _, desc in ipairs(char:GetDescendants()) do
+            if desc:IsA("BasePart") and (desc.Name:find("Arm") or desc.Name:find("Hand") or desc.Name:find("Glove")) then
+                desc.LocalTransparencyModifier = 0
+            end
+        end
+        head.LocalTransparencyModifier = 1
+        
+        local torso = char:FindFirstChild("Torso") :: BasePart?
+        if torso then
+            local rightShoulder = torso:FindFirstChild("Right Shoulder") :: Motor6D?
+            local leftShoulder = torso:FindFirstChild("Left Shoulder") :: Motor6D?
+            local lookY = cam.CFrame.LookVector.Y
+            local pitchAngle = math.clamp(lookY * 0.5, -math.rad(40), math.rad(40))
+            if rightShoulder and rightShoulder.CurrentAngle == 0 then
+                rightShoulder.Transform = rightShoulder.Transform * CFrame.Angles(pitchAngle, 0, 0)
+            end
+            if leftShoulder and leftShoulder.CurrentAngle == 0 then
+                leftShoulder.Transform = leftShoulder.Transform * CFrame.Angles(pitchAngle, 0, 0)
             end
         end
     end
@@ -132,6 +180,12 @@ function CombatController.Init()
         Scythe.add(_controllerScope, charConn)
     end
     
+    -- Bind first-person arms updater after camera
+    RunService:BindToRenderStep("FirstPersonArmsVisibility", Enum.RenderPriority.Camera.Value + 2, CombatController.UpdateFirstPersonArms)
+    Scythe.add(_controllerScope, function()
+        RunService:UnbindFromRenderStep("FirstPersonArmsVisibility")
+    end)
+    
     local vfxConn = combatVFXEvent.OnClientEvent:Connect(function(data: any)
         if type(data) ~= "table" then return end
         local hitPos = data.hitPosition or Vector3.zero
@@ -142,7 +196,6 @@ function CombatController.Init()
         
         CameraShake.AddTrauma(comboData.Trauma)
         CombatVFX.SpawnHitSparks(hitPos, comboData.SlashColor, isFinisher)
-        
         CombatVFX.SpawnFlyingComboInfo(hitPos, hitCombo, damage, isFinisher, comboData.SlashColor)
         
         local impactSound = isFinisher and CombatConfig.Sounds.HitFinisher or (hitCombo >= 3 and CombatConfig.Sounds.HitHeavy or CombatConfig.Sounds.HitMedium)
@@ -168,7 +221,7 @@ function CombatController.Init()
     end)
     Scythe.add(_controllerScope, inputConn)
     
-    print("[CombatController] Initialized with Toolbox R6 Punch Animations and Flying 3D Combo Burst.")
+    print("[CombatController] Initialized with 1st Person Arms Visibility, R6 Punch Animations, and 3D Combo Burst.")
 end
 
 function CombatController.Start()
