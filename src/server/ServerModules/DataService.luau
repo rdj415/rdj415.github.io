@@ -22,7 +22,8 @@ export type UpdateCallback<T> = (currentValue: T) -> (T, boolean?)
 local DataService = {}
 DataService.__index = DataService
 
-local _janitor: any = nil
+local _scythe: any = nil
+local _serviceScope: number = 0
 local _moduleLoader: any = nil
 local _profiles: { [Player]: PlayerData } = {}
 local _readOnlyMode: { [Player]: boolean } = {}
@@ -81,8 +82,8 @@ end
 function DataService.Init(Context: any)
 	_moduleLoader = Context.ModuleLoader
 
-	local JanitorClass = _moduleLoader.RequireShared("Utility.Janitor")
-	_janitor = JanitorClass.new()
+	_scythe = _moduleLoader.RequireShared("Packages.Scythe")
+	_serviceScope = _scythe.scope()
 
 	-- Session-locking lifecycle listener
 	local addConn = Players.PlayerAdded:Connect(function(player: Player)
@@ -92,10 +93,10 @@ function DataService.Init(Context: any)
 		DataService._releaseSession(player)
 	end)
 
-	_janitor:GiveTask(addConn)
-	_janitor:GiveTask(remConn)
+	_scythe.add(_serviceScope, addConn)
+	_scythe.add(_serviceScope, remConn)
 
-	print("[DataService] Initialized with ProfileStore wrapper architecture.")
+	print("[DataService] Initialized with ProfileStore wrapper architecture and Scythe scope.")
 end
 
 -- Asynchronous Start Lifecycle Hook
@@ -242,11 +243,10 @@ function DataService.Destroy()
 	table.clear(_readOnlyMode)
 	table.clear(_saveTokens)
 
-	if _janitor then
-		_janitor:Destroy()
-		_janitor = nil
+	if _scythe and _scythe.isAlive(_serviceScope) then
+		_scythe.scope(_serviceScope)
 	end
-	print("[DataService] Destroyed cleanly.")
+	print("[DataService] Destroyed cleanly via Scythe.")
 end
 
 return DataService

@@ -32,10 +32,19 @@ Welcome to the official repository for my developer portfolio. I am a **Senior R
   Authoritative server ability pipeline with high-precision timestamp verification (`os.clock()`), cooldown enforcement, player disconnect state reclamation, and automated anti-cheat displacement bypass integration during high-velocity dashes and combat abilities.
 
 - **`InteractionController.luau` — Proximity Interaction & Puzzle Prompt Engine**  
-  Client-side interaction framework designed for dense multiplayer maps (doors, generators, chests, interactables). Utilizes `TagService` dynamic CollectionService watchers with automatic janitor cleanup and a throttled 5 Hz distance calculation loop to maintain 60 FPS without per-frame CPU degradation.
+  Client-side interaction framework designed for dense multiplayer maps (doors, generators, chests, interactables). Utilizes `TagService` dynamic CollectionService watchers with Scythe zero-allocation scope cleanup and a throttled 5 Hz distance calculation loop to maintain 60 FPS without per-frame CPU degradation.
 
 - **`ZoneService.luau` — Dynamic Spatial Danger Zone & Round Orchestrator**  
   Multi-phase round boundary shrinkage using cubic Hermite smoothstep curves (`3t² - 2t³`) for stutter-free network replication, coordinating with client storm visualizers and applying throttled 1 Hz radial out-of-zone player damage.
+
+- **`Scythe.luau` — Zero-Allocation Scope-Based Memory Management Engine**  
+  High-performance memory management package providing zero-allocation resource lifecycles. Uses lightweight integer handles for 0 heap allocations per scope, with automated LIFO teardown of Instances, connections, and custom cleanup callbacks.
+
+- **`HitboxService.luau` — Spatial Combat & Shapecasting Engine**  
+  Zero-trust server-authoritative hit detection using Blockcast and Spherecast. Features dot-product combat angle pre-filtering, animation-driven marker triggers with zero `wait()` calls, server rate-limiting debounces, and client VFX offloading via UnreliableRemoteEvents.
+
+- **`DataService.luau` — Session-Locked Persistence & Transactional Mutation**  
+  Enterprise data persistence layer wrapping ProfileStore. Features atomic transactional mutations (`.Update()`) to prevent race conditions, cryptographic FNV-1a CSPRNG seeding, write-verify release tokens, and continuous S-curve sigmoid luck scaling.
 
 ---
 

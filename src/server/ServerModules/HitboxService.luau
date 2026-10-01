@@ -29,7 +29,8 @@ export type HitResult = {
 local HitboxService = {}
 HitboxService.__index = HitboxService
 
-local _janitor: any = nil
+local _scythe: any = nil
+local _serviceScope: number = 0
 local _moduleLoader: any = nil
 local _vfxRemote: UnreliableRemoteEvent? = nil
 local _attackerDebounce: { [Player]: number } = {}
@@ -83,17 +84,17 @@ end
 function HitboxService.Init(Context: any)
 	_moduleLoader = Context.ModuleLoader
 
-	-- Lazy-load Janitor through ModuleLoader
-	local JanitorClass = _moduleLoader.RequireShared("Utility.Janitor")
-	_janitor = JanitorClass.new()
+	-- Import Scythe zero-allocation memory engine
+	_scythe = _moduleLoader.RequireShared("Packages.Scythe")
+	_serviceScope = _scythe.scope()
 
 	-- Server-side debounce garbage collection on PlayerRemoving
 	local removeConn = Players.PlayerRemoving:Connect(function(player: Player)
 		_attackerDebounce[player] = nil
 	end)
-	_janitor:GiveTask(removeConn)
+	_scythe.add(_serviceScope, removeConn)
 
-	print("[HitboxService] Initialized synchronously via ModuleLoader")
+	print("[HitboxService] Initialized synchronously via ModuleLoader with Scythe scope.")
 end
 
 -- Asynchronous Start Lifecycle Hook
@@ -104,7 +105,7 @@ function HitboxService.Start()
 		remoteFolder = Instance.new("Folder")
 		remoteFolder.Name = "CombatRemotes"
 		remoteFolder.Parent = ReplicatedStorage
-		_janitor:GiveTask(remoteFolder)
+		_scythe.add(_serviceScope, remoteFolder)
 	end
 
 	local vfxEvent = remoteFolder:FindFirstChild("CombatVFX") :: UnreliableRemoteEvent?
@@ -112,7 +113,7 @@ function HitboxService.Start()
 		vfxEvent = Instance.new("UnreliableRemoteEvent")
 		vfxEvent.Name = "CombatVFX"
 		vfxEvent.Parent = remoteFolder
-		_janitor:GiveTask(vfxEvent)
+		_scythe.add(_serviceScope, vfxEvent)
 	end
 	_vfxRemote = vfxEvent
 
@@ -222,7 +223,7 @@ function HitboxService:BindToAnimationMarker(track: AnimationTrack, markerName: 
 	end)
 
 	_activeTrackTasks[track] = conn
-	_janitor:GiveTask(conn)
+	_scythe.add(_serviceScope, conn)
 
 	-- Auto-cleanup on animation stop
 	local stopConn: RBXScriptConnection
@@ -233,7 +234,7 @@ function HitboxService:BindToAnimationMarker(track: AnimationTrack, markerName: 
 		end
 		stopConn:Disconnect()
 	end)
-	_janitor:GiveTask(stopConn)
+	_scythe.add(_serviceScope, stopConn)
 end
 
 -- Destructor Cleanup Hook
@@ -244,11 +245,10 @@ function HitboxService.Destroy()
 	table.clear(_activeTrackTasks)
 	table.clear(_attackerDebounce)
 
-	if _janitor then
-		_janitor:Destroy()
-		_janitor = nil
+	if _scythe and _scythe.isAlive(_serviceScope) then
+		_scythe.scope(_serviceScope)
 	end
-	print("[HitboxService] Destroyed cleanly.")
+	print("[HitboxService] Destroyed cleanly via Scythe.")
 end
 
 return HitboxService

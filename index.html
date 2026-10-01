@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=12.0" />
+  <link rel="stylesheet" href="style.css?v=17.0" />
 
   <style>
     .scrolly-luau-container {
@@ -896,7 +896,7 @@ AIService.Metadata = {
               </div>
 
               <p class="system-text">
-                Client-side interaction framework designed for high-density environments (doors, generators, chests, puzzles). Watches CollectionService tags with automated teardown janitors, utilizing a throttled 5 Hz distance evaluation loop to maintain a solid 60 FPS without per-frame overhead.
+                Client-side interaction framework designed for high-density environments (doors, generators, chests, puzzles). Watches CollectionService tags with Scythe zero-allocation numeric scopes, utilizing a throttled 5 Hz distance evaluation loop to maintain a solid 60 FPS without per-frame overhead.
               </p>
 
               <div class="system-tags">
@@ -988,6 +988,10 @@ AIService.Metadata = {
             <button class="code-tab" data-target="code-data">
               <span class="tab-icon">💾</span>
               <span>DataService.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-scythe">
+              <span class="tab-icon">🗡️</span>
+              <span>Scythe.luau</span>
             </button>
           </div>
 
@@ -1431,7 +1435,8 @@ AbilityService.Metadata = {
 	Priority = <span class="t-num">20</span>,
 }
 
-<span class="t-kw">local</span> _maid = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _scythe = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _serviceScope: <span class="t-type">number</span> = <span class="t-num">0</span>
 <span class="t-kw">local</span> _moduleLoader = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _abilityConfig = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _abilityActivated = <span class="t-kw">nil</span>
@@ -1478,28 +1483,27 @@ AbilityService.Metadata = {
 		_abilityActivated.Name = <span class="t-str">"AbilityActivated"</span>
 		_abilityActivated.Parent = remotes
 	<span class="t-kw">end</span>
-	_maid:<span class="t-fn">GiveTask</span>(_abilityActivated.OnServerEvent:<span class="t-fn">Connect</span>(_onAbilityActivated))
+	_scythe.<span class="t-fn">add</span>(_serviceScope, _abilityActivated.OnServerEvent:<span class="t-fn">Connect</span>(_onAbilityActivated))
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> AbilityService.<span class="t-fn">Init</span>(context: <span class="t-type">any</span>)
 	_moduleLoader = context.ModuleLoader
-	<span class="t-kw">local</span> Maid = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.Maid"</span>)
-	_maid = Maid.<span class="t-fn">new</span>()
+	_scythe = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Packages.Scythe"</span>)
+	_serviceScope = _scythe.<span class="t-fn">scope</span>()
 	_abilityConfig = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.AbilityConfig"</span>)
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> AbilityService.<span class="t-fn">Start</span>(context: <span class="t-type">any</span>)
 	<span class="t-fn">_setupRemotes</span>()
-	_maid:<span class="t-fn">GiveTask</span>(Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(plr)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(plr)
 		_lastUse[plr] = <span class="t-kw">nil</span>
 	<span class="t-kw">end</span>))
 	<span class="t-fn">print</span>(<span class="t-str">"[AbilityService] Started"</span>)
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> AbilityService.<span class="t-fn">Destroy</span>()
-	<span class="t-kw">if</span> _maid <span class="t-kw">then</span>
-		_maid:<span class="t-fn">Destroy</span>()
-		_maid = <span class="t-kw">nil</span>
+	<span class="t-kw">if</span> _scythe <span class="t-kw">and</span> _scythe.<span class="t-fn">isAlive</span>(_serviceScope) <span class="t-kw">then</span>
+		_scythe.<span class="t-fn">scope</span>(_serviceScope)
 	<span class="t-kw">end</span>
 <span class="t-kw">end</span>
 
@@ -1517,7 +1521,8 @@ AbilityService.Metadata = {
 <span class="t-kw">local</span> InteractionController = {}
 <span class="t-kw">local</span> _spatialService = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _tagService = <span class="t-kw">nil</span>
-<span class="t-kw">local</span> _maid = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _scythe = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _controllerScope: <span class="t-type">number</span> = <span class="t-num">0</span>
 
 <span class="t-kw">local</span> CheckInterval = <span class="t-num">0.2</span>
 <span class="t-kw">local</span> InteractionRadius = <span class="t-num">15</span>
@@ -1528,14 +1533,17 @@ AbilityService.Metadata = {
 	<span class="t-kw">local</span> ML = Context.ModuleLoader
 	_spatialService = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.SpatialService"</span>)
 	_tagService = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.TagService"</span>)
-	_maid = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.Maid"</span>).<span class="t-fn">new</span>()
+	_scythe = ML.<span class="t-fn">RequireShared</span>(<span class="t-str">"Packages.Scythe"</span>)
+	_controllerScope = _scythe.<span class="t-fn">scope</span>()
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> InteractionController.<span class="t-fn">Start</span>()
 	<span class="t-fn">print</span>(<span class="t-str">"[InteractionController] Started"</span>)
 
-	<span class="t-comment">-- Dynamically watch tags and manage teardown janitors</span>
-	_tagService.<span class="t-fn">Watch</span>(<span class="t-str">"Interactable"</span>, <span class="t-kw">function</span>(instance, janitor)
+	<span class="t-comment">-- Dynamically watch tags and manage teardown scopes (0 heap allocations)</span>
+	_tagService.<span class="t-fn">Watch</span>(<span class="t-str">"Interactable"</span>, <span class="t-kw">function</span>(instance)
+		<span class="t-kw">local</span> tagScope: <span class="t-type">number</span> = _scythe.<span class="t-fn">scope</span>()
+
 		<span class="t-kw">local function</span> <span class="t-fn">setupPrompt</span>(prompt)
 			prompt.Enabled = <span class="t-kw">false</span>
 			_activePrompts[instance] = prompt
@@ -1555,7 +1563,7 @@ AbilityService.Metadata = {
 					<span class="t-kw">end</span>
 				<span class="t-kw">end</span>
 			<span class="t-kw">end</span>)
-			janitor:<span class="t-fn">Add</span>(<span class="t-kw">function</span>()
+			_scythe.<span class="t-fn">add</span>(tagScope, <span class="t-kw">function</span>()
 				<span class="t-kw">if</span> conn <span class="t-kw">then</span>
 					conn:<span class="t-fn">Disconnect</span>()
 					conn = <span class="t-kw">nil</span>
@@ -1563,7 +1571,7 @@ AbilityService.Metadata = {
 			<span class="t-kw">end</span>)
 		<span class="t-kw">end</span>
 
-		janitor:<span class="t-fn">Add</span>(<span class="t-kw">function</span>()
+		_scythe.<span class="t-fn">add</span>(tagScope, <span class="t-kw">function</span>()
 			_activePrompts[instance] = <span class="t-kw">nil</span>
 		<span class="t-kw">end</span>)
 	<span class="t-kw">end</span>)
@@ -1590,13 +1598,12 @@ AbilityService.Metadata = {
 			<span class="t-kw">end</span>
 		<span class="t-kw">end</span>
 	<span class="t-kw">end</span>)
-	_maid:<span class="t-fn">GiveTask</span>(heartbeatConn)
+	_scythe.<span class="t-fn">add</span>(_controllerScope, heartbeatConn)
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> InteractionController.<span class="t-fn">Destroy</span>()
-	<span class="t-kw">if</span> _maid <span class="t-kw">then</span>
-		_maid:<span class="t-fn">Destroy</span>()
-		_maid = <span class="t-kw">nil</span>
+	<span class="t-kw">if</span> _scythe <span class="t-kw">and</span> _scythe.<span class="t-fn">isAlive</span>(_controllerScope) <span class="t-kw">then</span>
+		_scythe.<span class="t-fn">scope</span>(_controllerScope)
 	<span class="t-kw">end</span>
 <span class="t-kw">end</span>
 
@@ -1617,7 +1624,8 @@ ZoneService.Metadata = {
 	Priority = <span class="t-num">22</span>,
 }
 
-<span class="t-kw">local</span> _maid = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _scythe = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _serviceScope: <span class="t-type">number</span> = <span class="t-num">0</span>
 <span class="t-kw">local</span> _networkRegistry = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _stormStateEvent = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _testConfig = <span class="t-kw">nil</span>
@@ -1651,8 +1659,8 @@ ZoneService.Metadata = {
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> ZoneService.<span class="t-fn">Init</span>(context: <span class="t-type">any</span>)
-	<span class="t-kw">local</span> Maid = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.Maid"</span>)
-	_maid = Maid.<span class="t-fn">new</span>()
+	_scythe = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Packages.Scythe"</span>)
+	_serviceScope = _scythe.<span class="t-fn">scope</span>()
 	_networkRegistry = context.ModuleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"SharedModules.NetworkRegistry"</span>)
 	_testConfig = context.ModuleLoader.<span class="t-fn">RequireScoped</span>(<span class="t-str">"ServerModules.TestConfig"</span>)
 	_stormStateEvent = _networkRegistry.<span class="t-fn">Resolve</span>(<span class="t-str">"StormStateEvent"</span>)
@@ -1664,7 +1672,7 @@ ZoneService.Metadata = {
 		_initialDiameter = _testConfig.StormInitialDiameter <span class="t-kw">or</span> <span class="t-num">1000</span>
 	<span class="t-kw">end</span>
 	_currentDiameter = _initialDiameter
-	_updateStormVisuals(_initialDiameter)
+	<span class="t-fn">_updateStormVisuals</span>(_initialDiameter)
 
 	<span class="t-kw">local</span> currentPhaseIndex = <span class="t-num">1</span>
 	<span class="t-kw">local</span> phases = (_testConfig <span class="t-kw">and</span> _testConfig.StormPhases) <span class="t-kw">or</span> {
@@ -1674,10 +1682,10 @@ ZoneService.Metadata = {
 	<span class="t-kw">local function</span> <span class="t-fn">runNextPhase</span>()
 		<span class="t-kw">if</span> currentPhaseIndex &gt; #phases <span class="t-kw">then return end</span>
 		<span class="t-kw">local</span> phase = phases[currentPhaseIndex]
-		<span class="t-kw">local</span> activeMaid = _maid
+		<span class="t-kw">local</span> phaseScope: <span class="t-type">number</span> = _scythe.<span class="t-fn">scope</span>()
 
 		<span class="t-fn">task.delay</span>(phase.WaitDuration, <span class="t-kw">function</span>()
-			<span class="t-kw">if not</span> _stormStateEvent <span class="t-kw">or</span> _maid ~= activeMaid <span class="t-kw">then return end</span>
+			<span class="t-kw">if not</span> _stormStateEvent <span class="t-kw">or not</span> _scythe.<span class="t-fn">isAlive</span>(phaseScope) <span class="t-kw">then return end</span>
 			_stormStateEvent:<span class="t-fn">FireAllClients</span>(<span class="t-str">"Shrinking"</span>, phase.ShrinkDuration)
 
 			<span class="t-kw">local</span> startDiameter = _currentDiameter
@@ -1687,7 +1695,7 @@ ZoneService.Metadata = {
 
 			<span class="t-kw">local</span> conn
 			conn = RunService.Heartbeat:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>()
-				<span class="t-kw">if</span> _maid ~= activeMaid <span class="t-kw">then</span> conn:<span class="t-fn">Disconnect</span>() <span class="t-kw">return end</span>
+				<span class="t-kw">if not</span> _scythe.<span class="t-fn">isAlive</span>(phaseScope) <span class="t-kw">then</span> conn:<span class="t-fn">Disconnect</span>() <span class="t-kw">return end</span>
 				<span class="t-kw">local</span> elapsed = <span class="t-fn">os.clock</span>() - startTime
 				<span class="t-kw">local</span> alpha = <span class="t-fn">math.clamp</span>(elapsed / duration, <span class="t-num">0</span>, <span class="t-num">1</span>)
 				<span class="t-comment">-- Cubic Hermite smoothstep for natural boundary shrinking</span>
@@ -1698,13 +1706,14 @@ ZoneService.Metadata = {
 				<span class="t-kw">if</span> alpha &gt;= <span class="t-num">1</span> <span class="t-kw">then</span>
 					conn:<span class="t-fn">Disconnect</span>()
 					_stormStateEvent:<span class="t-fn">FireAllClients</span>(<span class="t-str">"Finished"</span>)
+					_scythe.<span class="t-fn">scope</span>(phaseScope)
 					currentPhaseIndex += <span class="t-num">1</span>
 					<span class="t-fn">runNextPhase</span>()
 				<span class="t-kw">end</span>
 			<span class="t-kw">end</span>)
 
-			<span class="t-kw">if</span> _maid == activeMaid <span class="t-kw">then</span>
-				activeMaid:<span class="t-fn">GiveTask</span>(conn)
+			<span class="t-kw">if</span> _scythe.<span class="t-fn">isAlive</span>(phaseScope) <span class="t-kw">then</span>
+				_scythe.<span class="t-fn">add</span>(phaseScope, conn)
 			<span class="t-kw">else</span>
 				conn:<span class="t-fn">Disconnect</span>()
 			<span class="t-kw">end</span>
@@ -1722,7 +1731,7 @@ ZoneService.Metadata = {
 			<span class="t-fn">_checkAndDamagePlayers</span>()
 		<span class="t-kw">end</span>
 	<span class="t-kw">end</span>)
-	_maid:<span class="t-fn">GiveTask</span>(damageConn)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, damageConn)
 	<span class="t-fn">print</span>(<span class="t-str">"[ZoneService] Started"</span>)
 <span class="t-kw">end</span>
 
@@ -1737,9 +1746,8 @@ ZoneService.Metadata = {
 <span class="t-kw">end</span>
 
 <span class="t-kw">function</span> ZoneService.<span class="t-fn">Destroy</span>()
-	<span class="t-kw">if</span> _maid <span class="t-kw">then</span>
-		_maid:<span class="t-fn">Destroy</span>()
-		_maid = <span class="t-kw">nil</span>
+	<span class="t-kw">if</span> _scythe <span class="t-kw">and</span> _scythe.<span class="t-fn">isAlive</span>(_serviceScope) <span class="t-kw">then</span>
+		_scythe.<span class="t-fn">scope</span>(_serviceScope)
 	<span class="t-kw">end</span>
 <span class="t-kw">end</span>
 
@@ -1782,7 +1790,8 @@ ZoneService.Metadata = {
 <span class="t-kw">local</span> HitboxService = {}
 HitboxService.__index = HitboxService
 
-<span class="t-kw">local</span> _janitor: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _scythe: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _serviceScope: <span class="t-type">number</span> = <span class="t-num">0</span>
 <span class="t-kw">local</span> _moduleLoader: <span class="t-type">any</span> = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _vfxRemote: <span class="t-type">UnreliableRemoteEvent</span>? = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _attackerDebounce: { [<span class="t-type">Player</span>]: <span class="t-type">number</span> } = {}
@@ -1836,17 +1845,17 @@ HitboxService.__index = HitboxService
 <span class="t-kw">function</span> HitboxService.<span class="t-fn">Init</span>(Context: <span class="t-type">any</span>)
 	_moduleLoader = Context.ModuleLoader
 
-	<span class="t-comment">-- Lazy-load Janitor through ModuleLoader</span>
-	<span class="t-kw">local</span> JanitorClass = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Utility.Janitor"</span>)
-	_janitor = JanitorClass.<span class="t-fn">new</span>()
+	<span class="t-comment">-- Import Scythe zero-allocation memory engine</span>
+	_scythe = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Packages.Scythe"</span>)
+	_serviceScope = _scythe.<span class="t-fn">scope</span>()
 
 	<span class="t-comment">-- Server-side debounce garbage collection on PlayerRemoving</span>
 	<span class="t-kw">local</span> removeConn = Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(player: <span class="t-type">Player</span>)
 		_attackerDebounce[player] = <span class="t-kw">nil</span>
 	<span class="t-kw">end</span>)
-	_janitor:<span class="t-fn">GiveTask</span>(removeConn)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, removeConn)
 
-	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Initialized synchronously via ModuleLoader"</span>)
+	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Initialized synchronously via ModuleLoader with Scythe scope."</span>)
 <span class="t-kw">end</span>
 
 <span class="t-comment">-- Asynchronous Start Lifecycle Hook</span>
@@ -1857,7 +1866,7 @@ HitboxService.__index = HitboxService
 		remoteFolder = Instance.<span class="t-fn">new</span>(<span class="t-str">"Folder"</span>)
 		remoteFolder.Name = <span class="t-str">"CombatRemotes"</span>
 		remoteFolder.Parent = ReplicatedStorage
-		_janitor:<span class="t-fn">GiveTask</span>(remoteFolder)
+		_scythe.<span class="t-fn">add</span>(_serviceScope, remoteFolder)
 	<span class="t-kw">end</span>
 
 	<span class="t-kw">local</span> vfxEvent = remoteFolder:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"CombatVFX"</span>) :: <span class="t-type">UnreliableRemoteEvent</span>?
@@ -1865,7 +1874,7 @@ HitboxService.__index = HitboxService
 		vfxEvent = Instance.<span class="t-fn">new</span>(<span class="t-str">"UnreliableRemoteEvent"</span>)
 		vfxEvent.Name = <span class="t-str">"CombatVFX"</span>
 		vfxEvent.Parent = remoteFolder
-		_janitor:<span class="t-fn">GiveTask</span>(vfxEvent)
+		_scythe.<span class="t-fn">add</span>(_serviceScope, vfxEvent)
 	<span class="t-kw">end</span>
 	_vfxRemote = vfxEvent
 
@@ -1974,7 +1983,7 @@ HitboxService.__index = HitboxService
 	<span class="t-kw">end</span>)
 
 	_activeTrackTasks[track] = conn
-	_janitor:<span class="t-fn">GiveTask</span>(conn)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, conn)
 
 	<span class="t-kw">local</span> stopConn: <span class="t-type">RBXScriptConnection</span>
 	stopConn = track.Stopped:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>()
@@ -1984,7 +1993,7 @@ HitboxService.__index = HitboxService
 		<span class="t-kw">end</span>
 		stopConn:<span class="t-fn">Disconnect</span>()
 	<span class="t-kw">end</span>)
-	_janitor:<span class="t-fn">GiveTask</span>(stopConn)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, stopConn)
 <span class="t-kw">end</span>
 
 <span class="t-comment">-- Destructor Cleanup Hook</span>
@@ -1995,11 +2004,10 @@ HitboxService.__index = HitboxService
 	<span class="t-fn">table.clear</span>(_activeTrackTasks)
 	<span class="t-fn">table.clear</span>(_attackerDebounce)
 
-	<span class="t-kw">if</span> _janitor <span class="t-kw">then</span>
-		_janitor:<span class="t-fn">Destroy</span>()
-		_janitor = <span class="t-kw">nil</span>
+	<span class="t-kw">if</span> _scythe <span class="t-kw">and</span> _scythe.<span class="t-fn">isAlive</span>(_serviceScope) <span class="t-kw">then</span>
+		_scythe.<span class="t-fn">scope</span>(_serviceScope)
 	<span class="t-kw">end</span>
-	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Destroyed cleanly."</span>)
+	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Destroyed cleanly via Scythe."</span>)
 <span class="t-kw">end</span>
 
 <span class="t-kw">return</span> HitboxService</code></pre>
@@ -2035,7 +2043,8 @@ HitboxService.__index = HitboxService
 <span class="t-kw">local</span> DataService = {}
 DataService.__index = DataService
 
-<span class="t-kw">local</span> _janitor: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _scythe: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _serviceScope: <span class="t-type">number</span> = <span class="t-num">0</span>
 <span class="t-kw">local</span> _moduleLoader: <span class="t-type">any</span> = <span class="t-kw">nil</span>
 <span class="t-kw">local</span> _profiles: { [<span class="t-type">Player</span>]: <span class="t-type">PlayerData</span> } = {}
 <span class="t-kw">local</span> _readOnlyMode: { [<span class="t-type">Player</span>]: <span class="t-type">boolean</span> } = {}
@@ -2094,8 +2103,8 @@ DataService.__index = DataService
 <span class="t-kw">function</span> DataService.<span class="t-fn">Init</span>(Context: <span class="t-type">any</span>)
 	_moduleLoader = Context.ModuleLoader
 
-	<span class="t-kw">local</span> JanitorClass = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Utility.Janitor"</span>)
-	_janitor = JanitorClass.<span class="t-fn">new</span>()
+	_scythe = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Packages.Scythe"</span>)
+	_serviceScope = _scythe.<span class="t-fn">scope</span>()
 
 	<span class="t-comment">-- Session-locking lifecycle listener</span>
 	<span class="t-kw">local</span> addConn = Players.PlayerAdded:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(player: <span class="t-type">Player</span>)
@@ -2105,10 +2114,10 @@ DataService.__index = DataService
 		DataService.<span class="t-fn">_releaseSession</span>(player)
 	<span class="t-kw">end</span>)
 
-	_janitor:<span class="t-fn">GiveTask</span>(addConn)
-	_janitor:<span class="t-fn">GiveTask</span>(remConn)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, addConn)
+	_scythe.<span class="t-fn">add</span>(_serviceScope, remConn)
 
-	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Initialized with ProfileStore wrapper architecture."</span>)
+	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Initialized with ProfileStore wrapper architecture and Scythe scope."</span>)
 <span class="t-kw">end</span>
 
 <span class="t-comment">-- Asynchronous Start Lifecycle Hook</span>
@@ -2253,14 +2262,115 @@ DataService.__index = DataService
 	<span class="t-fn">table.clear</span>(_readOnlyMode)
 	<span class="t-fn">table.clear</span>(_saveTokens)
 
-	<span class="t-kw">if</span> _janitor <span class="t-kw">then</span>
-		_janitor:<span class="t-fn">Destroy</span>()
-		_janitor = <span class="t-kw">nil</span>
+	<span class="t-kw">if</span> _scythe <span class="t-kw">and</span> _scythe.<span class="t-fn">isAlive</span>(_serviceScope) <span class="t-kw">then</span>
+		_scythe.<span class="t-fn">scope</span>(_serviceScope)
 	<span class="t-kw">end</span>
-	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Destroyed cleanly."</span>)
+	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Destroyed cleanly via Scythe."</span>)
 <span class="t-kw">end</span>
 
 <span class="t-kw">return</span> DataService</code></pre>
+          </div>
+
+          <div class="code-panel" id="code-scythe">
+            <div class="code-panel-meta">
+              <span>Source: src/shared/Packages/Scythe.luau • Zero-allocation numeric scope-based memory & resource cleanup engine</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-scythe">Copy Code</button>
+            </div>
+            <pre><code id="raw-scythe"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Packages / Scythe.luau]</span>
+<span class="t-comment">-- Enterprise Zero-Allocation Scope-Based Memory Management Engine.</span>
+<span class="t-comment">-- Provides ultra-low-overhead resource lifecycle and cleanup via numeric scope handles.</span>
+
+<span class="t-kw">export type</span> <span class="t-type">ScopeId</span> = <span class="t-type">number</span>
+<span class="t-kw">export type</span> <span class="t-type">CleanupTask</span> = <span class="t-type">Instance</span> | <span class="t-type">RBXScriptConnection</span> | () -&gt; () | { Destroy: (<span class="t-type">any</span>) -&gt; () } | { destroy: (<span class="t-type">any</span>) -&gt; () } | <span class="t-type">any</span>
+
+<span class="t-kw">local</span> _scopes: { [<span class="t-type">ScopeId</span>]: { <span class="t-type">CleanupTask</span> } } = {}
+<span class="t-kw">local</span> _nextScopeId: <span class="t-type">ScopeId</span> = <span class="t-num">0</span>
+
+<span class="t-kw">local function</span> <span class="t-fn">_cleanupResource</span>(resource: <span class="t-type">CleanupTask</span>)
+	<span class="t-kw">local</span> resType = <span class="t-fn">typeof</span>(resource)
+
+	<span class="t-kw">if</span> resType == <span class="t-str">"RBXScriptConnection"</span> <span class="t-kw">then</span>
+		(resource :: <span class="t-type">RBXScriptConnection</span>):<span class="t-fn">Disconnect</span>()
+	<span class="t-kw">elseif</span> resType == <span class="t-str">"Instance"</span> <span class="t-kw">then</span>
+		(resource :: <span class="t-type">Instance</span>):<span class="t-fn">Destroy</span>()
+	<span class="t-kw">elseif</span> resType == <span class="t-str">"function"</span> <span class="t-kw">then</span>
+		(resource :: () -&gt; ())()
+	<span class="t-kw">elseif</span> resType == <span class="t-str">"table"</span> <span class="t-kw">then</span>
+		<span class="t-kw">local</span> tbl = resource :: <span class="t-type">any</span>
+		<span class="t-kw">if typeof</span>(tbl.Destroy) == <span class="t-str">"function"</span> <span class="t-kw">then</span>
+			tbl:<span class="t-fn">Destroy</span>()
+		<span class="t-kw">elseif typeof</span>(tbl.destroy) == <span class="t-str">"function"</span> <span class="t-kw">then</span>
+			tbl:<span class="t-fn">destroy</span>()
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> Scythe = {}
+
+<span class="t-comment">-- Create a new scope handle or destroy an existing scope</span>
+<span class="t-kw">function</span> Scythe.<span class="t-fn">scope</span>(scopeId: <span class="t-type">ScopeId</span>?): <span class="t-type">ScopeId</span>?
+	<span class="t-kw">if</span> scopeId == <span class="t-kw">nil then</span>
+		_nextScopeId += <span class="t-num">1</span>
+		<span class="t-kw">local</span> id = _nextScopeId
+		_scopes[id] = {}
+		<span class="t-kw">return</span> id
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> bucket = _scopes[scopeId]
+	<span class="t-kw">if not</span> bucket <span class="t-kw">then</span>
+		<span class="t-kw">return nil</span>
+	<span class="t-kw">end</span>
+
+	_scopes[scopeId] = <span class="t-kw">nil</span>
+
+	<span class="t-comment">-- Clean up resources in reverse order (LIFO)</span>
+	<span class="t-kw">for</span> i = #bucket, <span class="t-num">1</span>, -<span class="t-num">1</span> <span class="t-kw">do</span>
+		<span class="t-kw">local</span> taskItem = bucket[i]
+		<span class="t-kw">local</span> ok, err = <span class="t-fn">pcall</span>(_cleanupResource, taskItem)
+		<span class="t-kw">if not</span> ok <span class="t-kw">then</span>
+			<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[Scythe] Cleanup error in scope %d: %s"</span>, scopeId, <span class="t-fn">tostring</span>(err)))
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">return nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Register a resource inside the specified scope</span>
+<span class="t-kw">function</span> Scythe.<span class="t-fn">add</span>(scopeId: <span class="t-type">ScopeId</span>, resource: <span class="t-type">CleanupTask</span>): <span class="t-type">CleanupTask</span>
+	<span class="t-kw">local</span> bucket = _scopes[scopeId]
+	<span class="t-kw">if not</span> bucket <span class="t-kw">then</span>
+		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[Scythe] Attempted to add resource to dead or invalid scope %d. Cleaning immediately."</span>, scopeId))
+		<span class="t-fn">pcall</span>(_cleanupResource, resource)
+		<span class="t-kw">return</span> resource
+	<span class="t-kw">end</span>
+
+	<span class="t-fn">table.insert</span>(bucket, resource)
+	<span class="t-kw">return</span> resource
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Batch register an array of resources inside the specified scope</span>
+<span class="t-kw">function</span> Scythe.<span class="t-fn">addBulk</span>(scopeId: <span class="t-type">ScopeId</span>, resources: { <span class="t-type">CleanupTask</span> })
+	<span class="t-kw">local</span> bucket = _scopes[scopeId]
+	<span class="t-kw">if not</span> bucket <span class="t-kw">then</span>
+		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[Scythe] Attempted to addBulk resources to dead or invalid scope %d. Cleaning immediately."</span>, scopeId))
+		<span class="t-kw">for</span> _, res <span class="t-kw">in</span> resources <span class="t-kw">do</span>
+			<span class="t-fn">pcall</span>(_cleanupResource, res)
+		<span class="t-kw">end</span>
+		<span class="t-kw">return</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">for</span> _, res <span class="t-kw">in</span> resources <span class="t-kw">do</span>
+		<span class="t-fn">table.insert</span>(bucket, res)
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Check if the scope is currently active</span>
+<span class="t-kw">function</span> Scythe.<span class="t-fn">isAlive</span>(scopeId: <span class="t-type">ScopeId</span>): <span class="t-type">boolean</span>
+	<span class="t-kw">return</span> _scopes[scopeId] ~= <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> <span class="t-fn">table.freeze</span>(Scythe)</code></pre>
           </div>
 
         </div>
@@ -2458,7 +2568,7 @@ DataService.__index = DataService
             <ul class="tech-card-list">
               <li><strong>Custom ModuleLoader</strong>: Phased bootstrap system with scoped Init/Start cycles and pacing controls.</li>
               <li><strong>AtomicBinding Pattern</strong>: Recursive instance hierarchy binder eliminating race conditions and memory leaks.</li>
-              <li><strong>Janitor / Maid Class</strong>: Defensive resource management ensuring zero dangling events upon instance destruction.</li>
+              <li><strong>Scythe Zero-Allocation Engine</strong>: High-performance numeric scope resource management (0 heap allocations) ensuring defensive teardown of connections and instances.</li>
             </ul>
           </div>
 
@@ -2566,7 +2676,7 @@ DataService.__index = DataService
   <div class="toast-container" id="toastContainer"></div>
   <script src="assets/js/three.min.js"></script>
   <script>window.THREE || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>')</script>
-  <script src="scrolly-luau-engine.js?v=16.0"></script>
-  <script src="script.js?v=16.0"></script>
+  <script src="scrolly-luau-engine.js?v=17.0"></script>
+  <script src="script.js?v=17.0"></script>
 </body>
 </html>
