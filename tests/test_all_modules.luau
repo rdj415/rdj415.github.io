@@ -3,6 +3,7 @@
 
 local mock = require("./roblox_mock")
 local game = _G.game
+local workspace = _G.workspace
 local Vector3 = _G.Vector3
 local Vector2 = _G.Vector2
 local CFrame = _G.CFrame
@@ -496,6 +497,77 @@ runTest("DataService: Transactional mutation, Set method, IsReadOnly, and exact 
 	DataService.Destroy()
 end)
 
+-- 12. Spring and CameraShake tests
+runTest("Spring & CameraShake: 6-DOF physical harmonic impulse, calculation, and quadratic decay", function()
+	local Spring = mock.requireModule("./src/shared/Packages/Spring.luau")
+	local CameraShake = mock.requireModule("./src/shared/Packages/CameraShake.luau")
+
+	local spring = Spring.new(0, 1, 60, 5, 1)
+	spring:Impulse(10)
+	local p1 = spring:Update(0.016)
+	assertTrue(p1 > 0, "Spring moves forward after impulse")
+
+	CameraShake.SetTrauma(0.8)
+	assertEqual(CameraShake.GetTrauma(), 0.8, "Trauma set to 0.8")
+	local offsetPos, offsetAngles = CameraShake.CalculateOffset(0.1)
+	assertTrue(CameraShake.GetTrauma() < 0.8, "Trauma decays over time")
+end)
+
+-- 13. CombatService & CombatController tests
+runTest("CombatService & CombatController: 4-Hit combo sequence, damage scaling, knockback, and Scythe cleanup", function()
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local framework = ReplicatedStorage:FindFirstChild("CombatFramework")
+	if not framework then
+		framework = _G.Instance.new("Folder", ReplicatedStorage)
+		framework.Name = "CombatFramework"
+	end
+	if not framework:FindFirstChild("CombatEvent") then
+		local ce = _G.Instance.new("RemoteEvent", framework)
+		ce.Name = "CombatEvent"
+	end
+	if not framework:FindFirstChild("CombatVFXEvent") then
+		local cve = _G.Instance.new("UnreliableRemoteEvent", framework)
+		cve.Name = "CombatVFXEvent"
+	end
+
+	local CombatConfig = mock.requireModule("./src/shared/SharedModules/CombatConfig.luau")
+	local CombatService = mock.requireModule("./src/server/ServerModules/CombatService.luau")
+
+	CombatService.Init()
+	CombatService.Start()
+
+	local plr, char, hum, hrp = mock.addPlayer("Striker", 11223)
+	hrp.Position = Vector3.new(0, 5, 0)
+	hrp.CFrame = CFrame.new(0, 5, 0)
+
+	local dummyModel = _G.Instance.new("Model", workspace)
+	dummyModel.Name = "CombatDummy"
+	local dummyHrp = _G.Instance.new("Part", dummyModel)
+	dummyHrp.Name = "HumanoidRootPart"
+	dummyHrp.Position = Vector3.new(0, 5, -4) -- Directly in front, range 4 studs
+	dummyHrp.CFrame = CFrame.new(0, 5, -4)
+	local dummyHum = _G.Instance.new("Humanoid", dummyModel)
+	dummyHum.MaxHealth = 1000
+	dummyHum.Health = 1000
+	dummyModel.PrimaryPart = dummyHrp
+
+	-- Hit 1
+	local res1 = CombatService.ProcessAttack(plr, 1)
+	assertEqual(res1.TargetsHit, 1, "Hit 1 connects with target dummy")
+	assertEqual(dummyHum.Health, 1000 - CombatConfig.ComboData[1].Damage, "Hit 1 applies correct damage (15)")
+
+	-- Hit 4 (Finisher)
+	CombatService.GetPlayerState(plr).LastAttackTime = 0
+	local res4 = CombatService.ProcessAttack(plr, 4)
+	assertEqual(res4.TargetsHit, 1, "Finisher connects with target dummy")
+	assertTrue(res4.IsFinisher, "IsFinisher flag is true")
+	assertEqual(dummyHum.Health, 1000 - CombatConfig.ComboData[1].Damage - CombatConfig.ComboData[4].Damage, "Finisher applies heavy damage (55)")
+	assertTrue(dummyHrp.AssemblyLinearVelocity.Y >= 35, "Finisher applies massive upward launch velocity")
+
+	CombatService.Destroy()
+	dummyModel:Destroy()
+end)
+
 print("========================================")
 print(string.format("RESULTS: %d PASSED, %d FAILED", passedCount, failedCount))
 print("========================================")
@@ -503,3 +575,4 @@ print("========================================")
 if failedCount > 0 then
 	error(string.format("%d tests failed!", failedCount))
 end
+

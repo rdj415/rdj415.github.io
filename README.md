@@ -46,6 +46,9 @@ Welcome to the official repository for my developer portfolio. I am a **Senior R
 - **`DataService.luau` — Session-Locked Persistence & Transactional Mutation**  
   Enterprise data persistence layer wrapping ProfileStore. Features atomic transactional mutations (`.Update()`) to prevent race conditions, cryptographic FNV-1a CSPRNG seeding, write-verify release tokens, and continuous S-curve sigmoid luck scaling.
 
+- **`CombatService.luau` & `CombatController.luau` — Cinematic Action Combat & VFX Engine**  
+  High-intensity action combat framework featuring authoritative 4-hit combo strings (M1), microsecond hitstop (animation and camera freeze on impact for authentic anime/fighting game punch), 6-DOF harmonic spring camera shake, directional lunge physics, floating 3D critical damage numbers, and massive ragdoll/knockback finisher launches. Fully staged in Roblox Studio with an interactive training dummy and dynamic lighting arena.
+
 ---
 
 ## 💻 Technical Toolchain

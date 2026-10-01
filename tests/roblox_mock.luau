@@ -95,6 +95,12 @@ end
 Vector2.zero = Vector2.new(0, 0)
 _G.Vector2 = Vector2
 
+local Color3 = {
+	fromRGB = function(r, g, b) return { R = (r or 0)/255, G = (g or 0)/255, B = (b or 0)/255 } end,
+	new = function(r, g, b) return { R = r or 0, G = g or 0, B = b or 0 } end,
+}
+_G.Color3 = Color3
+
 local CFrame = {}
 local CFrame_meta = {
 	__mul = function(a, b)
@@ -197,6 +203,12 @@ function InstanceMethods:FindFirstChild(name: string, recursive: boolean?)
 		end
 	end
 	return nil
+end
+
+function InstanceMethods:WaitForChild(name: string, timeout: number?)
+	local child = self:FindFirstChild(name)
+	if child then return child end
+	return self:FindFirstChild(name)
 end
 
 function InstanceMethods:FindFirstChildOfClass(className: string)
@@ -536,8 +548,17 @@ local fs = require("@lune/fs")
 function mock.requireModule(path: string)
 	local content = fs.readFile(path)
 	local baseEnv = getfenv()
-	local env = setmetatable({}, {
+	local env
+	env = setmetatable({}, {
 		__index = function(self, key)
+			if key == "require" then
+				return function(target)
+					if type(target) == "string" then
+						return mock.requireModule(target)
+					end
+					return target
+				end
+			end
 			if _G[key] ~= nil then
 				return _G[key]
 			end
