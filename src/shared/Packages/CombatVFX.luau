@@ -150,13 +150,11 @@ function CombatVFX.SpawnFlyingComboInfo(position: Vector3, comboIndex: number, d
     
     local comboTitle = ""
     if isFinisher then
-        comboTitle = "★ 4x FINISHER! ★"
+        comboTitle = "FINISHER!"
         comboLabel.TextColor3 = Color3.fromRGB(244, 63, 94)
         comboLabel.TextSize = 34
     else
-        local icons = { "💥", "⚡", "🔥" }
-        local icon = icons[comboIndex] or "💥"
-        comboTitle = string.format("%s COMBO %dx!", icon, comboIndex)
+        comboTitle = string.format("COMBO %dx", comboIndex)
         comboLabel.TextColor3 = color
         comboLabel.TextSize = 26 + (comboIndex * 2)
     end

@@ -58,6 +58,17 @@ function CombatController.SetupAnimationsForCharacter(char: Model)
     end
 end
 
+local VALID_ARM_NAMES = {
+    ["Left Arm"] = true,
+    ["Right Arm"] = true,
+    ["LeftUpperArm"] = true,
+    ["LeftLowerArm"] = true,
+    ["LeftHand"] = true,
+    ["RightUpperArm"] = true,
+    ["RightLowerArm"] = true,
+    ["RightHand"] = true,
+}
+
 function CombatController.UpdateFirstPersonArms()
     local player = Players.LocalPlayer
     if not player then return end
@@ -67,40 +78,69 @@ function CombatController.UpdateFirstPersonArms()
     local cam = workspace.CurrentCamera
     if not head or not cam then return end
     
-    local dist = (cam.CFrame.Position - head.Position).Magnitude
-    local isFirstPerson = (dist < 1.6) or ((cam.Focus.Position - cam.CFrame.Position).Magnitude < 0.8)
+    local distToHead = (cam.CFrame.Position - head.Position).Magnitude
+    local distToFocus = (cam.Focus.Position - cam.CFrame.Position).Magnitude
+    local isFirstPerson = (distToHead < 2.5) or (distToFocus < 1.5) or (player.CameraMode == Enum.CameraMode.LockFirstPerson)
     
     if isFirstPerson then
-        local armNames = {
-            "Left Arm", "Right Arm",
-            "LeftUpperArm", "LeftLowerArm", "LeftHand",
-            "RightUpperArm", "RightLowerArm", "RightHand"
-        }
-        for _, name in ipairs(armNames) do
-            local armPart = char:FindFirstChild(name) :: BasePart?
-            if armPart then
-                armPart.LocalTransparencyModifier = 0
-            end
-        end
+        -- HIDE EVERYTHING (Head, Torso, Legs, Hair, Glasses, Hats, Accessories, Pets)
+        -- SHOW ONLY THE ARMS
         for _, desc in ipairs(char:GetDescendants()) do
-            if desc:IsA("BasePart") and (desc.Name:find("Arm") or desc.Name:find("Hand") or desc.Name:find("Glove")) then
-                desc.LocalTransparencyModifier = 0
+            if desc:IsA("BasePart") then
+                if VALID_ARM_NAMES[desc.Name] then
+                    desc.LocalTransparencyModifier = 0
+                else
+                    desc.LocalTransparencyModifier = 1
+                end
             end
         end
-        head.LocalTransparencyModifier = 1
         
+        -- Procedural pitch tracking: arms follow camera pitch (aiming up/down)
         local torso = char:FindFirstChild("Torso") :: BasePart?
         if torso then
             local rightShoulder = torso:FindFirstChild("Right Shoulder") :: Motor6D?
             local leftShoulder = torso:FindFirstChild("Left Shoulder") :: Motor6D?
-            local lookY = cam.CFrame.LookVector.Y
-            local pitchAngle = math.clamp(lookY * 0.5, -math.rad(40), math.rad(40))
-            if rightShoulder and rightShoulder.CurrentAngle == 0 then
-                rightShoulder.Transform = rightShoulder.Transform * CFrame.Angles(pitchAngle, 0, 0)
+            local lookPitch = math.clamp(math.asin(cam.CFrame.LookVector.Y), -math.rad(65), math.rad(65))
+            
+            local idleOffset = CFrame.Angles(math.rad(15), 0, 0)
+            
+            if rightShoulder then
+                rightShoulder.Transform = rightShoulder.Transform * CFrame.Angles(0, 0, lookPitch) * idleOffset
             end
-            if leftShoulder and leftShoulder.CurrentAngle == 0 then
-                leftShoulder.Transform = leftShoulder.Transform * CFrame.Angles(pitchAngle, 0, 0)
+            if leftShoulder then
+                leftShoulder.Transform = leftShoulder.Transform * CFrame.Angles(0, 0, -lookPitch) * idleOffset
             end
+        end
+    else
+        -- When in 3rd person, restore normal avatar parts and accessories
+        for _, desc in ipairs(char:GetDescendants()) do
+            if desc:IsA("BasePart") then
+                desc.LocalTransparencyModifier = 0
+            end
+        end
+    end
+end
+
+local styleOrder = CombatConfig.StyleOrder or { "Brawler", "MartialArts", "Titan" }
+local currentStyleIndex = 1
+
+function CombatController.GetCurrentStyle()
+    local key = styleOrder[currentStyleIndex] or "Brawler"
+    return (CombatConfig.Styles and CombatConfig.Styles[key]) or CombatConfig.Styles.Brawler
+end
+
+function CombatController.CycleStyle(): string
+    currentStyleIndex = (currentStyleIndex % #styleOrder) + 1
+    comboIndex = 1
+    return CombatController.GetCurrentStyle().Id
+end
+
+function CombatController.SetStyle(styleId: string)
+    for idx, name in ipairs(styleOrder) do
+        if name == styleId then
+            currentStyleIndex = idx
+            comboIndex = 1
+            break
         end
     end
 end
@@ -122,12 +162,18 @@ function CombatController.PerformAttack(customPlayer: Player?)
     local hrp = char:FindFirstChild("HumanoidRootPart") :: BasePart?
     if not hum or hum.Health <= 0 or not hrp then return end
     
+    local style = CombatController.GetCurrentStyle()
+    local maxCombo = style and style.MaxCombo or CombatConfig.MaxCombo
+    local comboSteps = style and style.ComboData or CombatConfig.ComboData
+    
     local now = os.clock()
-    if now - lastComboTime > CombatConfig.ComboResetDelay then
+    local resetDelay = style and style.ComboResetDelay or CombatConfig.ComboResetDelay
+    if now - lastComboTime > resetDelay then
         comboIndex = 1
     end
     
-    local comboData = CombatConfig.ComboData[comboIndex]
+    local currentHit = comboIndex
+    local comboData = comboSteps[currentHit] or comboSteps[1]
     if now - lastAttackTime < comboData.Cooldown then
         return
     end
@@ -135,8 +181,7 @@ function CombatController.PerformAttack(customPlayer: Player?)
     lastAttackTime = now
     lastComboTime = now
     
-    local currentHit = comboIndex
-    local isFinisher = (currentHit == CombatConfig.MaxCombo)
+    local isFinisher = (currentHit == maxCombo)
     
     local track = loadedTracks[currentHit]
     if track then
@@ -158,6 +203,7 @@ function CombatController.PerformAttack(customPlayer: Player?)
     combatEvent:FireServer({
         action = "Attack",
         comboIndex = currentHit,
+        moveId = "Punch",
     })
     
     if isFinisher then
@@ -194,15 +240,17 @@ function CombatController.Init()
         local comboData = CombatConfig.ComboData[hitCombo] or CombatConfig.ComboData[1]
         local damage = data.damage or comboData.Damage
         
+        local slashColor = data.slashColor or comboData.SlashColor
+        
         CameraShake.AddTrauma(comboData.Trauma)
-        CombatVFX.SpawnHitSparks(hitPos, comboData.SlashColor, isFinisher)
-        CombatVFX.SpawnFlyingComboInfo(hitPos, hitCombo, damage, isFinisher, comboData.SlashColor)
+        CombatVFX.SpawnHitSparks(hitPos, slashColor, isFinisher)
+        CombatVFX.SpawnFlyingComboInfo(hitPos, hitCombo, damage, isFinisher, slashColor)
         
         local impactSound = isFinisher and CombatConfig.Sounds.HitFinisher or (hitCombo >= 3 and CombatConfig.Sounds.HitHeavy or CombatConfig.Sounds.HitMedium)
         CombatVFX.PlaySound(impactSound, nil, comboData.SoundPitch, 1.0)
         
         if isFinisher then
-            CombatVFX.SpawnShockwave(hitPos - Vector3.new(0, 1.0, 0), comboData.SlashColor)
+            CombatVFX.SpawnShockwave(hitPos - Vector3.new(0, 1.0, 0), slashColor)
             CombatVFX.PlaySound(CombatConfig.Sounds.CritChime, nil, 1.1, 0.85)
         end
         
@@ -217,11 +265,13 @@ function CombatController.Init()
         if gameProcessed then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.KeyCode == Enum.KeyCode.F or input.KeyCode == Enum.KeyCode.ButtonR2 then
             CombatController.PerformAttack()
+        elseif input.KeyCode == Enum.KeyCode.Q or input.KeyCode == Enum.KeyCode.V or input.KeyCode == Enum.KeyCode.ButtonY then
+            CombatController.CycleStyle()
         end
     end)
     Scythe.add(_controllerScope, inputConn)
     
-    print("[CombatController] Initialized with 1st Person Arms Visibility, R6 Punch Animations, and 3D Combo Burst.")
+    print("[CombatController] Initialized: Multi-Styles, Elegant Dot Crosshair, 1st Person Arms.")
 end
 
 function CombatController.Start()

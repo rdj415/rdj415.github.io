@@ -15,6 +15,7 @@ local _serviceScope: any = nil
 type PlayerState = {
     LastAttackTime: number,
     CurrentCombo: number,
+    MoveCooldowns: { [string]: number },
 }
 local playerStates: { [Player]: PlayerState } = {}
 
@@ -24,6 +25,7 @@ function CombatService.GetPlayerState(player: Player): PlayerState
         state = {
             LastAttackTime = 0,
             CurrentCombo = 1,
+            MoveCooldowns = {},
         }
         playerStates[player] = state
     end
@@ -64,7 +66,7 @@ function CombatService.FindTargetsInFront(attackerChar: Model, maxRange: number,
     return results
 end
 
-function CombatService.ProcessAttack(player: Player, comboIndex: number): { TargetsHit: number, IsFinisher: boolean }
+function CombatService.ProcessAttack(player: Player, comboIndex: number, moveId: string?): { TargetsHit: number, IsFinisher: boolean }
     local char = player.Character
     if not char then return { TargetsHit = 0, IsFinisher = false } end
     local hum = char:FindFirstChildOfClass("Humanoid")
@@ -73,23 +75,73 @@ function CombatService.ProcessAttack(player: Player, comboIndex: number): { Targ
     
     local state = CombatService.GetPlayerState(player)
     local now = os.clock()
+    local lookVec = hrp.CFrame.LookVector
     
-    local clampedIndex = math.clamp(comboIndex, 1, CombatConfig.MaxCombo)
-    local comboData = CombatConfig.ComboData[clampedIndex]
+    -- Check if this is a special move (Kick, Uppercut, Slam)
+    if moveId and moveId ~= "Punch" and CombatConfig.Moves and CombatConfig.Moves[moveId] then
+        local move = CombatConfig.Moves[moveId]
+        local lastTime = state.MoveCooldowns[moveId] or 0
+        if now - lastTime < (move.Cooldown * 0.85) then
+            return { TargetsHit = 0, IsFinisher = false }
+        end
+        state.MoveCooldowns[moveId] = now
+        
+        if move.LungeSpeed and move.LungeSpeed > 0 then
+            hrp.AssemblyLinearVelocity = Vector3.new(lookVec.X * move.LungeSpeed, hrp.AssemblyLinearVelocity.Y, lookVec.Z * move.LungeSpeed)
+        end
+        
+        local targets = CombatService.FindTargetsInFront(char, CombatConfig.AttackRange, CombatConfig.AttackAngle)
+        local isFinisher = (moveId == "Slam" or moveId == "Uppercut")
+        local hitCount = 0
+        
+        for _, hit in ipairs(targets) do
+            local targetModel = hit.Model
+            local targetHum = targetModel:FindFirstChildOfClass("Humanoid")
+            local targetHrp = targetModel:FindFirstChild("HumanoidRootPart") :: BasePart?
+            
+            if targetHum and targetHum.Health > 0 and targetHrp then
+                hitCount += 1
+                targetHum:TakeDamage(move.Damage)
+                
+                local knockVec = (lookVec * move.Knockback) + Vector3.new(0, move.KnockbackUp or 20, 0)
+                targetHrp.AssemblyLinearVelocity = knockVec
+                
+                combatVFXEvent:FireAllClients({
+                    attacker = player,
+                    target = targetModel,
+                    hitPosition = hit.HitPoint,
+                    comboIndex = 1,
+                    damage = move.Damage,
+                    isFinisher = isFinisher,
+                    lookVector = lookVec,
+                    moveId = moveId,
+                    moveName = move.DisplayName,
+                    slashColor = move.Color,
+                })
+            end
+        end
+        
+        return { TargetsHit = hitCount, IsFinisher = isFinisher }
+    end
+    
+    -- Default Combo M1 (Punch)
+    local maxCombo = CombatConfig.MaxCombo or 4
+    local comboSteps = CombatConfig.ComboData
+    local clampedIndex = math.clamp(comboIndex, 1, maxCombo)
+    local comboData = comboSteps[clampedIndex] or comboSteps[1]
     
     if now - state.LastAttackTime < (comboData.Cooldown * 0.85) then
-        return { TargetsHit = 0, IsFinisher = (clampedIndex == CombatConfig.MaxCombo) }
+        return { TargetsHit = 0, IsFinisher = (clampedIndex == maxCombo) }
     end
     state.LastAttackTime = now
-    state.CurrentCombo = (clampedIndex % CombatConfig.MaxCombo) + 1
+    state.CurrentCombo = (clampedIndex % maxCombo) + 1
     
-    local lookVec = hrp.CFrame.LookVector
     if comboData.LungeSpeed and comboData.LungeSpeed > 0 then
         hrp.AssemblyLinearVelocity = Vector3.new(lookVec.X * comboData.LungeSpeed, hrp.AssemblyLinearVelocity.Y, lookVec.Z * comboData.LungeSpeed)
     end
     
     local targets = CombatService.FindTargetsInFront(char, CombatConfig.AttackRange, CombatConfig.AttackAngle)
-    local isFinisher = (clampedIndex == CombatConfig.MaxCombo)
+    local isFinisher = (clampedIndex == maxCombo)
     local hitCount = 0
     
     for _, hit in ipairs(targets) do
@@ -117,6 +169,9 @@ function CombatService.ProcessAttack(player: Player, comboIndex: number): { Targ
                 damage = comboData.Damage,
                 isFinisher = isFinisher,
                 lookVector = lookVec,
+                moveId = "Punch",
+                moveName = comboData.Name,
+                slashColor = comboData.SlashColor,
             })
         end
     end
@@ -130,7 +185,8 @@ function CombatService.Init()
         if type(data) ~= "table" then return end
         if data.action ~= "Attack" then return end
         local idx = tonumber(data.comboIndex) or 1
-        CombatService.ProcessAttack(player, idx)
+        local moveId = if type(data.moveId) == "string" then data.moveId else "Punch"
+        CombatService.ProcessAttack(player, idx, moveId)
     end)
     Scythe.add(_serviceScope, conn)
     

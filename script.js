@@ -35,7 +35,23 @@ document.addEventListener('DOMContentLoaded', () => {
       document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
     });
 
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+        mouse.active = true;
+        document.documentElement.style.setProperty('--mouse-x', `${e.touches[0].clientX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${e.touches[0].clientY}px`);
+      }
+    }, { passive: true });
+
     window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    window.addEventListener('touchend', () => {
       mouse.active = false;
       mouse.x = null;
       mouse.y = null;
@@ -295,14 +311,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.getElementById('nav-links');
 
   if (navToggle && navLinks) {
-    navToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navLinks.classList.toggle('open');
+      navToggle.classList.toggle('open', isOpen);
+      navToggle.setAttribute('aria-expanded', isOpen);
     });
 
     document.querySelectorAll('.nav-link').forEach((link) => {
       link.addEventListener('click', () => {
         navLinks.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
       });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (navLinks.classList.contains('open') && !navLinks.contains(e.target) && !navToggle.contains(e.target)) {
+        navLinks.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      }
     });
   }
 
