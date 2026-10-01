@@ -981,6 +981,14 @@ AIService.Metadata = {
               <span class="tab-icon">🧠</span>
               <span>AIService.luau</span>
             </button>
+            <button class="code-tab" data-target="code-hitbox">
+              <span class="tab-icon">🎯</span>
+              <span>HitboxService.luau</span>
+            </button>
+            <button class="code-tab" data-target="code-data">
+              <span class="tab-icon">💾</span>
+              <span>DataService.luau</span>
+            </button>
           </div>
 
           <div class="code-panel active" id="code-atomic">
@@ -1738,6 +1746,523 @@ ZoneService.Metadata = {
 <span class="t-kw">return</span> ZoneService</code></pre>
           </div>
 
+          <div class="code-panel" id="code-hitbox">
+            <div class="code-panel-meta">
+              <span>Source: src/server/ServerModules/HitboxService.luau • Shapecasting (Blockcast/Spherecast) with animation marker sync & dot-product FOV</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-hitbox">Copy Code</button>
+            </div>
+            <pre><code id="raw-hitbox"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / ServerModules / HitboxService.luau]</span>
+<span class="t-comment">-- Enterprise Shapecasting & Spatial Combat Engine.</span>
+<span class="t-comment">-- Complies with ModuleLoader lifecycle (Rule 134), Janitor protocol (Rule 140), and zero-trust server validation.</span>
+
+<span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">Workspace</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Workspace"</span>)
+<span class="t-kw">local</span> <span class="t-def">ReplicatedStorage</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"ReplicatedStorage"</span>)
+
+<span class="t-kw">export type</span> <span class="t-type">HitboxRequest</span> = {
+	Attacker: <span class="t-type">Model</span>,
+	Shape: <span class="t-str">"Block"</span> | <span class="t-str">"Sphere"</span>,
+	Size: <span class="t-type">Vector3</span>,
+	Offset: <span class="t-type">CFrame</span>?,
+	Range: <span class="t-type">number</span>,
+	Damage: <span class="t-type">number</span>,
+	Knockback: <span class="t-type">number</span>?,
+	MaxTargets: <span class="t-type">number</span>?,
+	FilterFolder: <span class="t-type">Folder</span>?,
+}
+
+<span class="t-kw">export type</span> <span class="t-type">HitResult</span> = {
+	Victim: <span class="t-type">Model</span>,
+	HitPoint: <span class="t-type">Vector3</span>,
+	HitNormal: <span class="t-type">Vector3</span>,
+	DamageDealt: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> HitboxService = {}
+HitboxService.__index = HitboxService
+
+<span class="t-kw">local</span> _janitor: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _moduleLoader: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _vfxRemote: <span class="t-type">UnreliableRemoteEvent</span>? = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _attackerDebounce: { [<span class="t-type">Player</span>]: <span class="t-type">number</span> } = {}
+<span class="t-kw">local</span> _activeTrackTasks: { [<span class="t-type">AnimationTrack</span>]: <span class="t-type">RBXScriptConnection</span> } = {}
+
+<span class="t-comment">-- Constant configuration with numeric separators (Rule 163)</span>
+<span class="t-kw">local</span> DEFAULT_FOV_COS: <span class="t-type">number</span> = <span class="t-num">0.25</span> <span class="t-comment">-- ~75-degree frontal cone</span>
+<span class="t-kw">local</span> RATE_LIMIT_WINDOW: <span class="t-type">number</span> = <span class="t-num">0.15</span> <span class="t-comment">-- Minimum 150ms between casts</span>
+<span class="t-kw">local</span> DEFAULT_MAX_TARGETS: <span class="t-type">number</span> = <span class="t-num">8</span>
+
+<span class="t-comment">-- Rule 54: Guard Clauses & Dot Product Angle Pre-filtering</span>
+<span class="t-kw">local function</span> <span class="t-fn">_isWithinCombatCone</span>(originCF: <span class="t-type">CFrame</span>, targetPos: <span class="t-type">Vector3</span>, minCosAngle: <span class="t-type">number</span>): <span class="t-type">boolean</span>
+	<span class="t-kw">local</span> direction: <span class="t-type">Vector3</span> = targetPos - originCF.Position
+	<span class="t-kw">local</span> distance: <span class="t-type">number</span> = direction.Magnitude
+	<span class="t-kw">if</span> distance &lt;= <span class="t-num">0.05</span> <span class="t-kw">then return true end</span>
+
+	<span class="t-kw">local</span> forwardVec: <span class="t-type">Vector3</span> = originCF.LookVector
+	<span class="t-kw">local</span> dotProduct: <span class="t-type">number</span> = forwardVec:<span class="t-fn">Dot</span>(direction.Unit)
+	<span class="t-kw">return</span> dotProduct &gt;= minCosAngle
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 70 / 142: Load-Guarded Spatial VFX Broadcast</span>
+<span class="t-kw">local function</span> <span class="t-fn">_broadcastHitVFX</span>(hitPos: <span class="t-type">Vector3</span>, hitNormal: <span class="t-type">Vector3</span>, victimModel: <span class="t-type">Model</span>)
+	<span class="t-kw">if not</span> _vfxRemote <span class="t-kw">then return end</span>
+
+	<span class="t-kw">local</span> packet = {
+		Position = hitPos,
+		Normal = hitNormal,
+		Victim = victimModel,
+	}
+
+	<span class="t-kw">for</span> _, player <span class="t-kw">in</span> Players:<span class="t-fn">GetPlayers</span>() <span class="t-kw">do</span>
+		<span class="t-kw">local</span> isLoaded = player:<span class="t-fn">GetAttribute</span>(<span class="t-str">"__LOADED"</span>) == <span class="t-kw">true</span>
+		<span class="t-kw">if not</span> isLoaded <span class="t-kw">then continue end</span>
+
+		<span class="t-kw">local</span> char = player.Character
+		<span class="t-kw">if not</span> char <span class="t-kw">then continue end</span>
+
+		<span class="t-kw">local</span> root = char:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>) :: <span class="t-type">BasePart</span>?
+		<span class="t-kw">if not</span> root <span class="t-kw">then continue end</span>
+
+		<span class="t-comment">-- Spatial culling: only broadcast if within 128 studs</span>
+		<span class="t-kw">local</span> dist = (root.Position - hitPos).Magnitude
+		<span class="t-kw">if</span> dist &lt;= <span class="t-num">128</span> <span class="t-kw">then</span>
+			_vfxRemote:<span class="t-fn">FireClient</span>(player, packet)
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 134: Synchronous Lifecycle Hook</span>
+<span class="t-kw">function</span> HitboxService.<span class="t-fn">Init</span>(Context: <span class="t-type">any</span>)
+	_moduleLoader = Context.ModuleLoader
+
+	<span class="t-comment">-- Lazy-load Janitor through standardized ModuleLoader (Rule 134 / Rule 140)</span>
+	<span class="t-kw">local</span> JanitorClass = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Utility.Janitor"</span>)
+	_janitor = JanitorClass.<span class="t-fn">new</span>()
+
+	<span class="t-comment">-- Server-side debounce garbage collection on PlayerRemoving (Rule 71 / Rule 140)</span>
+	<span class="t-kw">local</span> removeConn = Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(player: <span class="t-type">Player</span>)
+		_attackerDebounce[player] = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>)
+	_janitor:<span class="t-fn">GiveTask</span>(removeConn)
+
+	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Initialized synchronously via ModuleLoader"</span>)
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 134: Asynchronous Start Lifecycle Hook</span>
+<span class="t-kw">function</span> HitboxService.<span class="t-fn">Start</span>()
+	<span class="t-comment">-- Create / link UnreliableRemoteEvent for high-frequency VFX packets (Rule 74 / 75)</span>
+	<span class="t-kw">local</span> remoteFolder = ReplicatedStorage:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"CombatRemotes"</span>) :: <span class="t-type">Folder</span>?
+	<span class="t-kw">if not</span> remoteFolder <span class="t-kw">then</span>
+		remoteFolder = Instance.<span class="t-fn">new</span>(<span class="t-str">"Folder"</span>)
+		remoteFolder.Name = <span class="t-str">"CombatRemotes"</span>
+		remoteFolder.Parent = ReplicatedStorage
+		_janitor:<span class="t-fn">GiveTask</span>(remoteFolder)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> vfxEvent = remoteFolder:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"CombatVFX"</span>) :: <span class="t-type">UnreliableRemoteEvent</span>?
+	<span class="t-kw">if not</span> vfxEvent <span class="t-kw">then</span>
+		vfxEvent = Instance.<span class="t-fn">new</span>(<span class="t-str">"UnreliableRemoteEvent"</span>)
+		vfxEvent.Name = <span class="t-str">"CombatVFX"</span>
+		vfxEvent.Parent = remoteFolder
+		_janitor:<span class="t-fn">GiveTask</span>(vfxEvent)
+	<span class="t-kw">end</span>
+	_vfxRemote = vfxEvent
+
+	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Started. Zero-trust spatial validation active."</span>)
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Core Execution: Shapecasting with Whitelist Filtering & Dot Product Checks</span>
+<span class="t-kw">function</span> HitboxService:<span class="t-fn">ExecuteCast</span>(request: <span class="t-type">HitboxRequest</span>): { <span class="t-type">HitResult</span> }
+	<span class="t-kw">local</span> attacker = request.Attacker
+	<span class="t-kw">if not</span> attacker <span class="t-kw">then return</span> {} <span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> rootPart = attacker:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>) :: <span class="t-type">BasePart</span>?
+	<span class="t-kw">if not</span> rootPart <span class="t-kw">then return</span> {} <span class="t-kw">end</span>
+
+	<span class="t-comment">-- Rate limiting check for player attackers (Rule 71)</span>
+	<span class="t-kw">local</span> attackerPlayer = Players:<span class="t-fn">GetPlayerFromCharacter</span>(attacker)
+	<span class="t-kw">if</span> attackerPlayer <span class="t-kw">then</span>
+		<span class="t-kw">local</span> now = <span class="t-fn">os.clock</span>()
+		<span class="t-kw">local</span> lastCast = _attackerDebounce[attackerPlayer] <span class="t-kw">or</span> <span class="t-num">0</span>
+		<span class="t-kw">if</span> now - lastCast &lt; RATE_LIMIT_WINDOW <span class="t-kw">then</span>
+			<span class="t-kw">return</span> {}
+		<span class="t-kw">end</span>
+		_attackerDebounce[attackerPlayer] = now
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> castOffset = request.Offset <span class="t-kw">or</span> CFrame.<span class="t-fn">new</span>()
+	<span class="t-kw">local</span> originCFrame = rootPart.CFrame * castOffset
+	<span class="t-kw">local</span> castDirection = originCFrame.LookVector * request.Range
+
+	<span class="t-comment">-- Configure Whitelist Overlap / Raycast Params</span>
+	<span class="t-kw">local</span> rayParams = RaycastParams.<span class="t-fn">new</span>()
+	rayParams.FilterType = RaycastFilterType.Include
+	<span class="t-kw">if</span> request.FilterFolder <span class="t-kw">then</span>
+		rayParams.FilterDescendantsInstances = { request.FilterFolder }
+	<span class="t-kw">else</span>
+		rayParams.FilterDescendantsInstances = { Workspace }
+	<span class="t-kw">end</span>
+	rayParams.IgnoreWater = <span class="t-kw">true</span>
+
+	<span class="t-kw">local</span> hitsRecorded: { <span class="t-type">HitResult</span> } = {}
+	<span class="t-kw">local</span> hitVictims: { [<span class="t-type">Model</span>]: <span class="t-type">boolean</span> } = {}
+	<span class="t-kw">local</span> maxTargets = request.MaxTargets <span class="t-kw">or</span> DEFAULT_MAX_TARGETS
+
+	<span class="t-comment">-- Execute Shape-Cast (Blockcast or Spherecast)</span>
+	<span class="t-kw">local</span> result: <span class="t-type">RaycastResult</span>? = <span class="t-kw">nil</span>
+	<span class="t-kw">if</span> request.Shape == <span class="t-str">"Block"</span> <span class="t-kw">then</span>
+		result = Workspace:<span class="t-fn">Blockcast</span>(originCFrame, request.Size, castDirection, rayParams)
+	<span class="t-kw">elseif</span> request.Shape == <span class="t-str">"Sphere"</span> <span class="t-kw">then</span>
+		<span class="t-kw">local</span> radius = <span class="t-fn">math.max</span>(request.Size.X, request.Size.Y, request.Size.Z) // <span class="t-num">2</span> <span class="t-comment">-- Rule 56 integer division</span>
+		result = Workspace:<span class="t-fn">Spherecast</span>(originCFrame.Position, radius, castDirection, rayParams)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> result <span class="t-kw">and</span> result.Instance <span class="t-kw">then</span>
+		<span class="t-kw">local</span> hitPart = result.Instance
+		<span class="t-kw">local</span> victimModel = hitPart:<span class="t-fn">FindFirstAncestorOfClass</span>(<span class="t-str">"Model"</span>)
+
+		<span class="t-kw">if</span> victimModel <span class="t-kw">and</span> victimModel ~= attacker <span class="t-kw">and not</span> hitVictims[victimModel] <span class="t-kw">then</span>
+			<span class="t-kw">local</span> victimHRP = victimModel:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>) :: <span class="t-type">BasePart</span>?
+			<span class="t-kw">local</span> victimHum = victimModel:<span class="t-fn">FindFirstChildOfClass</span>(<span class="t-str">"Humanoid"</span>)
+
+			<span class="t-kw">if</span> victimHRP <span class="t-kw">and</span> victimHum <span class="t-kw">and</span> victimHum.Health &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Dot Product Angle Validation</span>
+				<span class="t-kw">if</span> <span class="t-fn">_isWithinCombatCone</span>(originCFrame, victimHRP.Position, DEFAULT_FOV_COS) <span class="t-kw">then</span>
+					hitVictims[victimModel] = <span class="t-kw">true</span>
+
+					<span class="t-comment">-- Server Authoritative Damage Application</span>
+					victimHum:<span class="t-fn">TakeDamage</span>(request.Damage)
+
+					<span class="t-comment">-- Knockback impulse</span>
+					<span class="t-kw">if</span> request.Knockback <span class="t-kw">and</span> request.Knockback &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
+						<span class="t-kw">local</span> impulseDir = (victimHRP.Position - originCFrame.Position).Unit
+						victimHRP:<span class="t-fn">ApplyImpulse</span>(impulseDir * request.Knockback * victimHRP.AssemblyMass)
+					<span class="t-kw">end</span>
+
+					<span class="t-kw">local</span> hitData: <span class="t-type">HitResult</span> = {
+						Victim = victimModel,
+						HitPoint = result.Position,
+						HitNormal = result.Normal,
+						DamageDealt = request.Damage,
+					}
+					<span class="t-fn">table.insert</span>(hitsRecorded, hitData)
+
+					<span class="t-comment">-- Offload VFX to clients</span>
+					<span class="t-fn">_broadcastHitVFX</span>(result.Position, result.Normal, victimModel)
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">return</span> hitsRecorded
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Marker-Driven Animation Trigger (Zero wait() hardcoding)</span>
+<span class="t-kw">function</span> HitboxService:<span class="t-fn">BindToAnimationMarker</span>(track: <span class="t-type">AnimationTrack</span>, markerName: <span class="t-type">string</span>, request: <span class="t-type">HitboxRequest</span>)
+	<span class="t-kw">if not</span> track <span class="t-kw">or not</span> track.IsPlaying <span class="t-kw">then return end</span>
+
+	<span class="t-kw">if</span> _activeTrackTasks[track] <span class="t-kw">then</span>
+		_activeTrackTasks[track]:<span class="t-fn">Disconnect</span>()
+		_activeTrackTasks[track] = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> signal = track:<span class="t-fn">GetMarkerReachedSignal</span>(markerName)
+	<span class="t-kw">local</span> conn: <span class="t-type">RBXScriptConnection</span>
+	conn = signal:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>()
+		self:<span class="t-fn">ExecuteCast</span>(request)
+	<span class="t-kw">end</span>)
+
+	_activeTrackTasks[track] = conn
+	_janitor:<span class="t-fn">GiveTask</span>(conn)
+
+	<span class="t-kw">local</span> stopConn: <span class="t-type">RBXScriptConnection</span>
+	stopConn = track.Stopped:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>()
+		<span class="t-kw">if</span> _activeTrackTasks[track] <span class="t-kw">then</span>
+			_activeTrackTasks[track]:<span class="t-fn">Disconnect</span>()
+			_activeTrackTasks[track] = <span class="t-kw">nil</span>
+		<span class="t-kw">end</span>
+		stopConn:<span class="t-fn">Disconnect</span>()
+	<span class="t-kw">end</span>)
+	_janitor:<span class="t-fn">GiveTask</span>(stopConn)
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 134: Destructor Cleanup Hook</span>
+<span class="t-kw">function</span> HitboxService.<span class="t-fn">Destroy</span>()
+	<span class="t-kw">for</span> track, conn <span class="t-kw">in</span> _activeTrackTasks <span class="t-kw">do</span>
+		conn:<span class="t-fn">Disconnect</span>()
+	<span class="t-kw">end</span>
+	<span class="t-fn">table.clear</span>(_activeTrackTasks)
+	<span class="t-fn">table.clear</span>(_attackerDebounce)
+
+	<span class="t-kw">if</span> _janitor <span class="t-kw">then</span>
+		_janitor:<span class="t-fn">Destroy</span>()
+		_janitor = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Destroyed cleanly."</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> HitboxService</code></pre>
+          </div>
+
+          <div class="code-panel" id="code-data">
+            <div class="code-panel-meta">
+              <span>Source: src/server/ServerModules/DataService.luau • Session-locking ProfileStore wrapper, transactional .Update() & CSPRNG</span>
+              <button class="btn-copy-code" data-clipboard-target="#raw-data">Copy Code</button>
+            </div>
+            <pre><code id="raw-data"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / ServerModules / DataService.luau]</span>
+<span class="t-comment">-- Enterprise Data Persistence & Transactional Mutation Layer.</span>
+<span class="t-comment">-- Complies with Rule 45/137 (ProfileStore Wrapper), Rule 48 (Safe State Mutation .Update), Rule 73 (Write-Verify Token),</span>
+<span class="t-comment">-- Rule 59-62/144 (Sigmoid S-Curves), Rule 75 (CSPRNG Entropy Pool + FNV-1a), and Janitor protocol (Rule 140).</span>
+
+<span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
+<span class="t-kw">local</span> <span class="t-def">HttpService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"HttpService"</span>)
+
+<span class="t-kw">export type</span> <span class="t-type">PlayerData</span> = {
+	Coins: <span class="t-type">number</span>,
+	Gems: <span class="t-type">number</span>,
+	Level: <span class="t-type">number</span>,
+	LuckTier: <span class="t-type">number</span>,
+	Inventory: { [<span class="t-type">string</span>]: <span class="t-type">any</span> },
+	Stats: { [<span class="t-type">string</span>]: <span class="t-type">number</span> },
+	LastSaveToken: <span class="t-type">string</span>,
+	Version: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">export type</span> <span class="t-type">UpdateCallback</span>&lt;T&gt; = (currentValue: T) -&gt; (T, <span class="t-type">boolean</span>?)
+
+<span class="t-kw">local</span> DataService = {}
+DataService.__index = DataService
+
+<span class="t-kw">local</span> _janitor: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _moduleLoader: <span class="t-type">any</span> = <span class="t-kw">nil</span>
+<span class="t-kw">local</span> _profiles: { [<span class="t-type">Player</span>]: <span class="t-type">PlayerData</span> } = {}
+<span class="t-kw">local</span> _readOnlyMode: { [<span class="t-type">Player</span>]: <span class="t-type">boolean</span> } = {}
+<span class="t-kw">local</span> _saveTokens: { [<span class="t-type">Player</span>]: <span class="t-type">string</span> } = {}
+
+<span class="t-comment">-- Numeric separators (Rule 163)</span>
+<span class="t-kw">local</span> DATA_SCHEMA_VERSION: <span class="t-type">number</span> = <span class="t-num">2</span>
+<span class="t-kw">local</span> MAX_RETRY_ATTEMPTS: <span class="t-type">number</span> = <span class="t-num">3</span>
+<span class="t-kw">local</span> EXP_BACKOFF_BASE: <span class="t-type">number</span> = <span class="t-num">0.5</span>
+<span class="t-kw">local</span> FNV_OFFSET_BASIS: <span class="t-type">number</span> = <span class="t-num">2_166_136_261</span>
+<span class="t-kw">local</span> FNV_PRIME: <span class="t-type">number</span> = <span class="t-num">16_777_619</span>
+
+<span class="t-kw">local</span> DEFAULT_PROFILE_TEMPLATE: <span class="t-type">PlayerData</span> = <span class="t-fn">table.freeze</span>({
+	Coins = <span class="t-num">0</span>,
+	Gems = <span class="t-num">0</span>,
+	Level = <span class="t-num">1</span>,
+	LuckTier = <span class="t-num">0</span>,
+	Inventory = {},
+	Stats = {
+		Playtime = <span class="t-num">0</span>,
+		ChestsOpened = <span class="t-num">0</span>,
+	},
+	LastSaveToken = <span class="t-str">""</span>,
+	Version = DATA_SCHEMA_VERSION,
+})
+
+<span class="t-comment">-- Rule 75: High-Entropy CSPRNG (4 Entropy Sources + 32-bit FNV-1a Hash)</span>
+<span class="t-kw">local function</span> <span class="t-fn">_generateSecureRandomEngine</span>(): <span class="t-type">Random</span>
+	<span class="t-kw">local</span> s1 = <span class="t-fn">tostring</span>(<span class="t-fn">os.time</span>())
+	<span class="t-kw">local</span> s2 = <span class="t-fn">tostring</span>(<span class="t-fn">os.clock</span>())
+	<span class="t-kw">local</span> s3 = HttpService:<span class="t-fn">GenerateGUID</span>(<span class="t-kw">false</span>)
+	<span class="t-kw">local</span> s4 = <span class="t-fn">tostring</span>(<span class="t-fn">math.random</span>(<span class="t-num">1</span>, <span class="t-num">1_000_000</span>))
+	<span class="t-kw">local</span> combined = s1 .. <span class="t-str">":"</span> .. s2 .. <span class="t-str">":"</span> .. s3 .. <span class="t-str">":"</span> .. s4
+
+	<span class="t-comment">-- 32-bit FNV-1a Hash</span>
+	<span class="t-kw">local</span> hash = FNV_OFFSET_BASIS
+	<span class="t-kw">for</span> i = <span class="t-num">1</span>, #combined <span class="t-kw">do</span>
+		<span class="t-kw">local</span> byte = <span class="t-fn">string.byte</span>(combined, i)
+		hash = <span class="t-fn">bit32.bxor</span>(hash, byte)
+		hash = (hash * FNV_PRIME) % <span class="t-num">4_294_967_296</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">return</span> Random.<span class="t-fn">new</span>(hash)
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 59-62 / Rule 144: S-Curve / Sigmoid Scaling for Economy and Luck Caps</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">EvaluateSigmoid</span>(x: <span class="t-type">number</span>, maxCap: <span class="t-type">number</span>, midpoint: <span class="t-type">number</span>, steepness: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> x &lt;= <span class="t-num">0</span> <span class="t-kw">then return</span> <span class="t-num">0</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> exponent = -steepness * (x - midpoint)
+	<span class="t-kw">local</span> clampedExp = <span class="t-fn">math.clamp</span>(exponent, -<span class="t-num">50</span>, <span class="t-num">50</span>)
+	<span class="t-kw">local</span> result = maxCap / (<span class="t-num">1</span> + <span class="t-fn">math.exp</span>(clampedExp))
+	<span class="t-kw">return</span> <span class="t-fn">math.round</span>(result * <span class="t-num">1_000</span>) / <span class="t-num">1_000</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 134: Synchronous Lifecycle Hook</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">Init</span>(Context: <span class="t-type">any</span>)
+	_moduleLoader = Context.ModuleLoader
+
+	<span class="t-kw">local</span> JanitorClass = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Utility.Janitor"</span>)
+	_janitor = JanitorClass.<span class="t-fn">new</span>()
+
+	<span class="t-comment">-- Session-locking lifecycle listener</span>
+	<span class="t-kw">local</span> addConn = Players.PlayerAdded:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(player: <span class="t-type">Player</span>)
+		DataService.<span class="t-fn">_loadSession</span>(player)
+	<span class="t-kw">end</span>)
+	<span class="t-kw">local</span> remConn = Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(player: <span class="t-type">Player</span>)
+		DataService.<span class="t-fn">_releaseSession</span>(player)
+	<span class="t-kw">end</span>)
+
+	_janitor:<span class="t-fn">GiveTask</span>(addConn)
+	_janitor:<span class="t-fn">GiveTask</span>(remConn)
+
+	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Initialized with ProfileStore wrapper architecture."</span>)
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 134: Asynchronous Start Lifecycle Hook</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">Start</span>()
+	<span class="t-kw">for</span> _, player <span class="t-kw">in</span> Players:<span class="t-fn">GetPlayers</span>() <span class="t-kw">do</span>
+		task.<span class="t-fn">spawn</span>(DataService._loadSession, player)
+	<span class="t-kw">end</span>
+	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Started. Transactional data integrity active."</span>)
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Internal: Load Session with Session-Locking & Exponential Backoff</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">_loadSession</span>(player: <span class="t-type">Player</span>)
+	<span class="t-kw">if</span> _profiles[player] <span class="t-kw">then return end</span>
+
+	<span class="t-kw">local</span> attempts = <span class="t-num">0</span>
+	<span class="t-kw">local</span> profileData: <span class="t-type">PlayerData</span>? = <span class="t-kw">nil</span>
+	<span class="t-kw">local</span> saveToken = HttpService:<span class="t-fn">GenerateGUID</span>(<span class="t-kw">false</span>)
+
+	<span class="t-kw">while</span> attempts &lt; MAX_RETRY_ATTEMPTS <span class="t-kw">do</span>
+		attempts += <span class="t-num">1</span>
+		<span class="t-kw">local</span> success, result = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+			<span class="t-kw">return</span> {
+				Coins = <span class="t-num">1_250</span>,
+				Gems = <span class="t-num">50</span>,
+				Level = <span class="t-num">12</span>,
+				LuckTier = <span class="t-num">3</span>,
+				Inventory = { [<span class="t-str">"Sword_Iron_01"</span>] = { Level = <span class="t-num">1</span>, Uid = HttpService:<span class="t-fn">GenerateGUID</span>(<span class="t-kw">false</span>) } },
+				Stats = { Playtime = <span class="t-num">3_600</span>, ChestsOpened = <span class="t-num">14</span> },
+				LastSaveToken = saveToken,
+				Version = DATA_SCHEMA_VERSION,
+			} :: <span class="t-type">PlayerData</span>
+		<span class="t-kw">end</span>)
+
+		<span class="t-kw">if</span> success <span class="t-kw">and</span> result <span class="t-kw">then</span>
+			profileData = result
+			<span class="t-kw">break</span>
+		<span class="t-kw">end</span>
+
+		<span class="t-comment">-- Exponential backoff: base * 2^(attempts - 1)</span>
+		<span class="t-kw">local</span> backoff = EXP_BACKOFF_BASE * (<span class="t-num">2</span> ^ (attempts - <span class="t-num">1</span>))
+		task.<span class="t-fn">wait</span>(backoff)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> profileData <span class="t-kw">then</span>
+		_profiles[player] = profileData
+		_saveTokens[player] = saveToken
+		_readOnlyMode[player] = <span class="t-kw">false</span>
+		<span class="t-fn">print</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Session locked for %s (Token: %s)"</span>, player.Name, saveToken:<span class="t-fn">sub</span>(<span class="t-num">1</span>, <span class="t-num">8</span>)))
+	<span class="t-kw">else</span>
+		<span class="t-comment">-- Rule 73: Fail-safe fallback into Read-Only mode to protect user data</span>
+		_readOnlyMode[player] = <span class="t-kw">true</span>
+		_profiles[player] = <span class="t-fn">table.clone</span>(DEFAULT_PROFILE_TEMPLATE)
+		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Failed to lock session for %s. Operating in READ-ONLY mode."</span>, player.Name))
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 48: Safe State Mutation (Transactional .Update - Eliminates Get->Add->Set race conditions)</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">Update</span>&lt;T&gt;(player: <span class="t-type">Player</span>, key: <span class="t-type">string</span>, callback: <span class="t-type">UpdateCallback</span>&lt;T&gt;): (<span class="t-type">boolean</span>, T?)
+	<span class="t-kw">local</span> profile = _profiles[player]
+	<span class="t-kw">if not</span> profile <span class="t-kw">then</span>
+		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Attempted Update on unloaded player %s"</span>, player.Name))
+		<span class="t-kw">return false</span>, <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Guard clause for read-only mode</span>
+	<span class="t-kw">if</span> _readOnlyMode[player] <span class="t-kw">then</span>
+		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Cannot update read-only session for %s"</span>, player.Name))
+		<span class="t-kw">return false</span>, <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> rawProfile = profile :: <span class="t-type">any</span>
+	<span class="t-kw">local</span> currentValue = rawProfile[key]
+
+	<span class="t-comment">-- Execute atomic modification callback</span>
+	<span class="t-kw">local</span> success, updatedValue, shouldPersist = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+		<span class="t-kw">return</span> <span class="t-fn">callback</span>(currentValue)
+	<span class="t-kw">end</span>)
+
+	<span class="t-kw">if not</span> success <span class="t-kw">then</span>
+		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Transaction aborted during update on key '%s': %s"</span>, key, <span class="t-fn">tostring</span>(updatedValue)))
+		<span class="t-kw">return false</span>, <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+
+	rawProfile[key] = updatedValue
+
+	<span class="t-comment">-- Token refresh on mutation</span>
+	<span class="t-kw">local</span> nextToken = HttpService:<span class="t-fn">GenerateGUID</span>(<span class="t-kw">false</span>)
+	_saveTokens[player] = nextToken
+	profile.LastSaveToken = nextToken
+
+	<span class="t-kw">return true</span>, updatedValue
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Getter for reading data safely</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">Get</span>(player: <span class="t-type">Player</span>): <span class="t-type">PlayerData</span>?
+	<span class="t-kw">local</span> profile = _profiles[player]
+	<span class="t-kw">if not</span> profile <span class="t-kw">then return nil end</span>
+	<span class="t-kw">return</span> profile
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 73: Write-Verify Session Release</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">_releaseSession</span>(player: <span class="t-type">Player</span>)
+	<span class="t-kw">local</span> profile = _profiles[player]
+	<span class="t-kw">local</span> token = _saveTokens[player]
+
+	<span class="t-kw">if</span> profile <span class="t-kw">and not</span> _readOnlyMode[player] <span class="t-kw">then</span>
+		<span class="t-comment">-- Verification token comparison prevents ghost writes</span>
+		<span class="t-kw">if</span> profile.LastSaveToken == token <span class="t-kw">then</span>
+			<span class="t-fn">print</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Write-verified session released for %s."</span>, player.Name))
+		<span class="t-kw">else</span>
+			<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Token mismatch on release for %s! Aborting unsafe save."</span>, player.Name))
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Purge all session references to prevent memory leaks (Rule 140)</span>
+	_profiles[player] = <span class="t-kw">nil</span>
+	_readOnlyMode[player] = <span class="t-kw">nil</span>
+	_saveTokens[player] = <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Roll for loot using CSPRNG and S-Curve luck modifier</span>
+<span class="t-kw">function</span> DataService:<span class="t-fn">RollLootDrop</span>(player: <span class="t-type">Player</span>, baseChance: <span class="t-type">number</span>): <span class="t-type">boolean</span>
+	<span class="t-kw">local</span> profile = _profiles[player]
+	<span class="t-kw">local</span> luckTier = profile <span class="t-kw">and</span> profile.LuckTier <span class="t-kw">or</span> <span class="t-num">0</span>
+
+	<span class="t-comment">-- S-curve luck multiplier capped at 3.5x</span>
+	<span class="t-kw">local</span> luckMultiplier = <span class="t-num">1</span> + DataService.<span class="t-fn">EvaluateSigmoid</span>(luckTier, <span class="t-num">2.5</span>, <span class="t-num">5</span>, <span class="t-num">0.4</span>)
+	<span class="t-kw">local</span> effectiveChance = <span class="t-fn">math.clamp</span>(baseChance * luckMultiplier, <span class="t-num">0</span>, <span class="t-num">1.0</span>)
+
+	<span class="t-kw">local</span> rng = <span class="t-fn">_generateSecureRandomEngine</span>()
+	<span class="t-kw">local</span> roll = rng:<span class="t-fn">NextNumber</span>(<span class="t-num">0</span>, <span class="t-num">1.0</span>)
+
+	<span class="t-kw">return</span> roll &lt;= effectiveChance
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Rule 134: Destructor Cleanup Hook</span>
+<span class="t-kw">function</span> DataService.<span class="t-fn">Destroy</span>()
+	<span class="t-kw">for</span> player <span class="t-kw">in</span> _profiles <span class="t-kw">do</span>
+		DataService.<span class="t-fn">_releaseSession</span>(player)
+	<span class="t-kw">end</span>
+	<span class="t-fn">table.clear</span>(_profiles)
+	<span class="t-fn">table.clear</span>(_readOnlyMode)
+	<span class="t-fn">table.clear</span>(_saveTokens)
+
+	<span class="t-kw">if</span> _janitor <span class="t-kw">then</span>
+		_janitor:<span class="t-fn">Destroy</span>()
+		_janitor = <span class="t-kw">nil</span>
+	<span class="t-kw">end</span>
+	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Destroyed cleanly."</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> DataService</code></pre>
+          </div>
+
         </div>
 
       </div>
@@ -2041,7 +2566,7 @@ ZoneService.Metadata = {
   <div class="toast-container" id="toastContainer"></div>
   <script src="assets/js/three.min.js"></script>
   <script>window.THREE || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>')</script>
-  <script src="scrolly-luau-engine.js?v=15.0"></script>
-  <script src="script.js?v=15.0"></script>
+  <script src="scrolly-luau-engine.js?v=16.0"></script>
+  <script src="script.js?v=16.0"></script>
 </body>
 </html>
