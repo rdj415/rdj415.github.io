@@ -26,7 +26,7 @@ function CombatVFX.SpawnSlashArc(cframe: CFrame, color: Color3, comboIndex: numb
     slash.Size = isFinisher and Vector3.new(0.3, 10, 10) or Vector3.new(0.2, 6.5, 6.5)
     
     local slantAngle = (comboIndex % 2 == 1) and math.rad(25) or math.rad(-25)
-    slash.CFrame = cframe * CFrame.new(0, 0, -3.2) * CFrame.Angles(0, 0, math.rad(90)) * CFrame.Angles(slantAngle, 0, 0)
+    slash.CFrame = cframe * CFrame.new(0, 0, -3.0) * CFrame.Angles(0, 0, math.rad(90)) * CFrame.Angles(slantAngle, 0, 0)
     slash.Anchored = true
     slash.CanCollide = false
     slash.Material = Enum.Material.Neon
@@ -120,50 +120,109 @@ function CombatVFX.SpawnShockwave(position: Vector3, color: Color3)
     Debris:AddItem(ring, 0.6)
 end
 
-function CombatVFX.SpawnDamageNumber(position: Vector3, damage: number, isFinisher: boolean)
+function CombatVFX.SpawnFlyingComboInfo(position: Vector3, comboIndex: number, damage: number, isFinisher: boolean, color: Color3)
     local part = Instance.new("Part")
-    part.Size = Vector3.new(0.1, 0.1, 0.1)
-    part.Position = position + Vector3.new(rng:NextNumber(-0.8, 0.8), rng:NextNumber(0.2, 0.8), rng:NextNumber(-0.8, 0.8))
+    part.Name = "FlyingComboEffect"
+    part.Size = Vector3.new(0.2, 0.2, 0.2)
+    part.Position = position + Vector3.new(rng:NextNumber(-0.5, 0.5), rng:NextNumber(0.5, 1.2), rng:NextNumber(-0.5, 0.5))
     part.Transparency = 1
     part.Anchored = true
     part.CanCollide = false
     part.Parent = workspace
     
     local bbg = Instance.new("BillboardGui")
-    bbg.Size = UDim2.new(4, 0, 1.5, 0)
+    bbg.Size = UDim2.new(6.5, 0, 2.8, 0)
     bbg.AlwaysOnTop = true
+    bbg.MaxDistance = 100
     bbg.Parent = part
     
-    local text = Instance.new("TextLabel")
-    text.Size = UDim2.new(1, 0, 1, 0)
-    text.BackgroundTransparency = 1
-    text.Font = Enum.Font.GothamBlack
-    text.Text = isFinisher and ("CRIT " .. tostring(math.floor(damage)) .. "!") or tostring(math.floor(damage))
-    text.TextColor3 = isFinisher and Color3.fromRGB(244, 63, 94) or Color3.fromRGB(255, 255, 255)
-    text.TextSize = isFinisher and 32 or 22
-    text.Parent = bbg
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, 0, 1, 0)
+    container.BackgroundTransparency = 1
+    container.Parent = bbg
     
-    local stroke = Instance.new("UIStroke")
-    stroke.Thickness = 2.5
-    stroke.Color = Color3.fromRGB(15, 23, 42)
-    stroke.Parent = text
+    local comboLabel = Instance.new("TextLabel")
+    comboLabel.Name = "ComboText"
+    comboLabel.Size = UDim2.new(1, 0, 0.55, 0)
+    comboLabel.Position = UDim2.new(0, 0, 0, 0)
+    comboLabel.BackgroundTransparency = 1
+    comboLabel.Font = Enum.Font.GothamBlack
     
-    local endPos = part.Position + Vector3.new(rng:NextNumber(-1, 1), 3.2, rng:NextNumber(-1, 1))
-    TweenService:Create(part, TweenInfo.new(0.65, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
-        Position = endPos
+    local comboTitle = ""
+    if isFinisher then
+        comboTitle = "★ 4x FINISHER! ★"
+        comboLabel.TextColor3 = Color3.fromRGB(244, 63, 94)
+        comboLabel.TextSize = 34
+    else
+        local icons = { "💥", "⚡", "🔥" }
+        local icon = icons[comboIndex] or "💥"
+        comboTitle = string.format("%s COMBO %dx!", icon, comboIndex)
+        comboLabel.TextColor3 = color
+        comboLabel.TextSize = 26 + (comboIndex * 2)
+    end
+    comboLabel.Text = comboTitle
+    comboLabel.Parent = container
+    
+    local stroke1 = Instance.new("UIStroke")
+    stroke1.Thickness = 2.8
+    stroke1.Color = Color3.fromRGB(15, 23, 42)
+    stroke1.Parent = comboLabel
+    
+    local dmgLabel = Instance.new("TextLabel")
+    dmgLabel.Name = "DamageText"
+    dmgLabel.Size = UDim2.new(1, 0, 0.45, 0)
+    dmgLabel.Position = UDim2.new(0, 0, 0.52, 0)
+    dmgLabel.BackgroundTransparency = 1
+    dmgLabel.Font = Enum.Font.GothamBlack
+    if isFinisher then
+        dmgLabel.Text = string.format("CRIT! %d DMG", math.floor(damage))
+        dmgLabel.TextColor3 = Color3.fromRGB(254, 205, 79)
+        dmgLabel.TextSize = 26
+    else
+        dmgLabel.Text = string.format("-%d DMG", math.floor(damage))
+        dmgLabel.TextColor3 = Color3.fromRGB(248, 250, 252)
+        dmgLabel.TextSize = 18
+    end
+    dmgLabel.Parent = container
+    
+    local stroke2 = Instance.new("UIStroke")
+    stroke2.Thickness = 2.2
+    stroke2.Color = Color3.fromRGB(15, 23, 42)
+    stroke2.Parent = dmgLabel
+    
+    local driftX = rng:NextNumber(-2.2, 2.2)
+    local driftZ = rng:NextNumber(-2.2, 2.2)
+    local peakPos = part.Position + Vector3.new(driftX, 3.8, driftZ)
+    
+    container.Size = UDim2.new(0.3, 0, 0.3, 0)
+    container.Position = UDim2.new(0.35, 0, 0.35, 0)
+    TweenService:Create(container, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0)
     }):Play()
     
-    task.delay(0.35, function()
-        TweenService:Create(text, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    TweenService:Create(part, TweenInfo.new(0.7, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
+        Position = peakPos
+    }):Play()
+    
+    task.delay(0.4, function()
+        TweenService:Create(comboLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
             TextTransparency = 1,
-            TextSize = text.TextSize * 0.7
+            TextSize = comboLabel.TextSize * 0.8
         }):Play()
-        TweenService:Create(stroke, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        TweenService:Create(stroke1, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Transparency = 1
+        }):Play()
+        TweenService:Create(dmgLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            TextTransparency = 1,
+            TextSize = dmgLabel.TextSize * 0.8
+        }):Play()
+        TweenService:Create(stroke2, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
             Transparency = 1
         }):Play()
     end)
     
-    Debris:AddItem(part, 0.75)
+    Debris:AddItem(part, 0.8)
 end
 
 function CombatVFX.Hitstop(duration: number, attackerChar: Model?, targetChar: Model?)
