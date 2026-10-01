@@ -1317,6 +1317,7 @@ function getLuauLettersShapes(scale) {
       if (scrollHeight <= 0) return;
 
       const progress = -rect.top / scrollHeight;
+      targetScroll = Math.max(0, Math.min(1, progress));
     }
 
     window.addEventListener('scroll', updateScrollProgress, { passive: true });
