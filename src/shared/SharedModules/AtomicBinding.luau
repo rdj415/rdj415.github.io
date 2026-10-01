@@ -61,6 +61,7 @@ function AtomicBinding.new(manifest: { [string]: string }, boundFn: BoundCallbac
 		_boundFn = boundFn,
 		_parsedManifest = parsedManifest,
 		_manifestSizeTarget = manifestSizeTarget,
+		_boundRoots = {} :: { [Instance]: boolean },
 		_dtorMap = {} :: { [Instance]: Destructor? },
 		_connections = {},
 		_rootInstToRootNode = {},
@@ -69,9 +70,10 @@ function AtomicBinding.new(manifest: { [string]: string }, boundFn: BoundCallbac
 end
 
 function AtomicBinding:_startBoundFn(root: Instance, resolvedManifest: { [string]: Instance })
-	if self._dtorMap[root] ~= nil then
+	if self._boundRoots[root] then
 		return
 	end
+	self._boundRoots[root] = true
 	local success, dtor = pcall(self._boundFn, resolvedManifest)
 	if success then
 		self._dtorMap[root] = dtor
@@ -81,9 +83,11 @@ function AtomicBinding:_startBoundFn(root: Instance, resolvedManifest: { [string
 end
 
 function AtomicBinding:_stopBoundFn(root: Instance)
+	if not self._boundRoots[root] then return end
+	self._boundRoots[root] = nil
 	local dtor = self._dtorMap[root]
-	if dtor == nil then return end
 	self._dtorMap[root] = nil
+	if dtor == nil then return end
 
 	pcall(function()
 		local dtorType = typeof(dtor)
@@ -93,6 +97,10 @@ function AtomicBinding:_stopBoundFn(root: Instance)
 			(dtor :: RBXScriptConnection):Disconnect()
 		elseif dtorType == "Instance" then
 			(dtor :: Instance):Destroy()
+		elseif dtorType == "thread" then
+			if coroutine.status(dtor :: thread) ~= "dead" then
+				task.cancel(dtor :: thread)
+			end
 		elseif dtorType == "table" then
 			local tbl = dtor :: any
 			if typeof(tbl.Destroy) == "function" then
@@ -160,6 +168,14 @@ function AtomicBinding:bindRoot(root: Instance)
 				if not childNode or childNode.instance ~= childInstance then return end
 				self:_stopBoundFn(root)
 				unbindNodeDescend(childNode, resolvedManifest)
+
+				-- Check if a matching replacement sibling already exists
+				for _, sibling in ipairs(instance:GetChildren()) do
+					if sibling.Name == childInstance.Name and sibling ~= childInstance then
+						processAddChild(sibling)
+						break
+					end
+				end
 			end
 
 			for _, child in ipairs(instance:GetChildren()) do processAddChild(child) end
@@ -167,7 +183,7 @@ function AtomicBinding:bindRoot(root: Instance)
 			table.insert(node.connections, instance.ChildRemoved:Connect(processDeleteChild))
 		end
 
-		if not children and isManifestResolved(resolvedManifest, manifestSizeTarget) then
+		if isManifestResolved(resolvedManifest, manifestSizeTarget) then
 			self:_startBoundFn(root, resolvedManifest)
 		end
 	end
@@ -184,6 +200,7 @@ function AtomicBinding:unbindRoot(root: Instance)
 		self._rootInstToRootNode[root] = nil
 	end
 	self._rootInstToManifest[root] = nil
+	self._boundRoots[root] = nil
 end
 
 function AtomicBinding:destroy()
@@ -193,6 +210,8 @@ function AtomicBinding:destroy()
 	table.clear(self._rootInstToRootNode)
 	table.clear(self._rootInstToManifest)
 	table.clear(self._dtorMap)
+	table.clear(self._boundRoots)
 end
+AtomicBinding.Destroy = AtomicBinding.destroy
 
 return AtomicBinding

@@ -9,6 +9,8 @@ export type CleanupTask = Instance | RBXScriptConnection | () -> () | thread | S
 local _scopes: { [ScopeId]: { CleanupTask } } = {}
 local _nextScopeId: ScopeId = 0
 
+local Scythe = {}
+
 local function _cleanupResource(resource: CleanupTask)
 	local resType = typeof(resource)
 
@@ -19,19 +21,12 @@ local function _cleanupResource(resource: CleanupTask)
 	elseif resType == "function" then
 		(resource :: () -> ())()
 	elseif resType == "thread" then
-		task.cancel(resource :: thread)
-	elseif resType == "number" then
-		local childScopeId = resource :: ScopeId
-		if _scopes[childScopeId] ~= nil then
-			local bucket = _scopes[childScopeId]
-			_scopes[childScopeId] = nil
-			for i = #bucket, 1, -1 do
-				local ok, err = pcall(_cleanupResource, bucket[i])
-				if not ok then
-					warn(string.format("[Scythe] Cleanup error in nested scope %d: %s", childScopeId, tostring(err)))
-				end
-			end
+		local th = resource :: thread
+		if coroutine.status(th) ~= "dead" then
+			task.cancel(th)
 		end
+	elseif resType == "number" then
+		Scythe.scope(resource :: ScopeId)
 	elseif resType == "table" then
 		local tbl = resource :: any
 		if typeof(tbl.Destroy) == "function" then
@@ -45,8 +40,6 @@ local function _cleanupResource(resource: CleanupTask)
 		end
 	end
 end
-
-local Scythe = {}
 
 -- Create a new scope handle or destroy an existing scope
 function Scythe.scope(scopeId: ScopeId?): ScopeId?

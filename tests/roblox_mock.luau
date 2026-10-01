@@ -181,6 +181,9 @@ local InstanceMeta = {
 			end
 			return
 		end
+		if key == "CFrame" and type(value) == "table" and value.Position then
+			rawset(self, "Position", value.Position)
+		end
 		rawset(self, key, value)
 	end,
 }
@@ -227,8 +230,30 @@ function InstanceMethods:GetChildren()
 	return table.clone(rawget(self, "_children") or {})
 end
 
+function InstanceMethods:GetDescendants()
+	local descendants = {}
+	local function gather(inst)
+		for _, child in ipairs(rawget(inst, "_children") or {}) do
+			table.insert(descendants, child)
+			gather(child)
+		end
+	end
+	gather(self)
+	return descendants
+end
+
 function InstanceMethods:GetPivot()
 	return self.CFrame or CFrame.new(self.Position or Vector3.new(0,0,0))
+end
+
+function InstanceMethods:GetFullName()
+	local names = { self.Name }
+	local curr = self.Parent
+	while curr and curr.Parent do
+		table.insert(names, 1, curr.Name)
+		curr = curr.Parent
+	end
+	return table.concat(names, ".")
 end
 
 function InstanceMethods:SetAttribute(k: string, v: any)
@@ -239,8 +264,24 @@ function InstanceMethods:GetAttribute(k: string)
 	return rawget(self, "_attributes")[k]
 end
 
+local classHierarchy: { [string]: { [string]: boolean } } = {
+	Part = { BasePart = true, PVInstance = true, Instance = true },
+	MeshPart = { BasePart = true, PVInstance = true, Instance = true },
+	Model = { PVInstance = true, Instance = true },
+	Folder = { Instance = true },
+	Humanoid = { Instance = true },
+	RemoteEvent = { Instance = true },
+	UnreliableRemoteEvent = { Instance = true },
+	ProximityPrompt = { Instance = true },
+	AnimationTrack = { Instance = true },
+	Attachment = { Instance = true },
+}
+
 function InstanceMethods:IsA(className: string)
-	return self.ClassName == className
+	if self.ClassName == className then return true end
+	local parents = classHierarchy[self.ClassName]
+	if parents and parents[className] then return true end
+	return false
 end
 
 function InstanceMethods:IsDescendantOf(ancestor: any)
@@ -313,6 +354,7 @@ function Instance.new(className: string, parent: any?)
 		Character = nil,
 		PrimaryPart = nil,
 		IsPlaying = true,
+		Stopped = Signal.new(),
 		_markerSignals = {},
 		OnServerEvent = Signal.new(),
 	}, InstanceMeta)
@@ -443,16 +485,12 @@ _G.debug = _G.debug or {}
 _G.debug.profilebegin = function() end
 _G.debug.profileend = function() end
 
+local luneTask = require("@lune/task")
 _G.task = {
-	wait = function(t) end,
-	spawn = function(f, ...) return coroutine.create(f), f(...) end,
-	delay = function(t, f, ...)
-		local thread = coroutine.create(function(...)
-			f(...)
-		end)
-		return thread
-	end,
-	cancel = function(thread) end,
+	wait = function(t) return luneTask.wait(t) end,
+	spawn = function(f, ...) return luneTask.spawn(f, ...) end,
+	delay = function(t, f, ...) return luneTask.delay(t, f, ...) end,
+	cancel = function(thread) return luneTask.cancel(thread) end,
 }
 
 function mock.addPlayer(name: string, userId: number?)

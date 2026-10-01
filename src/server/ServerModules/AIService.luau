@@ -166,10 +166,19 @@ function AIService.Start()
 			end
 
 			-- Evaluate target and move
-			if state.Target and state.Target.Parent then
-				local targetHRP = state.Target:FindFirstChild("HumanoidRootPart") :: BasePart?
-				if targetHRP and _isValidTargetForStrategy(npc, state.Target) then
-					_moveNPCTo(npc, targetHRP.Position, 16)
+			if state.Target then
+				if not state.Target.Parent then
+					state.Target = nil
+				else
+					local targetHum = state.Target:FindFirstChildOfClass("Humanoid")
+					if not targetHum or targetHum.Health <= 0 then
+						state.Target = nil
+					else
+						local targetHRP = state.Target:FindFirstChild("HumanoidRootPart") :: BasePart?
+						if targetHRP and _isValidTargetForStrategy(npc, state.Target) then
+							_moveNPCTo(npc, targetHRP.Position, 16)
+						end
+					end
 				end
 			end
 		end
@@ -180,6 +189,48 @@ function AIService.Start()
 	end
 
 	print("[AIService] Started. AI combat loop running.")
+end
+
+-- Set active target for an NPC
+function AIService.SetTarget(npc: Model, target: Model?)
+	local state = _npcs[npc]
+	if state then
+		state.Target = target
+	end
+end
+
+-- Get active target for an NPC
+function AIService.GetTarget(npc: Model): Model?
+	local state = _npcs[npc]
+	return state and state.Target
+end
+
+-- Scan for closest living player target within radius
+function AIService.FindNearestTarget(npc: Model, maxDistance: number?): Model?
+	local hrp = npc:FindFirstChild("HumanoidRootPart") :: BasePart?
+	if not hrp then return nil end
+
+	local maxDist = maxDistance or 100
+	local nearestChar: Model? = nil
+	local nearestDist = maxDist
+
+	local Players = game:GetService("Players")
+	for _, player in ipairs(Players:GetPlayers()) do
+		local char = player.Character
+		if char and char ~= npc then
+			local hum = char:FindFirstChildOfClass("Humanoid")
+			local targetHRP = char:FindFirstChild("HumanoidRootPart") :: BasePart?
+			if hum and hum.Health > 0 and targetHRP then
+				local dist = (targetHRP.Position - hrp.Position).Magnitude
+				if dist < nearestDist and _isValidTargetForStrategy(npc, char) then
+					nearestDist = dist
+					nearestChar = char
+				end
+			end
+		end
+	end
+
+	return nearestChar
 end
 
 -- Register an active NPC

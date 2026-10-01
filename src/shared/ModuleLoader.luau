@@ -45,17 +45,42 @@ local function CountLifecyclePhaseSteps(LifecycleUnits: { LifecycleUnit }, Phase
 	return Count
 end
 
+local ScopeBootProgress: { [string]: any } = {}
+
 local function ExecuteLifecyclePhase(ScopeName: string, LifecycleUnits: { LifecycleUnit }, PhaseName: string, Context: any)
+	local progress = ScopeBootProgress[ScopeName]
 	for _, Unit in ipairs(LifecycleUnits) do
 		local Loaded = Unit.Loaded
 		if type(Loaded) == "table" and type(Loaded[PhaseName]) == "function" then
+			if progress then
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			end
+
 			debug.profilebegin(ScopeName .. ":" .. Unit.Name .. ":" .. PhaseName)
-			local success, err = pcall(function()
-				Loaded[PhaseName](Context)
-			end)
+			if PhaseName == "Start" then
+				-- Asynchronous Start dispatch ensures services initialize without thread blocking
+				task.spawn(function()
+					local success, err = pcall(function()
+						Loaded[PhaseName](Context)
+					end)
+					if not success then
+						warn(string.format("[ModuleLoader] Error during asynchronous %s on %s: %s", PhaseName, Unit.Name, tostring(err)))
+					end
+				end)
+			else
+				local success, err = pcall(function()
+					Loaded[PhaseName](Context)
+				end)
+				if not success then
+					error(string.format("[ModuleLoader] Error during %s on %s: %s", PhaseName, Unit.Name, tostring(err)))
+				end
+			end
 			debug.profileend()
-			if not success then
-				error(string.format("[ModuleLoader] Error during %s on %s: %s", PhaseName, Unit.Name, tostring(err)))
+
+			if progress then
+				progress.CompletedStepCount += 1
+				progress.Percent = CalculateScopeBootPercent(progress.CompletedStepCount, progress.TotalStepCount)
 			end
 		end
 	end
@@ -88,6 +113,14 @@ end
 
 function ModuleLoader.Register(name: string, module: any)
 	ModuleCache[name] = module
+	local simpleName = name:match("([^%.]+)$")
+	if simpleName and ModuleCache[simpleName] == nil then
+		ModuleCache[simpleName] = module
+	end
+end
+
+function ModuleLoader.GetBootProgress(scopeName: string): any?
+	return ScopeBootProgress[scopeName]
 end
 
 function ModuleLoader.Require(scope: string, path: string): any
@@ -131,7 +164,12 @@ function ModuleLoader.Boot(scopeName: string, container: Instance)
 
 	for _, descendant in ipairs(container:GetDescendants()) do
 		if descendant:IsA("ModuleScript") then
-			local success, loaded = pcall(require, descendant)
+			local success, loaded
+			if (descendant :: any)._module ~= nil then
+				success, loaded = true, (descendant :: any)._module
+			else
+				success, loaded = pcall(require, descendant)
+			end
 			if success then
 				local priority = 10
 				if type(loaded) == "table" and type(loaded.Metadata) == "table" and type(loaded.Metadata.Priority) == "number" then
@@ -154,6 +192,11 @@ function ModuleLoader.Boot(scopeName: string, container: Instance)
 		return a.Priority > b.Priority
 	end)
 
+	local totalSteps = CountLifecyclePhaseSteps(units, "Init") + CountLifecyclePhaseSteps(units, "Start")
+	local progress = CreateScopeBootProgressState(scopeName)
+	progress.TotalStepCount = totalSteps
+	ScopeBootProgress[scopeName] = progress
+
 	local context = {
 		ModuleLoader = ModuleLoader,
 	}
@@ -164,6 +207,8 @@ function ModuleLoader.Boot(scopeName: string, container: Instance)
 	-- Phase 2: Asynchronous Start
 	ExecuteLifecyclePhase(scopeName, units, "Start", context)
 
+	progress.IsComplete = true
+	progress.Percent = 100
 	ScopeBootStateByName[scopeName] = true
 	print(string.format("[ModuleLoader] Scope '%s' boot completed (%d modules).", scopeName, #units))
 end

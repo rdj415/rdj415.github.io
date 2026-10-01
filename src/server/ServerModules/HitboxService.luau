@@ -34,7 +34,7 @@ local _serviceScope: number = 0
 local _moduleLoader: any = nil
 local _vfxRemote: UnreliableRemoteEvent? = nil
 local _attackerDebounce: { [Player]: number } = {}
-local _activeTrackTasks: { [AnimationTrack]: RBXScriptConnection } = {}
+local _activeTrackTasks: { [AnimationTrack]: { RBXScriptConnection } } = {}
 
 -- Combat configuration
 local DEFAULT_FOV_COS: number = 0.25 -- ~75-degree frontal cone
@@ -143,7 +143,8 @@ function HitboxService.ExecuteCast(selfOrRequest: any, maybeRequest: HitboxReque
 
 	local castOffset = request.Offset or CFrame.new()
 	local originCFrame = rootPart.CFrame * castOffset
-	local castDirection = originCFrame.LookVector * request.Range
+	local castRange = math.max(0.01, request.Range or 0)
+	local castDirection = originCFrame.LookVector * castRange
 
 	-- Configure Filter: Always exclude attacker to prevent torso self-blocking
 	local excludeList: { Instance } = { attacker }
@@ -240,8 +241,8 @@ function HitboxService.ExecuteCast(selfOrRequest: any, maybeRequest: HitboxReque
 				end
 			end
 		else
-			-- Hit environmental geometry; stop penetration if hitting solid anchored structures
-			if hitPart.Anchored and hitPart.CanCollide then
+			-- Hit environmental geometry; stop penetration if hitting solid anchored structures in Exclude mode
+			if rayParams.FilterType == RaycastFilterType.Exclude and hitPart.Anchored and hitPart.CanCollide then
 				break
 			else
 				if rayParams.FilterType == RaycastFilterType.Exclude then
@@ -281,10 +282,28 @@ function HitboxService.BindToAnimationMarker(selfOrTrack: any, trackOrMarker: an
 
 	if not track or not track.IsPlaying then return end
 
-	-- Clean up previous binding on the same track if re-bound
-	if _activeTrackTasks[track] then
-		_activeTrackTasks[track]:Disconnect()
-		_activeTrackTasks[track] = nil
+	local trackTasks = _activeTrackTasks[track]
+	if not trackTasks then
+		trackTasks = {}
+		_activeTrackTasks[track] = trackTasks
+
+		-- Auto-cleanup on animation stop
+		local stopConn: RBXScriptConnection? = nil
+		stopConn = track.Stopped:Connect(function()
+			local list = _activeTrackTasks[track]
+			if list then
+				for _, c in ipairs(list) do
+					c:Disconnect()
+				end
+				_activeTrackTasks[track] = nil
+			end
+			if stopConn then
+				stopConn:Disconnect()
+			end
+		end)
+		if stopConn then
+			_scythe.add(_serviceScope, stopConn)
+		end
 	end
 
 	local signal = track:GetMarkerReachedSignal(markerName)
@@ -293,29 +312,16 @@ function HitboxService.BindToAnimationMarker(selfOrTrack: any, trackOrMarker: an
 		HitboxService.ExecuteCast(request)
 	end)
 
-	_activeTrackTasks[track] = conn
+	table.insert(trackTasks, conn)
 	_scythe.add(_serviceScope, conn)
-
-	-- Auto-cleanup on animation stop
-	local stopConn: RBXScriptConnection? = nil
-	stopConn = track.Stopped:Connect(function()
-		if _activeTrackTasks[track] then
-			_activeTrackTasks[track]:Disconnect()
-			_activeTrackTasks[track] = nil
-		end
-		if stopConn then
-			stopConn:Disconnect()
-		end
-	end)
-	if stopConn then
-		_scythe.add(_serviceScope, stopConn)
-	end
 end
 
 -- Destructor Cleanup Hook
 function HitboxService.Destroy()
-	for track, conn in pairs(_activeTrackTasks) do
-		conn:Disconnect()
+	for track, conns in pairs(_activeTrackTasks) do
+		for _, conn in ipairs(conns) do
+			conn:Disconnect()
+		end
 	end
 	table.clear(_activeTrackTasks)
 	table.clear(_attackerDebounce)

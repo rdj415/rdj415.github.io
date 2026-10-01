@@ -199,6 +199,19 @@ function DataService.Get(player: Player): PlayerData?
 	return profile
 end
 
+-- Convenient atomic setter wrapping Update
+function DataService.Set<T>(player: Player, key: string, value: T): boolean
+	local ok, _ = DataService.Update(player, key, function(_)
+		return value, true
+	end)
+	return ok
+end
+
+-- Check if player session is operating in fallback Read-Only mode
+function DataService.IsReadOnly(player: Player): boolean
+	return _readOnlyMode[player] == true
+end
+
 -- Write-Verify Session Release
 function DataService._releaseSession(player: Player)
 	local profile = _profiles[player]
@@ -232,6 +245,10 @@ function DataService.RollLootDrop(selfOrPlayer: any, playerOrChance: any, maybeC
 		player = selfOrPlayer :: Player
 		baseChance = playerOrChance :: number
 	end
+
+	-- Guaranteed boundary cases
+	if baseChance <= 0 then return false end
+	if baseChance >= 1.0 then return true end
 
 	local profile = _profiles[player]
 	local luckTier = profile and profile.LuckTier or 0

@@ -35,15 +35,39 @@ function InteractionController.Init(context: any)
 	end)
 end
 
+local function getInstancePosition(inst: Instance): Vector3?
+	if inst:IsA("BasePart") then
+		return (inst :: BasePart).Position
+	elseif inst:IsA("Model") then
+		local prim = (inst :: Model).PrimaryPart
+		if prim then return prim.Position end
+		return (inst :: Model):GetPivot().Position
+	elseif inst:IsA("Attachment") then
+		return (inst :: Attachment).WorldPosition
+	end
+	local part = inst:FindFirstChildWhichIsA("BasePart", true)
+	if part then return part.Position end
+	return nil
+end
+
+local function cleanupTagScope(instance: Instance)
+	local scope = _tagScopes[instance]
+	if scope then
+		_tagScopes[instance] = nil
+		_activePrompts[instance] = nil
+		if _scythe and _scythe.isAlive(scope) then
+			_scythe.remove(_controllerScope, scope)
+			_scythe.scope(scope)
+		end
+	end
+end
+
 function InteractionController.Start()
 	print("[InteractionController] Started")
 
 	local function onInteractableAdded(instance: Instance)
 		-- Clean up previous scope if re-tagged
-		if _tagScopes[instance] and _scythe.isAlive(_tagScopes[instance]) then
-			_scythe.scope(_tagScopes[instance])
-			_tagScopes[instance] = nil
-		end
+		cleanupTagScope(instance)
 
 		local tagScope: number = _scythe.scope() :: number
 		_tagScopes[instance] = tagScope
@@ -79,11 +103,7 @@ function InteractionController.Start()
 		-- Clean up on ancestry removal to prevent memory leaks
 		local ancestryConn = instance.AncestryChanged:Connect(function(_, parent)
 			if not parent then
-				_activePrompts[instance] = nil
-				if _tagScopes[instance] and _scythe.isAlive(_tagScopes[instance]) then
-					_scythe.scope(_tagScopes[instance])
-					_tagScopes[instance] = nil
-				end
+				cleanupTagScope(instance)
 			end
 		end)
 		_scythe.add(tagScope, ancestryConn)
@@ -102,12 +122,7 @@ function InteractionController.Start()
 			task.spawn(onInteractableAdded, inst)
 		end
 		local tagAddedConn = CollectionService:GetInstanceAddedSignal("Interactable"):Connect(onInteractableAdded)
-		local tagRemovedConn = CollectionService:GetInstanceRemovedSignal("Interactable"):Connect(function(inst)
-			if _tagScopes[inst] and _scythe.isAlive(_tagScopes[inst]) then
-				_scythe.scope(_tagScopes[inst])
-				_tagScopes[inst] = nil
-			end
-		end)
+		local tagRemovedConn = CollectionService:GetInstanceRemovedSignal("Interactable"):Connect(cleanupTagScope)
 		_scythe.add(_controllerScope, tagAddedConn)
 		_scythe.add(_controllerScope, tagRemovedConn)
 	end
@@ -119,8 +134,9 @@ function InteractionController.Start()
 		if timeAccumulator < CheckInterval then return end
 		timeAccumulator = 0
 
-		if not _localPlayer then return end
-		local character = _localPlayer.Character
+		local player = _localPlayer or Players.LocalPlayer
+		if not player then return end
+		local character = player.Character
 		if not character then return end
 		local root = (character.PrimaryPart or character:FindFirstChild("HumanoidRootPart")) :: BasePart?
 		if not root then return end
@@ -128,18 +144,26 @@ function InteractionController.Start()
 		local myPos = root.Position
 		for instance, prompt in pairs(_activePrompts) do
 			if not instance.Parent or not prompt.Parent then
-				_activePrompts[instance] = nil
+				cleanupTagScope(instance)
 				continue
 			end
 
-			local dist = (instance:GetPivot().Position - myPos).Magnitude
-			prompt.Enabled = (dist <= InteractionRadius)
+			local targetPos = getInstancePosition(instance)
+			if targetPos then
+				local dist = (targetPos - myPos).Magnitude
+				prompt.Enabled = (dist <= InteractionRadius)
+			else
+				prompt.Enabled = false
+			end
 		end
 	end)
 	_scythe.add(_controllerScope, heartbeatConn)
 end
 
 function InteractionController.Destroy()
+	for instance in pairs(_tagScopes) do
+		cleanupTagScope(instance)
+	end
 	table.clear(_activePrompts)
 	table.clear(_tagScopes)
 	if _scythe and _scythe.isAlive(_controllerScope) then

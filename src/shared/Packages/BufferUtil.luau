@@ -88,6 +88,10 @@ function BufferUtil.CreateWriter(initialSize: number?)
 		cursor = BufferUtil.WriteVector3(b, cursor, v)
 	end
 
+	function writer:WriteBoolean(v: boolean)
+		self:WriteU8(if v then 1 else 0)
+	end
+
 	function writer:WriteString(str: string)
 		local strLen = #str
 		self:WriteU16(strLen)
@@ -108,6 +112,10 @@ function BufferUtil.CreateWriter(initialSize: number?)
 
 	function writer:GetCursor(): number
 		return cursor
+	end
+
+	function writer:SetCursor(pos: number)
+		cursor = math.clamp(pos, 0, buffer.len(b))
 	end
 
 	return writer
@@ -172,6 +180,10 @@ function BufferUtil.CreateReader(b: buffer)
 		return v
 	end
 
+	function reader:ReadBoolean(): boolean
+		return self:ReadU8() ~= 0
+	end
+
 	function reader:ReadString(): string
 		local strLen = self:ReadU16()
 		local str = buffer.readstring(b, cursor, strLen)
@@ -181,6 +193,14 @@ function BufferUtil.CreateReader(b: buffer)
 
 	function reader:GetCursor(): number
 		return cursor
+	end
+
+	function reader:SetCursor(pos: number)
+		cursor = math.clamp(pos, 0, totalLen)
+	end
+
+	function reader:GetRemaining(): number
+		return math.max(0, totalLen - cursor)
 	end
 
 	function reader:CanRead(bytes: number): boolean

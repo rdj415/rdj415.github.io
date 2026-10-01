@@ -27,6 +27,10 @@ local function _updateStormVisuals(diameter: number)
 	local stormZone = workspace:FindFirstChild("StormZone")
 	if not stormZone then return end
 	stormZone:SetAttribute("Diameter", diameter)
+	local outer = stormZone:FindFirstChild("StormWall") :: BasePart?
+	if outer then
+		outer.Size = Vector3.new(diameter, outer.Size.Y, diameter)
+	end
 end
 
 local function _checkAndDamagePlayers()
@@ -135,6 +139,7 @@ function ZoneService.Start(context: any)
 					if _stormStateEvent then
 						_stormStateEvent:FireAllClients("Finished")
 					end
+					_scythe.remove(_serviceScope, phaseScope)
 					_scythe.scope(phaseScope)
 					_activePhaseScope = nil
 					currentPhaseIndex += 1
@@ -180,11 +185,12 @@ function ZoneService.GetStormRadius(): number
 end
 
 function ZoneService.Destroy()
-	if _activeDelayThread then
+	if _activeDelayThread and coroutine.status(_activeDelayThread) ~= "dead" then
 		task.cancel(_activeDelayThread)
 		_activeDelayThread = nil
 	end
 	if _activePhaseScope and _scythe and _scythe.isAlive(_activePhaseScope) then
+		_scythe.remove(_serviceScope, _activePhaseScope)
 		_scythe.scope(_activePhaseScope)
 		_activePhaseScope = nil
 	end

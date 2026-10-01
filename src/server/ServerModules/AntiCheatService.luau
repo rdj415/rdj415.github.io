@@ -178,6 +178,7 @@ function AntiCheatService.Start()
 			if state.LastPosition then
 				local displacement = (currentPos - state.LastPosition).Magnitude
 				if displacement > AntiCheatConfig.MaxInstantDisplacement then
+					state.SuspicionScore += 5
 					RecordViolation(player, {
 						Type = "DisplacementExceeded",
 						Details = { Displacement = displacement, Allowed = AntiCheatConfig.MaxInstantDisplacement },
@@ -185,21 +186,53 @@ function AntiCheatService.Start()
 					})
 					if state.LastVerifiedPosition then
 						hrp.CFrame = CFrame.new(state.LastVerifiedPosition)
+						hrp.Position = state.LastVerifiedPosition
+						hrp.AssemblyLinearVelocity = Vector3.zero
+						hrp.AssemblyAngularVelocity = Vector3.zero
+						state.LastPosition = state.LastVerifiedPosition
+					else
+						state.LastPosition = currentPos
 					end
 				else
 					state.LastVerifiedPosition = currentPos
+					state.LastPosition = currentPos
 				end
 			else
 				state.LastVerifiedPosition = currentPos
+				state.LastPosition = currentPos
 			end
 
-			state.LastPosition = currentPos
+			-- Suspicion Score Decay over time
+			state.SuspicionScore = math.max(0, state.SuspicionScore - AntiCheatConfig.DecayRate * dt)
+			if state.SuspicionScore >= AntiCheatConfig.MaxSuspicionScore then
+				EnforcePunishment(player, "Kick", "Suspicion score threshold exceeded")
+			end
+
 			state.LastCheckTime = now
 		end
 	end)
 
 	_scythe.add(_serviceScope, heartbeatConn)
 	print("[AntiCheatService] Started. Authoritative spatial validation active.")
+end
+
+-- Report a violation from honeypots or server scripts
+function AntiCheatService.ReportViolation(player: Player, violationType: string, details: { [string]: any }?)
+	RecordViolation(player, {
+		Type = violationType,
+		Details = details,
+		Timestamp = os.clock(),
+	})
+end
+
+-- Get tracking state for a player
+function AntiCheatService.GetPlayerState(player: Player): PlayerState?
+	return PlayerStates[player.UserId]
+end
+
+-- Get recorded violation history for a player
+function AntiCheatService.GetViolationHistory(player: Player): { ViolationData }?
+	return ViolationHistory[player.UserId]
 end
 
 function AntiCheatService.Destroy()
