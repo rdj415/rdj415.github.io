@@ -1357,6 +1357,15 @@ AntiCheatService.Metadata = {
             </div>
             <pre><code id="raw-ai"><span class="t-comment">--!strict</span>
 <span class="t-comment">-- [ProductionCore / ServerModules / AIService.luau]</span>
+<span class="t-comment">-- Autonomous NPC AI engine: 2D planar projection, anti-stuck physics detection & throttled replication</span>
+
+<span class="t-kw">export type</span> <span class="t-type">NPCState</span> = {
+    Strategy: <span class="t-str">"Tactician"</span> | <span class="t-str">"Survivor"</span> | <span class="t-type">string</span>,
+    WalkStuckTime: <span class="t-type">number</span>?,
+}
+
+<span class="t-kw">local</span> _npcs: { [<span class="t-type">Model</span>]: <span class="t-type">NPCState</span> } = {}
+
 <span class="t-kw">local function</span> <span class="t-fn">_isValidTargetForStrategy</span>(npc: <span class="t-type">Model</span>, targetChar: <span class="t-type">Model</span>): <span class="t-type">boolean</span>
     <span class="t-kw">local</span> data = _npcs[npc]
     <span class="t-kw">if not</span> data <span class="t-kw">then return true end</span>
@@ -1382,7 +1391,7 @@ AntiCheatService.Metadata = {
     <span class="t-kw">return true</span>
 <span class="t-kw">end</span>
 
-<span class="t-kw">local function</span> <span class="t-fn">_moveNPCTo</span>(npc: <span class="t-type">Model</span>, targetPos: <span class="t-type">Vector3</span>, speed: <span class="t-type">number</span>, dt: <span class="t-type">number</span>): <span class="t-type">boolean</span>
+<span class="t-kw">local function</span> <span class="t-fn">_moveNPCTo</span>(npc: <span class="t-type">Model</span>, targetPos: <span class="t-type">Vector3</span>, speed: <span class="t-type">number</span>): <span class="t-type">boolean</span>
     targetPos = <span class="t-fn">_keepInZone</span>(npc, targetPos)
     <span class="t-kw">local</span> humanoid = npc:<span class="t-fn">FindFirstChildOfClass</span>(<span class="t-str">"Humanoid"</span>)
     <span class="t-kw">local</span> hrp = npc:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>)
@@ -1398,11 +1407,16 @@ AntiCheatService.Metadata = {
         <span class="t-kw">return true</span>
     <span class="t-kw">end</span>
 
-    humanoid.WalkSpeed = speed
-    humanoid.AutoRotate = <span class="t-kw">true</span>
+    <span class="t-comment">-- Guard against redundant network property replication</span>
+    <span class="t-kw">if</span> humanoid.WalkSpeed ~= speed <span class="t-kw">then</span>
+        humanoid.WalkSpeed = speed
+    <span class="t-kw">end</span>
+    <span class="t-kw">if not</span> humanoid.AutoRotate <span class="t-kw">then</span>
+        humanoid.AutoRotate = <span class="t-kw">true</span>
+    <span class="t-kw">end</span>
     humanoid:<span class="t-fn">Move</span>(directionXZ.Unit, <span class="t-kw">false</span>)
 
-    <span class="t-comment">-- Anti-stuck jump detection</span>
+    <span class="t-comment">-- Anti-stuck jump detection using assembly linear velocity</span>
     <span class="t-kw">local</span> data = _npcs[npc]
     <span class="t-kw">if</span> data <span class="t-kw">then</span>
         <span class="t-kw">local</span> now = <span class="t-fn">os.clock</span>()
@@ -1904,61 +1918,85 @@ HitboxService.__index = HitboxService
 	<span class="t-kw">local</span> originCFrame = rootPart.CFrame * castOffset
 	<span class="t-kw">local</span> castDirection = originCFrame.LookVector * request.Range
 
-	<span class="t-comment">-- Configure Whitelist Overlap / Raycast Params</span>
+	<span class="t-comment">-- Configure Exclude Filter (Always exclude attacker to prevent torso self-blocking)</span>
+	<span class="t-kw">local</span> excludeList: { <span class="t-type">Instance</span> } = { attacker }
 	<span class="t-kw">local</span> rayParams = RaycastParams.<span class="t-fn">new</span>()
-	rayParams.FilterType = RaycastFilterType.Include
 	<span class="t-kw">if</span> request.FilterFolder <span class="t-kw">then</span>
+		rayParams.FilterType = RaycastFilterType.Include
 		rayParams.FilterDescendantsInstances = { request.FilterFolder }
 	<span class="t-kw">else</span>
-		rayParams.FilterDescendantsInstances = { Workspace }
+		rayParams.FilterType = RaycastFilterType.Exclude
+		rayParams.FilterDescendantsInstances = excludeList
 	<span class="t-kw">end</span>
 	rayParams.IgnoreWater = <span class="t-kw">true</span>
 
 	<span class="t-kw">local</span> hitsRecorded: { <span class="t-type">HitResult</span> } = {}
 	<span class="t-kw">local</span> hitVictims: { [<span class="t-type">Model</span>]: <span class="t-type">boolean</span> } = {}
 	<span class="t-kw">local</span> maxTargets = request.MaxTargets <span class="t-kw">or</span> DEFAULT_MAX_TARGETS
+	<span class="t-kw">local</span> sphereRadius = <span class="t-fn">math.max</span>(request.Size.X, request.Size.Y, request.Size.Z) / <span class="t-num">2</span>
 
-	<span class="t-comment">-- Execute Shape-Cast (Blockcast or Spherecast)</span>
-	<span class="t-kw">local</span> result: <span class="t-type">RaycastResult</span>? = <span class="t-kw">nil</span>
-	<span class="t-kw">if</span> request.Shape == <span class="t-str">"Block"</span> <span class="t-kw">then</span>
-		result = Workspace:<span class="t-fn">Blockcast</span>(originCFrame, request.Size, castDirection, rayParams)
-	<span class="t-kw">elseif</span> request.Shape == <span class="t-str">"Sphere"</span> <span class="t-kw">then</span>
-		<span class="t-kw">local</span> radius = <span class="t-fn">math.max</span>(request.Size.X, request.Size.Y, request.Size.Z) // <span class="t-num">2</span>
-		result = Workspace:<span class="t-fn">Spherecast</span>(originCFrame.Position, radius, castDirection, rayParams)
-	<span class="t-kw">end</span>
+	<span class="t-comment">-- Iterative Penetration Shapecasting (supports multi-target cleave)</span>
+	<span class="t-kw">for</span> _ = <span class="t-num">1</span>, maxTargets <span class="t-kw">do</span>
+		<span class="t-kw">local</span> result: <span class="t-type">RaycastResult</span>? = <span class="t-kw">nil</span>
+		<span class="t-kw">if</span> request.Shape == <span class="t-str">"Block"</span> <span class="t-kw">then</span>
+			result = Workspace:<span class="t-fn">Blockcast</span>(originCFrame, request.Size, castDirection, rayParams)
+		<span class="t-kw">elseif</span> request.Shape == <span class="t-str">"Sphere"</span> <span class="t-kw">then</span>
+			result = Workspace:<span class="t-fn">Spherecast</span>(originCFrame.Position, sphereRadius, castDirection, rayParams)
+		<span class="t-kw">end</span>
 
-	<span class="t-kw">if</span> result <span class="t-kw">and</span> result.Instance <span class="t-kw">then</span>
+		<span class="t-kw">if not</span> result <span class="t-kw">or not</span> result.Instance <span class="t-kw">then</span>
+			<span class="t-kw">break</span>
+		<span class="t-kw">end</span>
+
 		<span class="t-kw">local</span> hitPart = result.Instance
 		<span class="t-kw">local</span> victimModel = hitPart:<span class="t-fn">FindFirstAncestorOfClass</span>(<span class="t-str">"Model"</span>)
 
-		<span class="t-kw">if</span> victimModel <span class="t-kw">and</span> victimModel ~= attacker <span class="t-kw">and not</span> hitVictims[victimModel] <span class="t-kw">then</span>
-			<span class="t-kw">local</span> victimHRP = victimModel:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>) :: <span class="t-type">BasePart</span>?
-			<span class="t-kw">local</span> victimHum = victimModel:<span class="t-fn">FindFirstChildOfClass</span>(<span class="t-str">"Humanoid"</span>)
+		<span class="t-kw">if</span> victimModel <span class="t-kw">then</span>
+			<span class="t-comment">-- Exclude this model from subsequent penetration steps in this sweep</span>
+			<span class="t-fn">table.insert</span>(excludeList, victimModel)
+			<span class="t-kw">if</span> rayParams.FilterType == RaycastFilterType.Exclude <span class="t-kw">then</span>
+				rayParams.FilterDescendantsInstances = excludeList
+			<span class="t-kw">end</span>
 
-			<span class="t-kw">if</span> victimHRP <span class="t-kw">and</span> victimHum <span class="t-kw">and</span> victimHum.Health &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
-				<span class="t-comment">-- Dot Product Angle Validation</span>
-				<span class="t-kw">if</span> <span class="t-fn">_isWithinCombatCone</span>(originCFrame, victimHRP.Position, DEFAULT_FOV_COS) <span class="t-kw">then</span>
-					hitVictims[victimModel] = <span class="t-kw">true</span>
+			<span class="t-kw">if</span> victimModel ~= attacker <span class="t-kw">and not</span> hitVictims[victimModel] <span class="t-kw">then</span>
+				<span class="t-kw">local</span> victimHRP = victimModel:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>) :: <span class="t-type">BasePart</span>?
+				<span class="t-kw">local</span> victimHum = victimModel:<span class="t-fn">FindFirstChildOfClass</span>(<span class="t-str">"Humanoid"</span>)
 
-					<span class="t-comment">-- Server Authoritative Damage Application</span>
-					victimHum:<span class="t-fn">TakeDamage</span>(request.Damage)
+				<span class="t-kw">if</span> victimHRP <span class="t-kw">and</span> victimHum <span class="t-kw">and</span> victimHum.Health &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
+					<span class="t-comment">-- Dot Product Angle Validation</span>
+					<span class="t-kw">if</span> <span class="t-fn">_isWithinCombatCone</span>(originCFrame, victimHRP.Position, DEFAULT_FOV_COS) <span class="t-kw">then</span>
+						hitVictims[victimModel] = <span class="t-kw">true</span>
 
-					<span class="t-comment">-- Knockback impulse</span>
-					<span class="t-kw">if</span> request.Knockback <span class="t-kw">and</span> request.Knockback &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
-						<span class="t-kw">local</span> impulseDir = (victimHRP.Position - originCFrame.Position).Unit
-						victimHRP:<span class="t-fn">ApplyImpulse</span>(impulseDir * request.Knockback * victimHRP.AssemblyMass)
+						<span class="t-comment">-- Server Authoritative Damage Application</span>
+						victimHum:<span class="t-fn">TakeDamage</span>(request.Damage)
+
+						<span class="t-comment">-- Knockback impulse</span>
+						<span class="t-kw">if</span> request.Knockback <span class="t-kw">and</span> request.Knockback &gt; <span class="t-num">0</span> <span class="t-kw">then</span>
+							<span class="t-kw">local</span> impulseDir = (victimHRP.Position - originCFrame.Position).Unit
+							victimHRP:<span class="t-fn">ApplyImpulse</span>(impulseDir * request.Knockback * victimHRP.AssemblyMass)
+						<span class="t-kw">end</span>
+
+						<span class="t-kw">local</span> hitData: <span class="t-type">HitResult</span> = {
+							Victim = victimModel,
+							HitPoint = result.Position,
+							HitNormal = result.Normal,
+							DamageDealt = request.Damage,
+						}
+						<span class="t-fn">table.insert</span>(hitsRecorded, hitData)
+
+						<span class="t-comment">-- Offload VFX to clients</span>
+						<span class="t-fn">_broadcastHitVFX</span>(result.Position, result.Normal, victimModel)
 					<span class="t-kw">end</span>
-
-					<span class="t-kw">local</span> hitData: <span class="t-type">HitResult</span> = {
-						Victim = victimModel,
-						HitPoint = result.Position,
-						HitNormal = result.Normal,
-						DamageDealt = request.Damage,
-					}
-					<span class="t-fn">table.insert</span>(hitsRecorded, hitData)
-
-					<span class="t-comment">-- Offload VFX to clients</span>
-					<span class="t-fn">_broadcastHitVFX</span>(result.Position, result.Normal, victimModel)
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+		<span class="t-kw">else</span>
+			<span class="t-comment">-- Hit environmental geometry; stop penetration if hitting solid anchored structures</span>
+			<span class="t-kw">if</span> hitPart.Anchored <span class="t-kw">and</span> hitPart.CanCollide <span class="t-kw">then</span>
+				<span class="t-kw">break</span>
+			<span class="t-kw">else</span>
+				<span class="t-fn">table.insert</span>(excludeList, hitPart)
+				<span class="t-kw">if</span> rayParams.FilterType == RaycastFilterType.Exclude <span class="t-kw">then</span>
+					rayParams.FilterDescendantsInstances = excludeList
 				<span class="t-kw">end</span>
 			<span class="t-kw">end</span>
 		<span class="t-kw">end</span>
@@ -2015,14 +2053,14 @@ HitboxService.__index = HitboxService
 
           <div class="code-panel" id="code-data">
             <div class="code-panel-meta">
-              <span>Source: src/server/ServerModules/DataService.luau • Session-locking ProfileStore wrapper, transactional .Update() & CSPRNG</span>
+              <span>Source: src/server/ServerModules/DataService.luau • Session-locking ProfileStore wrapper, transactional .Update() & zero-allocation PCG RNG</span>
               <button class="btn-copy-code" data-clipboard-target="#raw-data">Copy Code</button>
             </div>
             <pre><code id="raw-data"><span class="t-comment">--!strict</span>
 <span class="t-comment">-- [ProductionCore / ServerModules / DataService.luau]</span>
 <span class="t-comment">-- Enterprise Data Persistence & Transactional Mutation Layer.</span>
 <span class="t-comment">-- High-reliability data persistence layer with ProfileStore wrapper, transactional mutations,</span>
-<span class="t-comment">-- S-curve probability modeling, and FNV-1a cryptographic entropy seeding.</span>
+<span class="t-comment">-- S-curve probability modeling, and zero-allocation PCG Random engine.</span>
 
 <span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
 <span class="t-kw">local</span> <span class="t-def">HttpService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"HttpService"</span>)
@@ -2054,8 +2092,6 @@ DataService.__index = DataService
 <span class="t-kw">local</span> DATA_SCHEMA_VERSION: <span class="t-type">number</span> = <span class="t-num">2</span>
 <span class="t-kw">local</span> MAX_RETRY_ATTEMPTS: <span class="t-type">number</span> = <span class="t-num">3</span>
 <span class="t-kw">local</span> EXP_BACKOFF_BASE: <span class="t-type">number</span> = <span class="t-num">0.5</span>
-<span class="t-kw">local</span> FNV_OFFSET_BASIS: <span class="t-type">number</span> = <span class="t-num">2_166_136_261</span>
-<span class="t-kw">local</span> FNV_PRIME: <span class="t-type">number</span> = <span class="t-num">16_777_619</span>
 
 <span class="t-kw">local</span> DEFAULT_PROFILE_TEMPLATE: <span class="t-type">PlayerData</span> = <span class="t-fn">table.freeze</span>({
 	Coins = <span class="t-num">0</span>,
@@ -2071,24 +2107,9 @@ DataService.__index = DataService
 	Version = DATA_SCHEMA_VERSION,
 })
 
-<span class="t-comment">-- High-Entropy CSPRNG (4 Entropy Sources + 32-bit FNV-1a Hash)</span>
-<span class="t-kw">local function</span> <span class="t-fn">_generateSecureRandomEngine</span>(): <span class="t-type">Random</span>
-	<span class="t-kw">local</span> s1 = <span class="t-fn">tostring</span>(<span class="t-fn">os.time</span>())
-	<span class="t-kw">local</span> s2 = <span class="t-fn">tostring</span>(<span class="t-fn">os.clock</span>())
-	<span class="t-kw">local</span> s3 = HttpService:<span class="t-fn">GenerateGUID</span>(<span class="t-kw">false</span>)
-	<span class="t-kw">local</span> s4 = <span class="t-fn">tostring</span>(<span class="t-fn">math.random</span>(<span class="t-num">1</span>, <span class="t-num">1_000_000</span>))
-	<span class="t-kw">local</span> combined = s1 .. <span class="t-str">":"</span> .. s2 .. <span class="t-str">":"</span> .. s3 .. <span class="t-str">":"</span> .. s4
-
-	<span class="t-comment">-- 32-bit FNV-1a Hash</span>
-	<span class="t-kw">local</span> hash = FNV_OFFSET_BASIS
-	<span class="t-kw">for</span> i = <span class="t-num">1</span>, #combined <span class="t-kw">do</span>
-		<span class="t-kw">local</span> byte = <span class="t-fn">string.byte</span>(combined, i)
-		hash = <span class="t-fn">bit32.bxor</span>(hash, byte)
-		hash = (hash * FNV_PRIME) % <span class="t-num">4_294_967_296</span>
-	<span class="t-kw">end</span>
-
-	<span class="t-kw">return</span> Random.<span class="t-fn">new</span>(hash)
-<span class="t-kw">end</span>
+<span class="t-comment">-- Persistent Random engine: Luau's native Random.new() uses PCG32/Xoroshiro seeded from system entropy.</span>
+<span class="t-comment">-- Instantiated once at module level to guarantee zero-allocation rolls and eliminate GC pressure.</span>
+<span class="t-kw">local</span> _rng: <span class="t-type">Random</span> = Random.<span class="t-fn">new</span>()
 
 <span class="t-comment">-- S-Curve / Sigmoid Scaling for Economy and Luck Caps</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">EvaluateSigmoid</span>(x: <span class="t-type">number</span>, maxCap: <span class="t-type">number</span>, midpoint: <span class="t-type">number</span>, steepness: <span class="t-type">number</span>): <span class="t-type">number</span>
@@ -2130,6 +2151,8 @@ DataService.__index = DataService
 
 <span class="t-comment">-- Internal: Load Session with Session-Locking & Exponential Backoff</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">_loadSession</span>(player: <span class="t-type">Player</span>)
+	<span class="t-comment">-- Guard against race conditions: abort if player disconnected before thread executed</span>
+	<span class="t-kw">if not</span> player:<span class="t-fn">IsDescendantOf</span>(Players) <span class="t-kw">then return end</span>
 	<span class="t-kw">if</span> _profiles[player] <span class="t-kw">then return end</span>
 
 	<span class="t-kw">local</span> attempts = <span class="t-num">0</span>
@@ -2137,8 +2160,11 @@ DataService.__index = DataService
 	<span class="t-kw">local</span> saveToken = HttpService:<span class="t-fn">GenerateGUID</span>(<span class="t-kw">false</span>)
 
 	<span class="t-kw">while</span> attempts &lt; MAX_RETRY_ATTEMPTS <span class="t-kw">do</span>
+		<span class="t-kw">if not</span> player:<span class="t-fn">IsDescendantOf</span>(Players) <span class="t-kw">then return end</span>
 		attempts += <span class="t-num">1</span>
 		<span class="t-kw">local</span> success, result = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+			<span class="t-comment">-- In production deployment with ProfileStore backend, this executes:</span>
+			<span class="t-comment">-- return ProfileStore:LoadProfileAsync(playerKey)</span>
 			<span class="t-kw">return</span> {
 				Coins = <span class="t-num">1_250</span>,
 				Gems = <span class="t-num">50</span>,
@@ -2159,7 +2185,12 @@ DataService.__index = DataService
 		<span class="t-comment">-- Exponential backoff: base * 2^(attempts - 1)</span>
 		<span class="t-kw">local</span> backoff = EXP_BACKOFF_BASE * (<span class="t-num">2</span> ^ (attempts - <span class="t-num">1</span>))
 		task.<span class="t-fn">wait</span>(backoff)
+		<span class="t-comment">-- Guard against race conditions: check if player disconnected during backoff yield</span>
+		<span class="t-kw">if not</span> player:<span class="t-fn">IsDescendantOf</span>(Players) <span class="t-kw">then return end</span>
 	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Final disconnect guard before session allocation to prevent orphaned memory leaks</span>
+	<span class="t-kw">if not</span> player:<span class="t-fn">IsDescendantOf</span>(Players) <span class="t-kw">then return end</span>
 
 	<span class="t-kw">if</span> profileData <span class="t-kw">then</span>
 		_profiles[player] = profileData
@@ -2238,7 +2269,7 @@ DataService.__index = DataService
 	_saveTokens[player] = <span class="t-kw">nil</span>
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Roll for loot using CSPRNG and S-Curve luck modifier</span>
+<span class="t-comment">-- Roll for loot using persistent PCG RNG and S-Curve luck modifier</span>
 <span class="t-kw">function</span> DataService:<span class="t-fn">RollLootDrop</span>(player: <span class="t-type">Player</span>, baseChance: <span class="t-type">number</span>): <span class="t-type">boolean</span>
 	<span class="t-kw">local</span> profile = _profiles[player]
 	<span class="t-kw">local</span> luckTier = profile <span class="t-kw">and</span> profile.LuckTier <span class="t-kw">or</span> <span class="t-num">0</span>
@@ -2247,8 +2278,7 @@ DataService.__index = DataService
 	<span class="t-kw">local</span> luckMultiplier = <span class="t-num">1</span> + DataService.<span class="t-fn">EvaluateSigmoid</span>(luckTier, <span class="t-num">2.5</span>, <span class="t-num">5</span>, <span class="t-num">0.4</span>)
 	<span class="t-kw">local</span> effectiveChance = <span class="t-fn">math.clamp</span>(baseChance * luckMultiplier, <span class="t-num">0</span>, <span class="t-num">1.0</span>)
 
-	<span class="t-kw">local</span> rng = <span class="t-fn">_generateSecureRandomEngine</span>()
-	<span class="t-kw">local</span> roll = rng:<span class="t-fn">NextNumber</span>(<span class="t-num">0</span>, <span class="t-num">1.0</span>)
+	<span class="t-kw">local</span> roll = _rng:<span class="t-fn">NextNumber</span>(<span class="t-num">0</span>, <span class="t-num">1.0</span>)
 
 	<span class="t-kw">return</span> roll &lt;= effectiveChance
 <span class="t-kw">end</span>

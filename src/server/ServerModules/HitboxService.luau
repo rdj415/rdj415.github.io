@@ -143,61 +143,85 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 	local originCFrame = rootPart.CFrame * castOffset
 	local castDirection = originCFrame.LookVector * request.Range
 
-	-- Configure Whitelist Overlap / Raycast Params
+	-- Configure Exclude Filter (Always exclude attacker to prevent torso self-blocking)
+	local excludeList: { Instance } = { attacker }
 	local rayParams = RaycastParams.new()
-	rayParams.FilterType = RaycastFilterType.Include
 	if request.FilterFolder then
+		rayParams.FilterType = RaycastFilterType.Include
 		rayParams.FilterDescendantsInstances = { request.FilterFolder }
 	else
-		rayParams.FilterDescendantsInstances = { Workspace }
+		rayParams.FilterType = RaycastFilterType.Exclude
+		rayParams.FilterDescendantsInstances = excludeList
 	end
 	rayParams.IgnoreWater = true
 
 	local hitsRecorded: { HitResult } = {}
 	local hitVictims: { [Model]: boolean } = {}
 	local maxTargets = request.MaxTargets or DEFAULT_MAX_TARGETS
+	local sphereRadius = math.max(request.Size.X, request.Size.Y, request.Size.Z) / 2
 
-	-- Execute Shape-Cast (Blockcast or Spherecast)
-	local result: RaycastResult? = nil
-	if request.Shape == "Block" then
-		result = Workspace:Blockcast(originCFrame, request.Size, castDirection, rayParams)
-	elseif request.Shape == "Sphere" then
-		local radius = math.max(request.Size.X, request.Size.Y, request.Size.Z) // 2
-		result = Workspace:Spherecast(originCFrame.Position, radius, castDirection, rayParams)
-	end
+	-- Iterative Penetration Shapecasting (supports multi-target cleave)
+	for _ = 1, maxTargets do
+		local result: RaycastResult? = nil
+		if request.Shape == "Block" then
+			result = Workspace:Blockcast(originCFrame, request.Size, castDirection, rayParams)
+		elseif request.Shape == "Sphere" then
+			result = Workspace:Spherecast(originCFrame.Position, sphereRadius, castDirection, rayParams)
+		end
 
-	if result and result.Instance then
+		if not result or not result.Instance then
+			break
+		end
+
 		local hitPart = result.Instance
 		local victimModel = hitPart:FindFirstAncestorOfClass("Model")
 
-		if victimModel and victimModel ~= attacker and not hitVictims[victimModel] then
-			local victimHRP = victimModel:FindFirstChild("HumanoidRootPart") :: BasePart?
-			local victimHum = victimModel:FindFirstChildOfClass("Humanoid")
+		if victimModel then
+			-- Exclude this model from subsequent penetration steps in this sweep
+			table.insert(excludeList, victimModel)
+			if rayParams.FilterType == RaycastFilterType.Exclude then
+				rayParams.FilterDescendantsInstances = excludeList
+			end
 
-			if victimHRP and victimHum and victimHum.Health > 0 then
-				-- Dot Product Angle Validation
-				if _isWithinCombatCone(originCFrame, victimHRP.Position, DEFAULT_FOV_COS) then
-					hitVictims[victimModel] = true
+			if victimModel ~= attacker and not hitVictims[victimModel] then
+				local victimHRP = victimModel:FindFirstChild("HumanoidRootPart") :: BasePart?
+				local victimHum = victimModel:FindFirstChildOfClass("Humanoid")
 
-					-- Server Authoritative Damage Application
-					victimHum:TakeDamage(request.Damage)
+				if victimHRP and victimHum and victimHum.Health > 0 then
+					-- Dot Product Angle Validation
+					if _isWithinCombatCone(originCFrame, victimHRP.Position, DEFAULT_FOV_COS) then
+						hitVictims[victimModel] = true
 
-					-- Knockback impulse
-					if request.Knockback and request.Knockback > 0 then
-						local impulseDir = (victimHRP.Position - originCFrame.Position).Unit
-						victimHRP:ApplyImpulse(impulseDir * request.Knockback * victimHRP.AssemblyMass)
+						-- Server Authoritative Damage Application
+						victimHum:TakeDamage(request.Damage)
+
+						-- Knockback impulse
+						if request.Knockback and request.Knockback > 0 then
+							local impulseDir = (victimHRP.Position - originCFrame.Position).Unit
+							victimHRP:ApplyImpulse(impulseDir * request.Knockback * victimHRP.AssemblyMass)
+						end
+
+						local hitData: HitResult = {
+							Victim = victimModel,
+							HitPoint = result.Position,
+							HitNormal = result.Normal,
+							DamageDealt = request.Damage,
+						}
+						table.insert(hitsRecorded, hitData)
+
+						-- Offload VFX to clients
+						_broadcastHitVFX(result.Position, result.Normal, victimModel)
 					end
-
-					local hitData: HitResult = {
-						Victim = victimModel,
-						HitPoint = result.Position,
-						HitNormal = result.Normal,
-						DamageDealt = request.Damage,
-					}
-					table.insert(hitsRecorded, hitData)
-
-					-- Offload VFX to clients
-					_broadcastHitVFX(result.Position, result.Normal, victimModel)
+				end
+			end
+		else
+			-- Hit environmental geometry; stop penetration if hitting solid anchored structures
+			if hitPart.Anchored and hitPart.CanCollide then
+				break
+			else
+				table.insert(excludeList, hitPart)
+				if rayParams.FilterType == RaycastFilterType.Exclude then
+					rayParams.FilterDescendantsInstances = excludeList
 				end
 			end
 		end
