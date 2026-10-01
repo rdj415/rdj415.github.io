@@ -26,7 +26,7 @@ export type HitResult = {
 	DamageDealt: number,
 }
 
-local HitboxService = {}
+local HitboxService: any = {}
 HitboxService.__index = HitboxService
 
 local _scythe: any = nil
@@ -121,7 +121,9 @@ function HitboxService.Start()
 end
 
 -- Core Execution: Shapecasting with Whitelist Filtering & Dot Product Checks
-function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
+-- Polymorphic signature supporting both HitboxService:ExecuteCast(req) and HitboxService.ExecuteCast(req)
+function HitboxService.ExecuteCast(selfOrRequest: any, maybeRequest: HitboxRequest?): { HitResult }
+	local request: HitboxRequest = (if maybeRequest ~= nil then maybeRequest else selfOrRequest) :: HitboxRequest
 	local attacker = request.Attacker
 	if not attacker then return {} end
 
@@ -143,12 +145,19 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 	local originCFrame = rootPart.CFrame * castOffset
 	local castDirection = originCFrame.LookVector * request.Range
 
-	-- Configure Exclude Filter (Always exclude attacker to prevent torso self-blocking)
+	-- Configure Filter: Always exclude attacker to prevent torso self-blocking
 	local excludeList: { Instance } = { attacker }
+	local includedInstances: { Instance } = {}
 	local rayParams = RaycastParams.new()
+
 	if request.FilterFolder then
 		rayParams.FilterType = RaycastFilterType.Include
-		rayParams.FilterDescendantsInstances = { request.FilterFolder }
+		for _, child in ipairs(request.FilterFolder:GetChildren()) do
+			if child ~= attacker then
+				table.insert(includedInstances, child)
+			end
+		end
+		rayParams.FilterDescendantsInstances = includedInstances
 	else
 		rayParams.FilterType = RaycastFilterType.Exclude
 		rayParams.FilterDescendantsInstances = excludeList
@@ -162,6 +171,10 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 
 	-- Iterative Penetration Shapecasting (supports multi-target cleave)
 	for _ = 1, maxTargets do
+		if rayParams.FilterType == RaycastFilterType.Include and #includedInstances == 0 then
+			break
+		end
+
 		local result: RaycastResult? = nil
 		if request.Shape == "Block" then
 			result = Workspace:Blockcast(originCFrame, request.Size, castDirection, rayParams)
@@ -178,9 +191,20 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 
 		if victimModel then
 			-- Exclude this model from subsequent penetration steps in this sweep
-			table.insert(excludeList, victimModel)
 			if rayParams.FilterType == RaycastFilterType.Exclude then
+				table.insert(excludeList, victimModel)
 				rayParams.FilterDescendantsInstances = excludeList
+			else
+				local foundIdx = table.find(includedInstances, victimModel)
+				if foundIdx then
+					table.remove(includedInstances, foundIdx)
+				else
+					local partIdx = table.find(includedInstances, hitPart)
+					if partIdx then
+						table.remove(includedInstances, partIdx)
+					end
+				end
+				rayParams.FilterDescendantsInstances = includedInstances
 			end
 
 			if victimModel ~= attacker and not hitVictims[victimModel] then
@@ -195,9 +219,10 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 						-- Server Authoritative Damage Application
 						victimHum:TakeDamage(request.Damage)
 
-						-- Knockback impulse
+						-- Safe Knockback impulse (prevents NaN vector explosion)
 						if request.Knockback and request.Knockback > 0 then
-							local impulseDir = (victimHRP.Position - originCFrame.Position).Unit
+							local diff = victimHRP.Position - originCFrame.Position
+							local impulseDir = if diff.Magnitude > 0.001 then diff.Unit else originCFrame.LookVector
 							victimHRP:ApplyImpulse(impulseDir * request.Knockback * victimHRP.AssemblyMass)
 						end
 
@@ -219,9 +244,17 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 			if hitPart.Anchored and hitPart.CanCollide then
 				break
 			else
-				table.insert(excludeList, hitPart)
 				if rayParams.FilterType == RaycastFilterType.Exclude then
+					table.insert(excludeList, hitPart)
 					rayParams.FilterDescendantsInstances = excludeList
+				else
+					local partIdx = table.find(includedInstances, hitPart)
+					if partIdx then
+						table.remove(includedInstances, partIdx)
+						rayParams.FilterDescendantsInstances = includedInstances
+					else
+						break
+					end
 				end
 			end
 		end
@@ -230,8 +263,22 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 	return hitsRecorded
 end
 
--- Marker-Driven Animation Trigger
-function HitboxService:BindToAnimationMarker(track: AnimationTrack, markerName: string, request: HitboxRequest)
+-- Marker-Driven Animation Trigger supporting both : and . calling conventions
+function HitboxService.BindToAnimationMarker(selfOrTrack: any, trackOrMarker: any, markerOrRequest: any, maybeRequest: HitboxRequest?)
+	local track: AnimationTrack
+	local markerName: string
+	local request: HitboxRequest
+
+	if maybeRequest ~= nil then
+		track = trackOrMarker :: AnimationTrack
+		markerName = markerOrRequest :: string
+		request = maybeRequest
+	else
+		track = selfOrTrack :: AnimationTrack
+		markerName = trackOrMarker :: string
+		request = markerOrRequest :: HitboxRequest
+	end
+
 	if not track or not track.IsPlaying then return end
 
 	-- Clean up previous binding on the same track if re-bound
@@ -243,27 +290,31 @@ function HitboxService:BindToAnimationMarker(track: AnimationTrack, markerName: 
 	local signal = track:GetMarkerReachedSignal(markerName)
 	local conn: RBXScriptConnection
 	conn = signal:Connect(function()
-		self:ExecuteCast(request)
+		HitboxService.ExecuteCast(request)
 	end)
 
 	_activeTrackTasks[track] = conn
 	_scythe.add(_serviceScope, conn)
 
 	-- Auto-cleanup on animation stop
-	local stopConn: RBXScriptConnection
+	local stopConn: RBXScriptConnection? = nil
 	stopConn = track.Stopped:Connect(function()
 		if _activeTrackTasks[track] then
 			_activeTrackTasks[track]:Disconnect()
 			_activeTrackTasks[track] = nil
 		end
-		stopConn:Disconnect()
+		if stopConn then
+			stopConn:Disconnect()
+		end
 	end)
-	_scythe.add(_serviceScope, stopConn)
+	if stopConn then
+		_scythe.add(_serviceScope, stopConn)
+	end
 end
 
 -- Destructor Cleanup Hook
 function HitboxService.Destroy()
-	for track, conn in _activeTrackTasks do
+	for track, conn in pairs(_activeTrackTasks) do
 		conn:Disconnect()
 	end
 	table.clear(_activeTrackTasks)

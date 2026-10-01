@@ -4,7 +4,7 @@
 -- Provides ultra-low-overhead resource lifecycle and cleanup via numeric scope handles.
 
 export type ScopeId = number
-export type CleanupTask = Instance | RBXScriptConnection | () -> () | { Destroy: (any) -> () } | { destroy: (any) -> () } | any
+export type CleanupTask = Instance | RBXScriptConnection | () -> () | thread | ScopeId | { Destroy: (any) -> () } | { destroy: (any) -> () } | { Disconnect: (any) -> () } | { disconnect: (any) -> () } | any
 
 local _scopes: { [ScopeId]: { CleanupTask } } = {}
 local _nextScopeId: ScopeId = 0
@@ -18,12 +18,30 @@ local function _cleanupResource(resource: CleanupTask)
 		(resource :: Instance):Destroy()
 	elseif resType == "function" then
 		(resource :: () -> ())()
+	elseif resType == "thread" then
+		task.cancel(resource :: thread)
+	elseif resType == "number" then
+		local childScopeId = resource :: ScopeId
+		if _scopes[childScopeId] ~= nil then
+			local bucket = _scopes[childScopeId]
+			_scopes[childScopeId] = nil
+			for i = #bucket, 1, -1 do
+				local ok, err = pcall(_cleanupResource, bucket[i])
+				if not ok then
+					warn(string.format("[Scythe] Cleanup error in nested scope %d: %s", childScopeId, tostring(err)))
+				end
+			end
+		end
 	elseif resType == "table" then
 		local tbl = resource :: any
 		if typeof(tbl.Destroy) == "function" then
 			tbl:Destroy()
 		elseif typeof(tbl.destroy) == "function" then
 			tbl:destroy()
+		elseif typeof(tbl.Disconnect) == "function" then
+			tbl:Disconnect()
+		elseif typeof(tbl.disconnect) == "function" then
+			tbl:disconnect()
 		end
 	end
 end
@@ -85,6 +103,19 @@ function Scythe.addBulk(scopeId: ScopeId, resources: { CleanupTask })
 	for _, res in resources do
 		table.insert(bucket, res)
 	end
+end
+
+-- Remove a resource from an active scope without destroying it immediately
+function Scythe.remove(scopeId: ScopeId, resource: CleanupTask): boolean
+	local bucket = _scopes[scopeId]
+	if not bucket then return false end
+
+	local idx = table.find(bucket, resource)
+	if idx then
+		table.remove(bucket, idx)
+		return true
+	end
+	return false
 end
 
 -- Check if the scope is currently active

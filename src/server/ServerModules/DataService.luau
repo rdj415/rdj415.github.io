@@ -19,7 +19,7 @@ export type PlayerData = {
 
 export type UpdateCallback<T> = (currentValue: T) -> (T, boolean?)
 
-local DataService = {}
+local DataService: any = {}
 DataService.__index = DataService
 
 local _scythe: any = nil
@@ -32,22 +32,23 @@ local _saveTokens: { [Player]: string } = {}
 local DATA_SCHEMA_VERSION: number = 2
 local MAX_RETRY_ATTEMPTS: number = 3
 local EXP_BACKOFF_BASE: number = 0.5
-local FNV_OFFSET_BASIS: number = 2_166_136_261
-local FNV_PRIME: number = 16_777_619
 
-local DEFAULT_PROFILE_TEMPLATE: PlayerData = table.freeze({
-	Coins = 0,
-	Gems = 0,
-	Level = 1,
-	LuckTier = 0,
-	Inventory = {},
-	Stats = {
-		Playtime = 0,
-		ChestsOpened = 0,
-	},
-	LastSaveToken = "",
-	Version = DATA_SCHEMA_VERSION,
-})
+-- Factory function to generate clean, unshared isolated profile state
+local function _createDefaultProfile(): PlayerData
+	return {
+		Coins = 0,
+		Gems = 0,
+		Level = 1,
+		LuckTier = 0,
+		Inventory = {},
+		Stats = {
+			Playtime = 0,
+			ChestsOpened = 0,
+		},
+		LastSaveToken = "",
+		Version = DATA_SCHEMA_VERSION,
+	}
+end
 
 -- Persistent Random engine: Luau's native Random.new() uses PCG32/Xoroshiro seeded from system entropy.
 -- Instantiated once at module level to guarantee zero-allocation rolls and eliminate GC pressure.
@@ -87,7 +88,7 @@ end
 -- Asynchronous Start Lifecycle Hook
 function DataService.Start()
 	-- Load any players already in server
-	for _, player in Players:GetPlayers() do
+	for _, player in ipairs(Players:GetPlayers()) do
 		task.spawn(DataService._loadSession, player)
 	end
 	print("[DataService] Started. Transactional data integrity active.")
@@ -142,9 +143,9 @@ function DataService._loadSession(player: Player)
 		_readOnlyMode[player] = false
 		print(string.format("[DataService] Session locked for %s (Token: %s)", player.Name, saveToken:sub(1, 8)))
 	else
-		-- Fail-safe fallback into Read-Only mode to protect user data
+		-- Fail-safe fallback into Read-Only mode to protect user data (using isolated fresh table)
 		_readOnlyMode[player] = true
-		_profiles[player] = table.clone(DEFAULT_PROFILE_TEMPLATE)
+		_profiles[player] = _createDefaultProfile()
 		warn(string.format("[DataService] Failed to lock session for %s. Operating in READ-ONLY mode.", player.Name))
 	end
 end
@@ -174,6 +175,11 @@ function DataService.Update<T>(player: Player, key: string, callback: UpdateCall
 	if not success then
 		warn(string.format("[DataService] Transaction aborted during update on key '%s': %s", key, tostring(updatedValue)))
 		return false, nil
+	end
+
+	-- If callback explicitly returned shouldPersist == false, rollback without committing
+	if shouldPersist == false then
+		return false, currentValue
 	end
 
 	rawProfile[key] = updatedValue
@@ -214,7 +220,19 @@ function DataService._releaseSession(player: Player)
 end
 
 -- Roll for loot using persistent PCG RNG and S-Curve luck modifier
-function DataService:RollLootDrop(player: Player, baseChance: number): boolean
+-- Polymorphic signature supporting both DataService:RollLootDrop(player, chance) and DataService.RollLootDrop(player, chance)
+function DataService.RollLootDrop(selfOrPlayer: any, playerOrChance: any, maybeChance: number?): boolean
+	local player: Player
+	local baseChance: number
+
+	if maybeChance ~= nil then
+		player = playerOrChance :: Player
+		baseChance = maybeChance :: number
+	else
+		player = selfOrPlayer :: Player
+		baseChance = playerOrChance :: number
+	end
+
 	local profile = _profiles[player]
 	local luckTier = profile and profile.LuckTier or 0
 
@@ -229,7 +247,7 @@ end
 
 -- Destructor Cleanup Hook
 function DataService.Destroy()
-	for player in _profiles do
+	for player in pairs(_profiles) do
 		DataService._releaseSession(player)
 	end
 	table.clear(_profiles)

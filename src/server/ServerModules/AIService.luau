@@ -13,6 +13,7 @@ export type NPCState = {
 	WalkStuckTime: number?,
 	Target: Model?,
 	LastPathCalculation: number?,
+	AncestryConn: RBXScriptConnection?,
 }
 
 local AIService = {}
@@ -140,7 +141,9 @@ end
 -- Asynchronous Start Lifecycle Hook
 function AIService.Start()
 	if _moduleLoader then
-		_zoneService = _moduleLoader.RequireScoped("ServerModules.ZoneService")
+		pcall(function()
+			_zoneService = _moduleLoader.RequireScoped("ServerModules.ZoneService")
+		end)
 	end
 
 	-- High-performance throttled AI simulation loop
@@ -150,15 +153,15 @@ function AIService.Start()
 		if now - lastTick < 0.1 then return end -- 10Hz AI decision tick
 		lastTick = now
 
-		for npc, state in _npcs do
+		for npc, state in pairs(_npcs) do
 			if not npc.Parent then
-				_npcs[npc] = nil
+				AIService.UnregisterNPC(npc)
 				continue
 			end
 
 			local hum = npc:FindFirstChildOfClass("Humanoid")
 			if not hum or hum.Health <= 0 then
-				_npcs[npc] = nil
+				AIService.UnregisterNPC(npc)
 				continue
 			end
 
@@ -181,30 +184,44 @@ end
 
 -- Register an active NPC
 function AIService.RegisterNPC(npc: Model, strategy: NPCStrategy?)
+	if _npcs[npc] then
+		AIService.UnregisterNPC(npc)
+	end
+
 	local state: NPCState = {
 		Strategy = strategy or "Tactician",
 		WalkStuckTime = nil,
 		Target = nil,
 		LastPathCalculation = nil,
+		AncestryConn = nil,
 	}
 	_npcs[npc] = state
 
-	-- Bind ancestry destroyed cleanup
-	local conn = npc.AncestryChanged:Connect(function(_, parent)
+	-- Bind ancestry destroyed cleanup with self-disconnecting listener
+	local conn: RBXScriptConnection? = nil
+	conn = npc.AncestryChanged:Connect(function(_, parent)
 		if not parent then
-			_npcs[npc] = nil
+			AIService.UnregisterNPC(npc)
 		end
 	end)
-	_scythe.add(_serviceScope, conn)
+	state.AncestryConn = conn
 end
 
--- Unregister an NPC
+-- Unregister an NPC and clean up connections immediately
 function AIService.UnregisterNPC(npc: Model)
+	local state = _npcs[npc]
+	if state and state.AncestryConn then
+		state.AncestryConn:Disconnect()
+		state.AncestryConn = nil
+	end
 	_npcs[npc] = nil
 end
 
 -- Destructor Cleanup Hook
 function AIService.Destroy()
+	for npc in pairs(_npcs) do
+		AIService.UnregisterNPC(npc)
+	end
 	table.clear(_npcs)
 	if _scythe and _scythe.isAlive(_serviceScope) then
 		_scythe.scope(_serviceScope)
