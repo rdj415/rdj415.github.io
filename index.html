@@ -1754,7 +1754,7 @@ ZoneService.Metadata = {
             <pre><code id="raw-hitbox"><span class="t-comment">--!strict</span>
 <span class="t-comment">-- [ProductionCore / ServerModules / HitboxService.luau]</span>
 <span class="t-comment">-- Enterprise Shapecasting & Spatial Combat Engine.</span>
-<span class="t-comment">-- Complies with ModuleLoader lifecycle (Rule 134), Janitor protocol (Rule 140), and zero-trust server validation.</span>
+<span class="t-comment">-- Provides server-authoritative hit detection, animation-driven marker triggers, and zero-allocation memory cleanup.</span>
 
 <span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
 <span class="t-kw">local</span> <span class="t-def">Workspace</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Workspace"</span>)
@@ -1788,12 +1788,12 @@ HitboxService.__index = HitboxService
 <span class="t-kw">local</span> _attackerDebounce: { [<span class="t-type">Player</span>]: <span class="t-type">number</span> } = {}
 <span class="t-kw">local</span> _activeTrackTasks: { [<span class="t-type">AnimationTrack</span>]: <span class="t-type">RBXScriptConnection</span> } = {}
 
-<span class="t-comment">-- Constant configuration with numeric separators (Rule 163)</span>
+<span class="t-comment">-- Combat configuration</span>
 <span class="t-kw">local</span> DEFAULT_FOV_COS: <span class="t-type">number</span> = <span class="t-num">0.25</span> <span class="t-comment">-- ~75-degree frontal cone</span>
 <span class="t-kw">local</span> RATE_LIMIT_WINDOW: <span class="t-type">number</span> = <span class="t-num">0.15</span> <span class="t-comment">-- Minimum 150ms between casts</span>
 <span class="t-kw">local</span> DEFAULT_MAX_TARGETS: <span class="t-type">number</span> = <span class="t-num">8</span>
 
-<span class="t-comment">-- Rule 54: Guard Clauses & Dot Product Angle Pre-filtering</span>
+<span class="t-comment">-- Guard Clauses & Dot Product Angle Pre-filtering</span>
 <span class="t-kw">local function</span> <span class="t-fn">_isWithinCombatCone</span>(originCF: <span class="t-type">CFrame</span>, targetPos: <span class="t-type">Vector3</span>, minCosAngle: <span class="t-type">number</span>): <span class="t-type">boolean</span>
 	<span class="t-kw">local</span> direction: <span class="t-type">Vector3</span> = targetPos - originCF.Position
 	<span class="t-kw">local</span> distance: <span class="t-type">number</span> = direction.Magnitude
@@ -1804,7 +1804,7 @@ HitboxService.__index = HitboxService
 	<span class="t-kw">return</span> dotProduct &gt;= minCosAngle
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 70 / 142: Load-Guarded Spatial VFX Broadcast</span>
+<span class="t-comment">-- Load-Guarded Spatial VFX Broadcast</span>
 <span class="t-kw">local function</span> <span class="t-fn">_broadcastHitVFX</span>(hitPos: <span class="t-type">Vector3</span>, hitNormal: <span class="t-type">Vector3</span>, victimModel: <span class="t-type">Model</span>)
 	<span class="t-kw">if not</span> _vfxRemote <span class="t-kw">then return end</span>
 
@@ -1832,15 +1832,15 @@ HitboxService.__index = HitboxService
 	<span class="t-kw">end</span>
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 134: Synchronous Lifecycle Hook</span>
+<span class="t-comment">-- Synchronous Lifecycle Hook</span>
 <span class="t-kw">function</span> HitboxService.<span class="t-fn">Init</span>(Context: <span class="t-type">any</span>)
 	_moduleLoader = Context.ModuleLoader
 
-	<span class="t-comment">-- Lazy-load Janitor through standardized ModuleLoader (Rule 134 / Rule 140)</span>
+	<span class="t-comment">-- Lazy-load Janitor through ModuleLoader</span>
 	<span class="t-kw">local</span> JanitorClass = _moduleLoader.<span class="t-fn">RequireShared</span>(<span class="t-str">"Utility.Janitor"</span>)
 	_janitor = JanitorClass.<span class="t-fn">new</span>()
 
-	<span class="t-comment">-- Server-side debounce garbage collection on PlayerRemoving (Rule 71 / Rule 140)</span>
+	<span class="t-comment">-- Server-side debounce garbage collection on PlayerRemoving</span>
 	<span class="t-kw">local</span> removeConn = Players.PlayerRemoving:<span class="t-fn">Connect</span>(<span class="t-kw">function</span>(player: <span class="t-type">Player</span>)
 		_attackerDebounce[player] = <span class="t-kw">nil</span>
 	<span class="t-kw">end</span>)
@@ -1849,9 +1849,9 @@ HitboxService.__index = HitboxService
 	<span class="t-fn">print</span>(<span class="t-str">"[HitboxService] Initialized synchronously via ModuleLoader"</span>)
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 134: Asynchronous Start Lifecycle Hook</span>
+<span class="t-comment">-- Asynchronous Start Lifecycle Hook</span>
 <span class="t-kw">function</span> HitboxService.<span class="t-fn">Start</span>()
-	<span class="t-comment">-- Create / link UnreliableRemoteEvent for high-frequency VFX packets (Rule 74 / 75)</span>
+	<span class="t-comment">-- Create / link UnreliableRemoteEvent for high-frequency VFX packets</span>
 	<span class="t-kw">local</span> remoteFolder = ReplicatedStorage:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"CombatRemotes"</span>) :: <span class="t-type">Folder</span>?
 	<span class="t-kw">if not</span> remoteFolder <span class="t-kw">then</span>
 		remoteFolder = Instance.<span class="t-fn">new</span>(<span class="t-str">"Folder"</span>)
@@ -1880,7 +1880,7 @@ HitboxService.__index = HitboxService
 	<span class="t-kw">local</span> rootPart = attacker:<span class="t-fn">FindFirstChild</span>(<span class="t-str">"HumanoidRootPart"</span>) :: <span class="t-type">BasePart</span>?
 	<span class="t-kw">if not</span> rootPart <span class="t-kw">then return</span> {} <span class="t-kw">end</span>
 
-	<span class="t-comment">-- Rate limiting check for player attackers (Rule 71)</span>
+	<span class="t-comment">-- Rate limiting check for player attackers</span>
 	<span class="t-kw">local</span> attackerPlayer = Players:<span class="t-fn">GetPlayerFromCharacter</span>(attacker)
 	<span class="t-kw">if</span> attackerPlayer <span class="t-kw">then</span>
 		<span class="t-kw">local</span> now = <span class="t-fn">os.clock</span>()
@@ -1914,7 +1914,7 @@ HitboxService.__index = HitboxService
 	<span class="t-kw">if</span> request.Shape == <span class="t-str">"Block"</span> <span class="t-kw">then</span>
 		result = Workspace:<span class="t-fn">Blockcast</span>(originCFrame, request.Size, castDirection, rayParams)
 	<span class="t-kw">elseif</span> request.Shape == <span class="t-str">"Sphere"</span> <span class="t-kw">then</span>
-		<span class="t-kw">local</span> radius = <span class="t-fn">math.max</span>(request.Size.X, request.Size.Y, request.Size.Z) // <span class="t-num">2</span> <span class="t-comment">-- Rule 56 integer division</span>
+		<span class="t-kw">local</span> radius = <span class="t-fn">math.max</span>(request.Size.X, request.Size.Y, request.Size.Z) // <span class="t-num">2</span>
 		result = Workspace:<span class="t-fn">Spherecast</span>(originCFrame.Position, radius, castDirection, rayParams)
 	<span class="t-kw">end</span>
 
@@ -1987,7 +1987,7 @@ HitboxService.__index = HitboxService
 	_janitor:<span class="t-fn">GiveTask</span>(stopConn)
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 134: Destructor Cleanup Hook</span>
+<span class="t-comment">-- Destructor Cleanup Hook</span>
 <span class="t-kw">function</span> HitboxService.<span class="t-fn">Destroy</span>()
 	<span class="t-kw">for</span> track, conn <span class="t-kw">in</span> _activeTrackTasks <span class="t-kw">do</span>
 		conn:<span class="t-fn">Disconnect</span>()
@@ -2013,8 +2013,8 @@ HitboxService.__index = HitboxService
             <pre><code id="raw-data"><span class="t-comment">--!strict</span>
 <span class="t-comment">-- [ProductionCore / ServerModules / DataService.luau]</span>
 <span class="t-comment">-- Enterprise Data Persistence & Transactional Mutation Layer.</span>
-<span class="t-comment">-- Complies with Rule 45/137 (ProfileStore Wrapper), Rule 48 (Safe State Mutation .Update), Rule 73 (Write-Verify Token),</span>
-<span class="t-comment">-- Rule 59-62/144 (Sigmoid S-Curves), Rule 75 (CSPRNG Entropy Pool + FNV-1a), and Janitor protocol (Rule 140).</span>
+<span class="t-comment">-- High-reliability data persistence layer with ProfileStore wrapper, transactional mutations,</span>
+<span class="t-comment">-- S-curve probability modeling, and FNV-1a cryptographic entropy seeding.</span>
 
 <span class="t-kw">local</span> <span class="t-def">Players</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"Players"</span>)
 <span class="t-kw">local</span> <span class="t-def">HttpService</span> = <span class="t-fn">game:GetService</span>(<span class="t-str">"HttpService"</span>)
@@ -2041,7 +2041,7 @@ DataService.__index = DataService
 <span class="t-kw">local</span> _readOnlyMode: { [<span class="t-type">Player</span>]: <span class="t-type">boolean</span> } = {}
 <span class="t-kw">local</span> _saveTokens: { [<span class="t-type">Player</span>]: <span class="t-type">string</span> } = {}
 
-<span class="t-comment">-- Numeric separators (Rule 163)</span>
+<span class="t-comment">-- Persistence configuration</span>
 <span class="t-kw">local</span> DATA_SCHEMA_VERSION: <span class="t-type">number</span> = <span class="t-num">2</span>
 <span class="t-kw">local</span> MAX_RETRY_ATTEMPTS: <span class="t-type">number</span> = <span class="t-num">3</span>
 <span class="t-kw">local</span> EXP_BACKOFF_BASE: <span class="t-type">number</span> = <span class="t-num">0.5</span>
@@ -2062,7 +2062,7 @@ DataService.__index = DataService
 	Version = DATA_SCHEMA_VERSION,
 })
 
-<span class="t-comment">-- Rule 75: High-Entropy CSPRNG (4 Entropy Sources + 32-bit FNV-1a Hash)</span>
+<span class="t-comment">-- High-Entropy CSPRNG (4 Entropy Sources + 32-bit FNV-1a Hash)</span>
 <span class="t-kw">local function</span> <span class="t-fn">_generateSecureRandomEngine</span>(): <span class="t-type">Random</span>
 	<span class="t-kw">local</span> s1 = <span class="t-fn">tostring</span>(<span class="t-fn">os.time</span>())
 	<span class="t-kw">local</span> s2 = <span class="t-fn">tostring</span>(<span class="t-fn">os.clock</span>())
@@ -2081,7 +2081,7 @@ DataService.__index = DataService
 	<span class="t-kw">return</span> Random.<span class="t-fn">new</span>(hash)
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 59-62 / Rule 144: S-Curve / Sigmoid Scaling for Economy and Luck Caps</span>
+<span class="t-comment">-- S-Curve / Sigmoid Scaling for Economy and Luck Caps</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">EvaluateSigmoid</span>(x: <span class="t-type">number</span>, maxCap: <span class="t-type">number</span>, midpoint: <span class="t-type">number</span>, steepness: <span class="t-type">number</span>): <span class="t-type">number</span>
 	<span class="t-kw">if</span> x &lt;= <span class="t-num">0</span> <span class="t-kw">then return</span> <span class="t-num">0</span> <span class="t-kw">end</span>
 	<span class="t-kw">local</span> exponent = -steepness * (x - midpoint)
@@ -2090,7 +2090,7 @@ DataService.__index = DataService
 	<span class="t-kw">return</span> <span class="t-fn">math.round</span>(result * <span class="t-num">1_000</span>) / <span class="t-num">1_000</span>
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 134: Synchronous Lifecycle Hook</span>
+<span class="t-comment">-- Synchronous Lifecycle Hook</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">Init</span>(Context: <span class="t-type">any</span>)
 	_moduleLoader = Context.ModuleLoader
 
@@ -2111,7 +2111,7 @@ DataService.__index = DataService
 	<span class="t-fn">print</span>(<span class="t-str">"[DataService] Initialized with ProfileStore wrapper architecture."</span>)
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 134: Asynchronous Start Lifecycle Hook</span>
+<span class="t-comment">-- Asynchronous Start Lifecycle Hook</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">Start</span>()
 	<span class="t-kw">for</span> _, player <span class="t-kw">in</span> Players:<span class="t-fn">GetPlayers</span>() <span class="t-kw">do</span>
 		task.<span class="t-fn">spawn</span>(DataService._loadSession, player)
@@ -2158,14 +2158,14 @@ DataService.__index = DataService
 		_readOnlyMode[player] = <span class="t-kw">false</span>
 		<span class="t-fn">print</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Session locked for %s (Token: %s)"</span>, player.Name, saveToken:<span class="t-fn">sub</span>(<span class="t-num">1</span>, <span class="t-num">8</span>)))
 	<span class="t-kw">else</span>
-		<span class="t-comment">-- Rule 73: Fail-safe fallback into Read-Only mode to protect user data</span>
+		<span class="t-comment">-- Fail-safe fallback into Read-Only mode to protect user data</span>
 		_readOnlyMode[player] = <span class="t-kw">true</span>
 		_profiles[player] = <span class="t-fn">table.clone</span>(DEFAULT_PROFILE_TEMPLATE)
 		<span class="t-fn">warn</span>(<span class="t-fn">string.format</span>(<span class="t-str">"[DataService] Failed to lock session for %s. Operating in READ-ONLY mode."</span>, player.Name))
 	<span class="t-kw">end</span>
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 48: Safe State Mutation (Transactional .Update - Eliminates Get->Add->Set race conditions)</span>
+<span class="t-comment">-- Safe State Mutation (Transactional .Update - Eliminates Get->Add->Set race conditions)</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">Update</span>&lt;T&gt;(player: <span class="t-type">Player</span>, key: <span class="t-type">string</span>, callback: <span class="t-type">UpdateCallback</span>&lt;T&gt;): (<span class="t-type">boolean</span>, T?)
 	<span class="t-kw">local</span> profile = _profiles[player]
 	<span class="t-kw">if not</span> profile <span class="t-kw">then</span>
@@ -2209,7 +2209,7 @@ DataService.__index = DataService
 	<span class="t-kw">return</span> profile
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 73: Write-Verify Session Release</span>
+<span class="t-comment">-- Write-Verify Session Release</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">_releaseSession</span>(player: <span class="t-type">Player</span>)
 	<span class="t-kw">local</span> profile = _profiles[player]
 	<span class="t-kw">local</span> token = _saveTokens[player]
@@ -2223,7 +2223,7 @@ DataService.__index = DataService
 		<span class="t-kw">end</span>
 	<span class="t-kw">end</span>
 
-	<span class="t-comment">-- Purge all session references to prevent memory leaks (Rule 140)</span>
+	<span class="t-comment">-- Purge all session references to prevent memory leaks</span>
 	_profiles[player] = <span class="t-kw">nil</span>
 	_readOnlyMode[player] = <span class="t-kw">nil</span>
 	_saveTokens[player] = <span class="t-kw">nil</span>
@@ -2244,7 +2244,7 @@ DataService.__index = DataService
 	<span class="t-kw">return</span> roll &lt;= effectiveChance
 <span class="t-kw">end</span>
 
-<span class="t-comment">-- Rule 134: Destructor Cleanup Hook</span>
+<span class="t-comment">-- Destructor Cleanup Hook</span>
 <span class="t-kw">function</span> DataService.<span class="t-fn">Destroy</span>()
 	<span class="t-kw">for</span> player <span class="t-kw">in</span> _profiles <span class="t-kw">do</span>
 		DataService.<span class="t-fn">_releaseSession</span>(player)

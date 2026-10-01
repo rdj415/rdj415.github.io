@@ -1,8 +1,7 @@
 --!strict
 -- [ProductionCore / ServerModules / DataService.luau]
 -- Enterprise Data Persistence & Transactional Mutation Layer.
--- Complies with Rule 45/137 (ProfileStore Wrapper), Rule 48 (Safe State Mutation .Update), Rule 73 (Write-Verify Token),
--- Rule 59-62/144 (Sigmoid S-Curves), Rule 75 (CSPRNG Entropy Pool + FNV-1a), and Janitor protocol (Rule 140).
+-- Provides session-locked ProfileStore wrapper, atomic state updates, write-verification tokens, and CSPRNG RNG.
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
@@ -29,7 +28,6 @@ local _profiles: { [Player]: PlayerData } = {}
 local _readOnlyMode: { [Player]: boolean } = {}
 local _saveTokens: { [Player]: string } = {}
 
--- Numeric separators (Rule 163)
 local DATA_SCHEMA_VERSION: number = 2
 local MAX_RETRY_ATTEMPTS: number = 3
 local EXP_BACKOFF_BASE: number = 0.5
@@ -50,7 +48,7 @@ local DEFAULT_PROFILE_TEMPLATE: PlayerData = table.freeze({
 	Version = DATA_SCHEMA_VERSION,
 })
 
--- Rule 75: High-Entropy CSPRNG (4 Entropy Sources + 32-bit FNV-1a Hash)
+-- High-Entropy CSPRNG (4 Entropy Sources + 32-bit FNV-1a Hash)
 local function _generateSecureRandomEngine(): Random
 	local s1 = tostring(os.time())
 	local s2 = tostring(os.clock())
@@ -69,7 +67,7 @@ local function _generateSecureRandomEngine(): Random
 	return Random.new(hash)
 end
 
--- Rule 59-62 / Rule 144: S-Curve / Sigmoid Scaling for Economy and Luck Caps
+-- S-Curve / Sigmoid Scaling for Economy and Luck Caps
 function DataService.EvaluateSigmoid(x: number, maxCap: number, midpoint: number, steepness: number): number
 	if x <= 0 then return 0 end
 	-- Logistic function: L / (1 + e^(-k * (x - x0)))
@@ -79,7 +77,7 @@ function DataService.EvaluateSigmoid(x: number, maxCap: number, midpoint: number
 	return math.round(result * 1_000) / 1_000
 end
 
--- Rule 134: Synchronous Lifecycle Hook
+-- Synchronous Lifecycle Hook
 function DataService.Init(Context: any)
 	_moduleLoader = Context.ModuleLoader
 
@@ -100,7 +98,7 @@ function DataService.Init(Context: any)
 	print("[DataService] Initialized with ProfileStore wrapper architecture.")
 end
 
--- Rule 134: Asynchronous Start Lifecycle Hook
+-- Asynchronous Start Lifecycle Hook
 function DataService.Start()
 	-- Load any players already in server
 	for _, player in Players:GetPlayers() do
@@ -149,14 +147,14 @@ function DataService._loadSession(player: Player)
 		_readOnlyMode[player] = false
 		print(string.format("[DataService] Session locked for %s (Token: %s)", player.Name, saveToken:sub(1, 8)))
 	else
-		-- Rule 73: Fail-safe fallback into Read-Only mode to protect user data
+		-- Fail-safe fallback into Read-Only mode to protect user data
 		_readOnlyMode[player] = true
 		_profiles[player] = table.clone(DEFAULT_PROFILE_TEMPLATE)
 		warn(string.format("[DataService] Failed to lock session for %s. Operating in READ-ONLY mode.", player.Name))
 	end
 end
 
--- Rule 48: Safe State Mutation (Transactional .Update - Eliminates Get->Add->Set race conditions)
+-- Safe State Mutation (Transactional .Update - Eliminates Get->Add->Set race conditions)
 function DataService.Update<T>(player: Player, key: string, callback: UpdateCallback<T>): (boolean, T?)
 	local profile = _profiles[player]
 	if not profile then
@@ -200,7 +198,7 @@ function DataService.Get(player: Player): PlayerData?
 	return profile
 end
 
--- Rule 73: Write-Verify Session Release
+-- Write-Verify Session Release
 function DataService._releaseSession(player: Player)
 	local profile = _profiles[player]
 	local token = _saveTokens[player]
@@ -214,7 +212,7 @@ function DataService._releaseSession(player: Player)
 		end
 	end
 
-	-- Purge all session references to prevent memory leaks (Rule 140)
+	-- Purge all session references to prevent memory leaks
 	_profiles[player] = nil
 	_readOnlyMode[player] = nil
 	_saveTokens[player] = nil
@@ -235,7 +233,7 @@ function DataService:RollLootDrop(player: Player, baseChance: number): boolean
 	return roll <= effectiveChance
 end
 
--- Rule 134: Destructor Cleanup Hook
+-- Destructor Cleanup Hook
 function DataService.Destroy()
 	for player in _profiles do
 		DataService._releaseSession(player)

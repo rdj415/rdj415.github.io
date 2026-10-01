@@ -1,7 +1,7 @@
 --!strict
 -- [ProductionCore / ServerModules / HitboxService.luau]
 -- Enterprise Shapecasting & Spatial Combat Engine.
--- Complies with ModuleLoader lifecycle (Rule 134), Janitor protocol (Rule 140), and zero-trust server validation.
+-- Provides server-authoritative hit detection, animation-driven marker triggers, and zero-allocation memory cleanup.
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -35,12 +35,12 @@ local _vfxRemote: UnreliableRemoteEvent? = nil
 local _attackerDebounce: { [Player]: number } = {}
 local _activeTrackTasks: { [AnimationTrack]: RBXScriptConnection } = {}
 
--- Constant configuration with numeric separators (Rule 163)
+-- Combat configuration
 local DEFAULT_FOV_COS: number = 0.25 -- ~75-degree frontal cone
 local RATE_LIMIT_WINDOW: number = 0.15 -- Minimum 150ms between casts
 local DEFAULT_MAX_TARGETS: number = 8
 
--- Rule 54: Guard Clauses & Dot Product Angle Pre-filtering
+-- Guard Clauses & Dot Product Angle Pre-filtering
 local function _isWithinCombatCone(originCF: CFrame, targetPos: Vector3, minCosAngle: number): boolean
 	local direction: Vector3 = targetPos - originCF.Position
 	local distance: number = direction.Magnitude
@@ -51,7 +51,7 @@ local function _isWithinCombatCone(originCF: CFrame, targetPos: Vector3, minCosA
 	return dotProduct >= minCosAngle
 end
 
--- Rule 70 / 142: Load-Guarded Spatial VFX Broadcast
+-- Load-Guarded Spatial VFX Broadcast
 local function _broadcastHitVFX(hitPos: Vector3, hitNormal: Vector3, victimModel: Model)
 	if not _vfxRemote then return end
 
@@ -79,15 +79,15 @@ local function _broadcastHitVFX(hitPos: Vector3, hitNormal: Vector3, victimModel
 	end
 end
 
--- Rule 134: Synchronous Lifecycle Hook
+-- Synchronous Lifecycle Hook
 function HitboxService.Init(Context: any)
 	_moduleLoader = Context.ModuleLoader
 
-	-- Lazy-load Janitor through standardized ModuleLoader (Rule 134 / Rule 140)
+	-- Lazy-load Janitor through ModuleLoader
 	local JanitorClass = _moduleLoader.RequireShared("Utility.Janitor")
 	_janitor = JanitorClass.new()
 
-	-- Server-side debounce garbage collection on PlayerRemoving (Rule 71 / Rule 140)
+	-- Server-side debounce garbage collection on PlayerRemoving
 	local removeConn = Players.PlayerRemoving:Connect(function(player: Player)
 		_attackerDebounce[player] = nil
 	end)
@@ -96,9 +96,9 @@ function HitboxService.Init(Context: any)
 	print("[HitboxService] Initialized synchronously via ModuleLoader")
 end
 
--- Rule 134: Asynchronous Start Lifecycle Hook
+-- Asynchronous Start Lifecycle Hook
 function HitboxService.Start()
-	-- Create / link UnreliableRemoteEvent for high-frequency VFX packets (Rule 74 / 75)
+	-- Create / link UnreliableRemoteEvent for high-frequency VFX packets
 	local remoteFolder = ReplicatedStorage:FindFirstChild("CombatRemotes") :: Folder?
 	if not remoteFolder then
 		remoteFolder = Instance.new("Folder")
@@ -127,7 +127,7 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 	local rootPart = attacker:FindFirstChild("HumanoidRootPart") :: BasePart?
 	if not rootPart then return {} end
 
-	-- Rate limiting check for player attackers (Rule 71)
+	-- Rate limiting check for player attackers
 	local attackerPlayer = Players:GetPlayerFromCharacter(attacker)
 	if attackerPlayer then
 		local now = os.clock()
@@ -161,7 +161,7 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 	if request.Shape == "Block" then
 		result = Workspace:Blockcast(originCFrame, request.Size, castDirection, rayParams)
 	elseif request.Shape == "Sphere" then
-		local radius = math.max(request.Size.X, request.Size.Y, request.Size.Z) // 2 -- Rule 56 integer division
+		local radius = math.max(request.Size.X, request.Size.Y, request.Size.Z) // 2
 		result = Workspace:Spherecast(originCFrame.Position, radius, castDirection, rayParams)
 	end
 
@@ -205,7 +205,7 @@ function HitboxService:ExecuteCast(request: HitboxRequest): { HitResult }
 	return hitsRecorded
 end
 
--- Marker-Driven Animation Trigger (Zero wait() hardcoding)
+-- Marker-Driven Animation Trigger
 function HitboxService:BindToAnimationMarker(track: AnimationTrack, markerName: string, request: HitboxRequest)
 	if not track or not track.IsPlaying then return end
 
@@ -236,7 +236,7 @@ function HitboxService:BindToAnimationMarker(track: AnimationTrack, markerName: 
 	_janitor:GiveTask(stopConn)
 end
 
--- Rule 134: Destructor Cleanup Hook
+-- Destructor Cleanup Hook
 function HitboxService.Destroy()
 	for track, conn in _activeTrackTasks do
 		conn:Disconnect()
