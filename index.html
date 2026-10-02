@@ -531,12 +531,31 @@ AIService.Metadata = {
             Custom-built architectural libraries and authoritative server systems powering enterprise-grade Roblox game modes.
           </p>
         </div>
-
         <div class="video-showcase-header">
           <div class="video-showcase-tabs">
             <button class="v-tab active" data-target="video-showcase-ai">
               <span class="v-tab-icon">🤖</span>
               <span>AI NPC & Hover Dynamics</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-combat">
+              <span class="v-tab-icon">⚔️</span>
+              <span>Authoritative Combat & Combos</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-parkour">
+              <span class="v-tab-icon">🏃</span>
+              <span>Parkour & Traversal Controller</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-minimap">
+              <span class="v-tab-icon">🗺️</span>
+              <span>Tactical Minimap & GPS</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-airdrop">
+              <span class="v-tab-icon">📦</span>
+              <span>Dynamic Airdrop & Looting</span>
+            </button>
+            <button class="v-tab" data-target="video-showcase-survival">
+              <span class="v-tab-icon">🛰️</span>
+              <span>Survival Framework & Telemetry</span>
             </button>
             <button class="v-tab" data-target="video-showcase-inventory">
               <span class="v-tab-icon">🎒</span>
@@ -576,6 +595,166 @@ AIService.Metadata = {
           </div>
         </div>
 
+        <div class="featured-video-card" id="video-showcase-combat">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/combat_melee_poster.jpg">
+              <source src="assets/videos/combat_melee_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • SERVER-VALIDATED MELEE & COMBO ENGINE</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">COMBO ARCHITECTURE</span>
+              <span class="fv-tag">STUN & POSTURE</span>
+              <span class="fv-tag">HITBOX VALIDATION</span>
+            </div>
+            <h3 class="fv-title">Server-Authoritative Melee Combat, Combo Chains & Posture/Stun Framework</h3>
+            <p class="fv-desc">
+              High-intensity martial arts combat controller with responsive branching combo trees: LMB (Jab chain), E (Kick), R (Uppercut), Q (Ground Slam), and T (Grab & Throw). Features client-side predictive responsiveness paired with authoritative server spatial verification, hit-stop impact pauses, floating combat damage numbers (-10 DMG), and target posture/stun meter depletion leading to executable states.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect AntiCheat & Combat Logic</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Client-Side Prediction • Zero Ghost Hits • Strict Anti-Reach Checks</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="featured-video-card" id="video-showcase-parkour">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/parkour_system_poster.jpg">
+              <source src="assets/videos/parkour_system_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • PROCEDURAL TRAVERSAL & LEDGE GRABBING</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">PROCEDURAL RAYCAST</span>
+              <span class="fv-tag">ROOT MOTION</span>
+              <span class="fv-tag">STAMINA DYNAMICS</span>
+            </div>
+            <h3 class="fv-title">Advanced Parkour Locomotion, Dynamic Ledge Grabs & Stamina Controller</h3>
+            <p class="fv-desc">
+              High-fidelity locomotion framework featuring multi-directional surface raycasting, dynamic wall climbing, ledge hanging, mantle vaulting, and stamina fatigue curves. Decoupled client predictive physics with authoritative server stance synchronization ensures fluid 60 FPS transitions without jitter, clipping, or desync.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect Traversal Architecture</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Dynamic Raycasting • 60 FPS Root Motion • Zero Ragdoll Stalls</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="featured-video-card" id="video-showcase-minimap">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/tactical_minimap_poster.jpg">
+              <source src="assets/videos/tactical_minimap_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • 2D/3D VECTOR PROJECTION & WAYPOINT GPS</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">VECTOR PROJECTION</span>
+              <span class="fv-tag">RADAR MATHEMATICS</span>
+              <span class="fv-tag">SUB-0.5MS UI</span>
+            </div>
+            <h3 class="fv-title">Tactical Rotating Minimap, Dynamic Waypoints & 3D Radar HUD</h3>
+            <p class="fv-desc">
+              Real-time tactical navigation engine featuring high-frequency camera-relative orientation tracking, clamped circular radar boundary projections, dynamic distance stud calculations, and interactive map marker placement. Optimized with viewport object pooling to maintain sub-0.5ms UI render cost on RunService.RenderStepped.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect Radar Mathematics</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Clamped Polar Coordinates • Sub-0.5ms Render Cost • Viewport Pooling</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="featured-video-card" id="video-showcase-airdrop">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/airdrop_system_poster.jpg">
+              <source src="assets/videos/airdrop_system_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • PHYSICS SIMULATION & SUPPLY DROPS</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">PHYSICS CONSTRAINTS</span>
+              <span class="fv-tag">PARTICLE FLARES</span>
+              <span class="fv-tag">LOOT ROLLOUT</span>
+            </div>
+            <h3 class="fv-title">Physics-Driven Parachute Airdrops & Dynamic Crate Weapon Looting</h3>
+            <p class="fv-desc">
+              Server-scheduled tactical supply drop system featuring realistic aerodynamic drag physics, parachute sway dampening, impact surface landing detection, volumetric red smoke signaling beacons, and interactive loot opening that instantly replicates equipped armaments (Assault Rifle, Katana, Laser Blaster) to player inventories.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect Loot Architecture</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Network-Replicated Physics • Particle Beacons • Authoritative Rollout</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="featured-video-card" id="video-showcase-survival">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls loop muted playsinline poster="assets/videos/survival_framework_poster.jpg">
+              <source src="assets/videos/survival_framework_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • FULL GAME LOOP & ENGINE TELEMETRY</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">ENGINE TELEMETRY</span>
+              <span class="fv-tag">INVENTORY BUS</span>
+              <span class="fv-tag">DYNAMIC WEATHER</span>
+            </div>
+            <h3 class="fv-title">Full Tactical Survival Framework, Engine Telemetry HUD & Weather Core</h3>
+            <p class="fv-desc">
+              Complete game loop orchestrator showcasing real-time hardware telemetry (RAM, CPU frame budget, GPU load, Network Ping, Up/Down bandwidth), dynamic weather simulation (Clear to Storm lighting/particle transitions), inventory event buses ([InventoryGuiController]), ability hotbars, and custom proximity interaction prompts.
+            </p>
+            <div class="fv-actions">
+              <a href="#code-showroom" class="btn btn-sm btn-primary">
+                <span>Inspect Architecture Suite</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Full Telemetry Instrumentation • Event-Driven Bus • 60 FPS Budgeted</span>
+            </div>
+          </div>
+        </div>
+
         <div class="featured-video-card" id="video-showcase-inventory">
           <div class="featured-video-wrapper">
             <video class="featured-video" controls loop muted playsinline poster="assets/videos/inventory_admin_poster.jpg">
@@ -608,7 +787,7 @@ AIService.Metadata = {
           </div>
         </div>
 
-        <div class="systems-grid">
+<div class="systems-grid">
 
           <div class="system-card">
             <div class="system-media">
@@ -641,27 +820,145 @@ AIService.Metadata = {
 
           <div class="system-card">
             <div class="system-media">
-              <img src="assets/images/combat_system_banner.jpg" alt="Combat & Lag Compensation" class="system-img" />
-              <div class="system-media-badge">Combat • Security</div>
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/combat_melee_poster.jpg">
+                <source src="assets/videos/combat_melee_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Combat Core</div>
             </div>
 
             <div class="system-card-content">
               <div class="system-card-header">
                 <div>
-                  <h3 class="system-title">Authoritative Combat & Anti-Cheat Core</h3>
-                  <span class="system-sub">AntiCheatService • Displacement Auditing • BanAsync</span>
+                  <h3 class="system-title">Authoritative Combat & Combo Engine</h3>
+                  <span class="system-sub">AntiCheatService • Combo Chains • Posture Stun</span>
                 </div>
               </div>
 
               <p class="system-text">
-                Server-authoritative physics verification and security enforcement. Features real-time instant displacement auditing, suspicion score decay algorithms, executor detection via trap honeypots, and automated universe-wide suspensions with <code>Players:BanAsync</code>.
+                Server-authoritative martial arts melee controller with dynamic combo branching (Jab, Kick, Uppercut, Slam, Throw), hit-stop impact pauses, floating combat damage, posture/stun meter depletion, and anti-reach exploit enforcement with <code>Players:BanAsync</code>.
               </p>
 
               <div class="system-tags">
                 <span>AntiCheatService.luau</span>
-                <span>Instant Displacement</span>
-                <span>Honeypots</span>
+                <span>Combo Chains</span>
+                <span>Hit-Stop Frames</span>
                 <span>Players:BanAsync</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/parkour_system_poster.jpg">
+                <source src="assets/videos/parkour_system_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Traversal Core</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Fluid Parkour & Traversal Controller</h3>
+                  <span class="system-sub">ParkourController.luau • Ledge Grabbing • Stamina Curve</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Procedural raycast locomotion engine featuring dynamic wall climbing, ledge hanging, mantle vaulting, and stamina fatigue curves. Decouples client prediction from authoritative stance synchronization for fluid 60 FPS transitions.
+              </p>
+
+              <div class="system-tags">
+                <span>ParkourController.luau</span>
+                <span>Ledge Grabbing</span>
+                <span>Dynamic Mantling</span>
+                <span>Stamina Recovery</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/tactical_minimap_poster.jpg">
+                <source src="assets/videos/tactical_minimap_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • GPS & Radar</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Tactical Minimap & Waypoint GPS Engine</h3>
+                  <span class="system-sub">MinimapController.luau • Polar Projection • Viewport Pooling</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                High-performance rotating tactical radar HUD with clamped circular boundary math, camera-relative orientation tracking, dynamic distance stud calculations, and interactive map marker placement running under 0.5ms per frame.
+              </p>
+
+              <div class="system-tags">
+                <span>MinimapController.luau</span>
+                <span>2D/3D Projection</span>
+                <span>Sub-0.5ms Render</span>
+                <span>Dynamic Markers</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/airdrop_system_poster.jpg">
+                <source src="assets/videos/airdrop_system_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Airdrops & Physics</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Physics-Driven Airdrop & Loot System</h3>
+                  <span class="system-sub">SupplyDropService.luau • Aerodynamic Drag • Flare Particles</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Server-scheduled tactical supply drop system with parachute sway physics, terminal velocity dampening, ground impact triggers, volumetric red smoke signaling beacons, and instant loot weapon rollout into player hotbars.
+              </p>
+
+              <div class="system-tags">
+                <span>SupplyDropService.luau</span>
+                <span>Physics Drag</span>
+                <span>Smoke Flares</span>
+                <span>Hotbar Rollout</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/survival_framework_poster.jpg">
+                <source src="assets/videos/survival_framework_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Engine Telemetry</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">Survival Framework & Diagnostics HUD</h3>
+                  <span class="system-sub">TelemetryService.luau • Weather Engine • Proximity Prompts</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Comprehensive game loop orchestrator displaying real-time hardware telemetry (RAM, CPU, GPU, Network Ping, Bandwidth), dynamic atmospheric weather transitions, inventory bus synchronization, and custom proximity prompts.
+              </p>
+
+              <div class="system-tags">
+                <span>TelemetryService.luau</span>
+                <span>Hardware Profiler</span>
+                <span>Weather Engine</span>
+                <span>Event Bus Sync</span>
               </div>
             </div>
           </div>
