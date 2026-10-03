@@ -13,6 +13,7 @@ const fileMap = {
   'raw-hitbox': 'src/server/ServerModules/HitboxService.luau',
   'raw-data': 'src/server/ServerModules/DataService.luau',
   'raw-scythe': 'src/shared/Packages/Scythe.luau',
+  'raw-dungeon': 'src/server/ServerModules/DungeonGenerator.luau',
 };
 
 const keywords = new Set([

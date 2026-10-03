@@ -751,6 +751,96 @@ body {
   font-weight: 600;
 }
 
+/* Procedural Dungeon Showcase & Decorated Metrics */
+.dungeon-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 6px 0 10px 0;
+}
+
+.dungeon-stat-chip {
+  background: rgba(17, 21, 32, 0.85);
+  border: 1px solid rgba(0, 242, 254, 0.22);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.dungeon-stat-chip:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 242, 254, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 242, 254, 0.15);
+}
+
+.dungeon-stat-val {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  letter-spacing: -0.5px;
+}
+
+.dungeon-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.dungeon-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  background: rgba(7, 9, 14, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin: 4px 0 8px 0;
+}
+
+.dungeon-metric-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.dungeon-metric-pip {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.dungeon-metric-title {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: -0.2px;
+}
+
+@media (max-width: 900px) {
+  .dungeon-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
 @media (max-width: 900px) {
   .featured-video-card {
     grid-template-columns: 1fr;

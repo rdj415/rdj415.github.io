@@ -49,6 +49,9 @@ Welcome to the official repository for my developer portfolio. I am a **Senior R
 - **`CombatService.luau` & `CombatController.luau` — Cinematic Action Combat & VFX Engine**  
   High-intensity action combat framework featuring authoritative 4-hit combo strings (M1), microsecond hitstop (animation and camera freeze on impact for authentic anime/fighting game punch), 6-DOF harmonic spring camera shake, directional lunge physics, floating 3D critical damage numbers, and massive ragdoll/knockback finisher launches. Fully staged in Roblox Studio with an interactive training dummy and dynamic lighting arena.
 
+- **`DungeonGenerator.luau` & `DungeonBuilder.luau` — Deterministic Procedural Layout & Room Generator**  
+  High-performance grid-based dungeon generation framework with sub-millisecond graph solving (< 0.1 ms in Luau `--!strict`). Features automated BFS reachability validation (100% reachable path from Start to Exit, 0 overlaps), decoupled off-workspace assembly, real-time 2D radar minimap, and zero-leak Cleaner lifecycle pipelines.
+
 ---
 
 ## 💻 Technical Toolchain
