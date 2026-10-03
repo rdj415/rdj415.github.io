@@ -539,6 +539,12 @@ AIService.Metadata = {
               </span>
               <span>Procedural Dungeon & Grid Walker</span>
             </button>
+            <button class="v-tab" data-target="video-showcase-interaction">
+              <span class="v-tab-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              </span>
+              <span>Contextual Interactions &amp; Facility Protocol</span>
+            </button>
             <button class="v-tab" data-target="video-showcase-ai">
               <span class="v-tab-icon">🤖</span>
               <span>AI NPC & Hover Dynamics</span>
@@ -644,6 +650,84 @@ AIService.Metadata = {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </a>
               <span class="fv-metric">Pure Luau (--!strict) • Sub-0.1ms Solve • Zero Render Thrash</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="featured-video-card" id="video-showcase-interaction">
+          <div class="featured-video-wrapper">
+            <video class="featured-video" controls autoplay loop muted playsinline poster="assets/videos/interaction_facility_poster.jpg">
+              <source src="assets/videos/interaction_facility_demo.mp4" type="video/mp4">
+              Your browser does not support HTML5 video.
+            </video>
+            <div class="video-overlay-badge">
+              <span class="pulse-circle"></span>
+              <span>LIVE IN-ENGINE FOOTAGE • AAA CONTEXTUAL INTERACTIONS &amp; FACILITY PROTOCOL</span>
+            </div>
+          </div>
+          <div class="featured-video-info">
+            <div class="fv-tag-row">
+              <span class="fv-tag">IN-ENGINE DEMO</span>
+              <span class="fv-tag">HOLD-TO-INTERACT</span>
+              <span class="fv-tag">SERVER AUTHORITATIVE</span>
+              <span class="fv-tag">WORLD-SPACE HUD</span>
+              <span class="fv-tag">EVENT-DRIVEN VFX</span>
+            </div>
+            <h3 class="fv-title">AAA Contextual Interaction &amp; Facility State Pipeline</h3>
+            <p class="fv-desc">
+              High-fidelity contextual interaction engine with server-authoritative hold sessions, dynamic world-to-screen HUD clamping, multi-objective facility protocol state machines, and synchronized procedural VFX.
+            </p>
+
+            <!-- Decorated Technical Stat Chips -->
+            <div class="interaction-stat-grid">
+              <div class="interaction-stat-chip">
+                <span class="interaction-stat-val">&lt; 0.04 ms</span>
+                <span class="interaction-stat-label">Frame Budget</span>
+              </div>
+              <div class="interaction-stat-chip">
+                <span class="interaction-stat-val">Zero-Trust</span>
+                <span class="interaction-stat-label">Server Authority</span>
+              </div>
+              <div class="interaction-stat-chip">
+                <span class="interaction-stat-val">Dual-Mode</span>
+                <span class="interaction-stat-label">Tap &amp; Hold HUD</span>
+              </div>
+              <div class="interaction-stat-chip">
+                <span class="interaction-stat-val">0 Leaks</span>
+                <span class="interaction-stat-label">Cleaner Lifecycle</span>
+              </div>
+            </div>
+
+            <!-- Decorated Key Technical Metrics Bullet Points -->
+            <div class="interaction-metrics-list">
+              <div class="interaction-metric-item">
+                <span class="interaction-metric-pip"></span>
+                <span><strong class="interaction-metric-title">Server-Authoritative Hold Validation:</strong> Zero-trust network architecture managing active hold sessions (<code class="t-type">ActiveHolds[Player]</code>) with Euclidean distance thresholding, continuous line-of-sight raycasts, and network latency tolerances to eliminate client-side packet tampering.</span>
+              </div>
+              <div class="interaction-metric-item">
+                <span class="interaction-metric-pip"></span>
+                <span><strong class="interaction-metric-title">Dynamic Viewport-Projected HUD:</strong> High-performance <code class="t-fn">WorldToViewportPoint</code> coordinate projection featuring screen-edge clamping (<code class="t-fn">math.clamp</code>), off-screen culling, and animated radial progress indicators with zero frame-budget spikes (&lt; 0.04 ms/frame).</span>
+              </div>
+              <div class="interaction-metric-item">
+                <span class="interaction-metric-pip"></span>
+                <span><strong class="interaction-metric-title">Multi-Objective Facility State Machine:</strong> Centralized event pipeline coordinating interdependent facility protocols (<code class="t-str">Auxiliary Generator</code> restoration &rarr; <code class="t-str">Security Keycard Lvl 1</code> acquisition &rarr; <code class="t-str">Sector-04 Bulkhead</code> authorization).</span>
+              </div>
+              <div class="interaction-metric-item">
+                <span class="interaction-metric-pip"></span>
+                <span><strong class="interaction-metric-title">Event-Driven Procedural VFX &amp; Acoustics:</strong> Decoupled visual bus executing dynamic electrical spark extinguishment, high-pressure steam valve releases (<code class="t-fn">Emit(25)</code>), animated CFrame hydraulic blast door slides, and 3D inverse-tapered acoustic attenuation.</span>
+              </div>
+              <div class="interaction-metric-item">
+                <span class="interaction-metric-pip"></span>
+                <span><strong class="interaction-metric-title">Dynamic Toast Notification Bus:</strong> Fluid slide-in priority toast queue with quart easing, type-safe color-coded semantic accents (<code class="t-str">Success</code>, <code class="t-str">Warning</code>, <code class="t-str">Danger</code>), and automatic cleanup threads.</span>
+              </div>
+            </div>
+
+            <div class="fv-actions">
+              <a href="#code-interaction" class="btn btn-sm btn-primary">
+                <span>Inspect InteractionController Code</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+              <span class="fv-metric">Pure Luau (--!strict) • Zero Memory Leaks • AAA Polished UX</span>
             </div>
           </div>
         </div>
@@ -842,6 +926,36 @@ AIService.Metadata = {
         </div>
 
 <div class="systems-grid">
+
+          <div class="system-card">
+            <div class="system-media">
+              <video class="system-video" autoplay loop muted playsinline poster="assets/videos/interaction_facility_poster.jpg">
+                <source src="assets/videos/interaction_facility_demo.mp4" type="video/mp4">
+              </video>
+              <div class="system-media-badge"><span class="pulse-circle"></span> Live Demo • Interaction Engine</div>
+            </div>
+
+            <div class="system-card-content">
+              <div class="system-card-header">
+                <div>
+                  <h3 class="system-title">AAA Contextual Interaction &amp; Facility State Pipeline</h3>
+                  <span class="system-sub">InteractionController.luau • World-Space HUD • Authoritative Hold Sessions</span>
+                </div>
+              </div>
+
+              <p class="system-text">
+                Production-grade contextual interaction architecture featuring zero-trust server validation, dual-mode instant/hold prompts, 3D viewport-projected HUD with screen-edge clamping, multi-objective facility protocol state machines, and synchronized procedural VFX.
+              </p>
+
+              <div class="system-tags">
+                <span>InteractionController.luau</span>
+                <span>World-Space HUD</span>
+                <span>Authoritative Hold</span>
+                <span>Facility State Bus</span>
+                <span>Zero-Trust Validation</span>
+              </div>
+            </div>
+          </div>
 
           <div class="system-card">
             <div class="system-media">
@@ -2447,6 +2561,121 @@ AtomicBinding.Destroy = AtomicBinding.destroy
 <span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
 <span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
 
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
 <span class="t-kw">export type</span> <span class="t-type">LifecycleUnit</span> = {
 	Name: <span class="t-type">string</span>,
 	Loaded: <span class="t-type">any</span>,
@@ -2607,6 +2836,967 @@ AtomicBinding.Destroy = AtomicBinding.destroy
 <span class="t-kw">end</span>
 
 <span class="t-kw">return</span> ModuleLoader</code>quot;</span>)
+	<span class="t-kw">if</span> simpleName <span class="t-kw">and</span> ModuleCache[simpleName] == <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		ModuleCache[simpleName] = module
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">GetBootProgress</span>(scopeName: <span class="t-type">string</span>): <span class="t-type">any</span>?
+	<span class="t-kw">return</span> ScopeBootProgress[scopeName]
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Require</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): <span class="t-type">any</span>
+	<span class="t-kw">local</span> cacheKey = scope .. <span class="t-str">&quot;:&quot;</span> .. path
+	<span class="t-kw">if</span> ModuleCache[cacheKey] ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		<span class="t-kw">return</span> ModuleCache[cacheKey]
+	<span class="t-kw">end</span>
+	<span class="t-kw">if</span> ModuleCache[path] ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		<span class="t-kw">return</span> ModuleCache[path]
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> inst = <span class="t-fn">ResolveModuleInstance</span>(scope, path)
+	<span class="t-kw">if</span> inst <span class="t-kw">then</span>
+		<span class="t-kw">local</span> loaded = <span class="t-fn">require</span>(inst)
+		ModuleCache[cacheKey] = loaded
+		ModuleCache[path] = loaded
+		<span class="t-kw">return</span> loaded
+	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Check fallback in cache under simple name</span>
+	<span class="t-kw">local</span> simpleName = path:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export</span> <span class="t-kw">type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CreateScopeBootProgressState</span>(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CalculateScopeBootPercent</span>(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.<span class="t-fn">clamp</span>(math.<span class="t-fn">floor</span>(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">CountLifecyclePhaseSteps</span>(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> ScopeBootProgress: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ExecuteLifecyclePhase</span>(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">local</span> progress = ScopeBootProgress[ScopeName]
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CurrentModuleName = Unit.Name
+				progress.CurrentPhaseName = PhaseName
+			<span class="t-kw">end</span>
+
+			debug.<span class="t-fn">profilebegin</span>(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">if</span> PhaseName == <span class="t-str">&quot;Start&quot;</span> <span class="t-kw">then</span>
+				<span class="t-comment">-- Asynchronous Start dispatch ensures services initialize without thread blocking</span>
+				task.<span class="t-fn">spawn</span>(<span class="t-kw">function</span>()
+					<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+						Loaded[PhaseName](Context)
+					<span class="t-kw">end</span>)
+					<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+						<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during asynchronous %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+					<span class="t-kw">end</span>
+				<span class="t-kw">end</span>)
+			<span class="t-kw">else</span>
+				<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+					Loaded[PhaseName](Context)
+				<span class="t-kw">end</span>)
+				<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+					<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, <span class="t-fn">tostring</span>(err)))
+				<span class="t-kw">end</span>
+			<span class="t-kw">end</span>
+			debug.<span class="t-fn">profileend</span>()
+
+			<span class="t-kw">if</span> progress <span class="t-kw">then</span>
+				progress.CompletedStepCount += <span class="t-num">1</span>
+				progress.Percent = <span class="t-fn">CalculateScopeBootPercent</span>(progress.CompletedStepCount, progress.TotalStepCount)
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> <span class="t-fn">ResolveModuleInstance</span>(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.<span class="t-fn">split</span>(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Register</span>(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+	<span class="t-kw">local</span> simpleName = name:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)<code id="raw-loader"><span class="t-comment">--!strict</span>
+<span class="t-comment">-- [ProductionCore / Shared / ModuleLoader.luau]</span>
+<span class="t-comment">-- Core bootstrap lifecycle engine: Handles phased Init/Start, client pacing, and dependency resolution</span>
+
+<span class="t-kw">local</span> RunService = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;RunService&quot;</span>)
+<span class="t-kw">local</span> ReplicatedStorage = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ReplicatedStorage&quot;</span>)
+
+<span class="t-kw">local</span> ModuleLoader = {}
+<span class="t-kw">local</span> ModuleCache: { [<span class="t-type">string</span>]: <span class="t-type">any</span> } = {}
+<span class="t-kw">local</span> ScopeBootStateByName = { Shared = <span class="t-kw">false</span>, Server = <span class="t-kw">false</span>, Client = <span class="t-kw">false</span> }
+
+<span class="t-kw">export type</span> <span class="t-type">LifecycleUnit</span> = {
+	Name: <span class="t-type">string</span>,
+	Loaded: <span class="t-type">any</span>,
+	Priority: <span class="t-type">number</span>,
+}
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> CreateScopeBootProgressState(ScopeName: <span class="t-type">string</span>)
+	<span class="t-kw">return</span> {
+		ScopeName = ScopeName,
+		CurrentModuleName = <span class="t-str">&quot;Preparing&quot;</span>,
+		CurrentPhaseName = <span class="t-str">&quot;Boot&quot;</span>,
+		CurrentModulePercent = <span class="t-num">0</span>,
+		CompletedStepCount = <span class="t-num">0</span>,
+		TotalStepCount = <span class="t-num">0</span>,
+		Percent = <span class="t-num">0</span>,
+		IsComplete = <span class="t-kw">false</span>,
+	}
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> CalculateScopeBootPercent(CompletedStepCount: <span class="t-type">number</span>, TotalStepCount: <span class="t-type">number</span>): <span class="t-type">number</span>
+	<span class="t-kw">if</span> TotalStepCount &lt;= <span class="t-num">0</span> <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-num">100</span> <span class="t-kw">end</span>
+	<span class="t-kw">local</span> RawPercent = (CompletedStepCount / TotalStepCount) * <span class="t-num">100</span>
+	<span class="t-kw">return</span> math.clamp(math.floor(RawPercent + <span class="t-num">0.5</span>), <span class="t-num">0</span>, <span class="t-num">100</span>)
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> CountLifecyclePhaseSteps(LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>): <span class="t-type">number</span>
+	<span class="t-kw">local</span> Count = <span class="t-num">0</span>
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			Count += <span class="t-num">1</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> Count
+<span class="t-kw">end</span>
+
+<span class="t-kw">local</span> <span class="t-kw">function</span> ExecuteLifecyclePhase(ScopeName: <span class="t-type">string</span>, LifecycleUnits: { <span class="t-type">LifecycleUnit</span> }, PhaseName: <span class="t-type">string</span>, Context: <span class="t-type">any</span>)
+	<span class="t-kw">for</span> _, Unit <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(LifecycleUnits) <span class="t-kw">do</span>
+		<span class="t-kw">local</span> Loaded = Unit.Loaded
+		<span class="t-kw">if</span> <span class="t-kw">type</span>(Loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(Loaded[PhaseName]) == <span class="t-str">&quot;function&quot;</span> <span class="t-kw">then</span>
+			debug.profilebegin(ScopeName .. <span class="t-str">&quot;:&quot;</span> .. Unit.Name .. <span class="t-str">&quot;:&quot;</span> .. PhaseName)
+			<span class="t-kw">local</span> success, err = <span class="t-fn">pcall</span>(<span class="t-kw">function</span>()
+				Loaded[PhaseName](Context)
+			<span class="t-kw">end</span>)
+			debug.profileend()
+			<span class="t-kw">if</span> <span class="t-kw">not</span> success <span class="t-kw">then</span>
+				<span class="t-fn">error</span>(<span class="t-type">string</span>.format(<span class="t-str">&quot;[ModuleLoader] Error during %s on %s: %s&quot;</span>, PhaseName, Unit.Name, tostring(err)))
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+<span class="t-kw">end</span>
+
+<span class="t-comment">-- Resolve module instance from a dot-delimited path</span>
+<span class="t-kw">local</span> <span class="t-kw">function</span> ResolveModuleInstance(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): ModuleScript?
+	<span class="t-kw">local</span> current: <span class="t-type">Instance</span>? = <span class="t-kw">nil</span>
+
+	<span class="t-kw">if</span> scope == <span class="t-str">&quot;Shared&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^Packages%.&quot;</span>) <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^SharedModules%.&quot;</span>) <span class="t-kw">then</span>
+		current = ReplicatedStorage
+	<span class="t-kw">elseif</span> scope == <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">or</span> path:<span class="t-fn">match</span>(<span class="t-str">&quot;^ServerModules%.&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">local</span> sss = game:<span class="t-fn">GetService</span>(<span class="t-str">&quot;ServerScriptService&quot;</span>)
+		current = sss
+	<span class="t-kw">else</span>
+		current = ReplicatedStorage
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> parts = <span class="t-type">string</span>.split(path, <span class="t-str">&quot;.&quot;</span>)
+	<span class="t-kw">for</span> _, part <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(parts) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> <span class="t-kw">not</span> current <span class="t-kw">then</span> <span class="t-kw">return</span> <span class="t-kw">nil</span> <span class="t-kw">end</span>
+		current = current:<span class="t-fn">FindFirstChild</span>(part)
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">if</span> current <span class="t-kw">and</span> current:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+		<span class="t-kw">return</span> current :: ModuleScript
+	<span class="t-kw">end</span>
+	<span class="t-kw">return</span> <span class="t-kw">nil</span>
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.Register(name: <span class="t-type">string</span>, module: <span class="t-type">any</span>)
+	ModuleCache[name] = module
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.Require(scope: <span class="t-type">string</span>, path: <span class="t-type">string</span>): <span class="t-type">any</span>
+	<span class="t-kw">local</span> cacheKey = scope .. <span class="t-str">&quot;:&quot;</span> .. path
+	<span class="t-kw">if</span> ModuleCache[cacheKey] ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		<span class="t-kw">return</span> ModuleCache[cacheKey]
+	<span class="t-kw">end</span>
+	<span class="t-kw">if</span> ModuleCache[path] ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		<span class="t-kw">return</span> ModuleCache[path]
+	<span class="t-kw">end</span>
+
+	<span class="t-kw">local</span> inst = ResolveModuleInstance(scope, path)
+	<span class="t-kw">if</span> inst <span class="t-kw">then</span>
+		<span class="t-kw">local</span> loaded = <span class="t-fn">require</span>(inst)
+		ModuleCache[cacheKey] = loaded
+		ModuleCache[path] = loaded
+		<span class="t-kw">return</span> loaded
+	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Check fallback in cache under simple name</span>
+	<span class="t-kw">local</span> simpleName = path:<span class="t-fn">match</span>(<span class="t-str">&quot;([^%.]+)$&quot;</span>) <span class="t-kw">or</span> path
+	<span class="t-kw">if</span> ModuleCache[simpleName] ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		<span class="t-kw">return</span> ModuleCache[simpleName]
+	<span class="t-kw">end</span>
+
+	<span class="t-fn">error</span>(<span class="t-type">string</span>.format(<span class="t-str">&quot;[ModuleLoader] Could not resolve module &#x27;%s&#x27; in scope &#x27;%s&#x27;&quot;</span>, path, scope))
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.RequireShared(path: <span class="t-type">string</span>): <span class="t-type">any</span>
+	<span class="t-kw">return</span> ModuleLoader.Require(<span class="t-str">&quot;Shared&quot;</span>, path)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.RequireScoped(path: <span class="t-type">string</span>): <span class="t-type">any</span>
+	<span class="t-kw">local</span> isServer = RunService:<span class="t-fn">IsServer</span>()
+	<span class="t-kw">local</span> scope = <span class="t-kw">if</span> isServer <span class="t-kw">then</span> <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">else</span> <span class="t-str">&quot;Client&quot;</span>
+	<span class="t-kw">return</span> ModuleLoader.Require(scope, path)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.Boot(scopeName: <span class="t-type">string</span>, container: <span class="t-type">Instance</span>)
+	<span class="t-kw">local</span> units: { <span class="t-type">LifecycleUnit</span> } = {}
+
+	<span class="t-kw">for</span> _, descendant <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(container:<span class="t-fn">GetDescendants</span>()) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> descendant:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+			<span class="t-kw">local</span> success, loaded = <span class="t-fn">pcall</span>(<span class="t-fn">require</span>, descendant)
+			<span class="t-kw">if</span> success <span class="t-kw">then</span>
+				<span class="t-kw">local</span> priority = <span class="t-num">10</span>
+				<span class="t-kw">if</span> <span class="t-kw">type</span>(loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(loaded.Metadata) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(loaded.Metadata.Priority) == <span class="t-str">&quot;number&quot;</span> <span class="t-kw">then</span>
+					priority = loaded.Metadata.Priority
+				<span class="t-kw">end</span>
+				table.insert(units, {
+					Name = descendant.Name,
+					Loaded = loaded,
+					Priority = priority,
+				})
+				ModuleCache[descendant.Name] = loaded
+			<span class="t-kw">else</span>
+				<span class="t-fn">warn</span>(<span class="t-type">string</span>.format(<span class="t-str">&quot;[ModuleLoader] Failed to require %s: %s&quot;</span>, descendant:<span class="t-fn">GetFullName</span>(), tostring(loaded)))
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Sort by Priority descending (higher priority inits first)</span>
+	table.sort(units, <span class="t-kw">function</span>(a, b)
+		<span class="t-kw">return</span> a.Priority &gt; b.Priority
+	<span class="t-kw">end</span>)
+
+	<span class="t-kw">local</span> context = {
+		ModuleLoader = ModuleLoader,
+	}
+
+	<span class="t-comment">-- Phase 1: Synchronous Init</span>
+	ExecuteLifecyclePhase(scopeName, units, <span class="t-str">&quot;Init&quot;</span>, context)
+
+	<span class="t-comment">-- Phase 2: Asynchronous Start</span>
+	ExecuteLifecyclePhase(scopeName, units, <span class="t-str">&quot;Start&quot;</span>, context)
+
+	ScopeBootStateByName[scopeName] = <span class="t-kw">true</span>
+	<span class="t-fn">print</span>(<span class="t-type">string</span>.format(<span class="t-str">&quot;[ModuleLoader] Scope &#x27;%s&#x27; boot completed (%d modules).&quot;</span>, scopeName, #units))
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> ModuleLoader</code>quot;</span>) <span class="t-kw">or</span> path
+	<span class="t-kw">if</span> ModuleCache[simpleName] ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+		<span class="t-kw">return</span> ModuleCache[simpleName]
+	<span class="t-kw">end</span>
+
+	<span class="t-fn">error</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Could not resolve module &#x27;%s&#x27; in scope &#x27;%s&#x27;&quot;</span>, path, scope))
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">RequireShared</span>(path: <span class="t-type">string</span>): <span class="t-type">any</span>
+	<span class="t-kw">return</span> ModuleLoader.<span class="t-fn">Require</span>(<span class="t-str">&quot;Shared&quot;</span>, path)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">RequireScoped</span>(path: <span class="t-type">string</span>): <span class="t-type">any</span>
+	<span class="t-kw">local</span> isServer = RunService:<span class="t-fn">IsServer</span>()
+	<span class="t-kw">local</span> scope = <span class="t-kw">if</span> isServer <span class="t-kw">then</span> <span class="t-str">&quot;Server&quot;</span> <span class="t-kw">else</span> <span class="t-str">&quot;Client&quot;</span>
+	<span class="t-kw">return</span> ModuleLoader.<span class="t-fn">Require</span>(scope, path)
+<span class="t-kw">end</span>
+
+<span class="t-kw">function</span> ModuleLoader.<span class="t-fn">Boot</span>(scopeName: <span class="t-type">string</span>, container: <span class="t-type">Instance</span>)
+	<span class="t-kw">local</span> units: { <span class="t-type">LifecycleUnit</span> } = {}
+
+	<span class="t-kw">for</span> _, descendant <span class="t-kw">in</span> <span class="t-fn">ipairs</span>(container:<span class="t-fn">GetDescendants</span>()) <span class="t-kw">do</span>
+		<span class="t-kw">if</span> descendant:<span class="t-fn">IsA</span>(<span class="t-str">&quot;ModuleScript&quot;</span>) <span class="t-kw">then</span>
+			<span class="t-kw">local</span> success, loaded
+			<span class="t-kw">if</span> (descendant :: <span class="t-type">any</span>)._module ~= <span class="t-kw">nil</span> <span class="t-kw">then</span>
+				success, loaded = <span class="t-kw">true</span>, (descendant :: <span class="t-type">any</span>)._module
+			<span class="t-kw">else</span>
+				success, loaded = <span class="t-fn">pcall</span>(require, descendant)
+			<span class="t-kw">end</span>
+			<span class="t-kw">if</span> success <span class="t-kw">then</span>
+				<span class="t-kw">local</span> priority = <span class="t-num">10</span>
+				<span class="t-kw">if</span> <span class="t-kw">type</span>(loaded) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(loaded.Metadata) == <span class="t-str">&quot;table&quot;</span> <span class="t-kw">and</span> <span class="t-kw">type</span>(loaded.Metadata.Priority) == <span class="t-str">&quot;number&quot;</span> <span class="t-kw">then</span>
+					priority = loaded.Metadata.Priority
+				<span class="t-kw">end</span>
+				<span class="t-type">table</span>.<span class="t-fn">insert</span>(units, {
+					Name = descendant.Name,
+					Loaded = loaded,
+					Priority = priority,
+				})
+				ModuleCache[descendant.Name] = loaded
+			<span class="t-kw">else</span>
+				<span class="t-fn">warn</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Failed to require %s: %s&quot;</span>, descendant:<span class="t-fn">GetFullName</span>(), <span class="t-fn">tostring</span>(loaded)))
+			<span class="t-kw">end</span>
+		<span class="t-kw">end</span>
+	<span class="t-kw">end</span>
+
+	<span class="t-comment">-- Sort by Priority descending (higher priority inits first)</span>
+	<span class="t-type">table</span>.<span class="t-fn">sort</span>(units, <span class="t-kw">function</span>(a, b)
+		<span class="t-kw">return</span> a.Priority &gt; b.Priority
+	<span class="t-kw">end</span>)
+
+	<span class="t-kw">local</span> totalSteps = <span class="t-fn">CountLifecyclePhaseSteps</span>(units, <span class="t-str">&quot;Init&quot;</span>) + <span class="t-fn">CountLifecyclePhaseSteps</span>(units, <span class="t-str">&quot;Start&quot;</span>)
+	<span class="t-kw">local</span> progress = <span class="t-fn">CreateScopeBootProgressState</span>(scopeName)
+	progress.TotalStepCount = totalSteps
+	ScopeBootProgress[scopeName] = progress
+
+	<span class="t-kw">local</span> context = {
+		ModuleLoader = ModuleLoader,
+	}
+
+	<span class="t-comment">-- Phase 1: Synchronous Init</span>
+	<span class="t-fn">ExecuteLifecyclePhase</span>(scopeName, units, <span class="t-str">&quot;Init&quot;</span>, context)
+
+	<span class="t-comment">-- Phase 2: Asynchronous Start</span>
+	<span class="t-fn">ExecuteLifecyclePhase</span>(scopeName, units, <span class="t-str">&quot;Start&quot;</span>, context)
+
+	progress.IsComplete = <span class="t-kw">true</span>
+	progress.Percent = <span class="t-num">100</span>
+	ScopeBootStateByName[scopeName] = <span class="t-kw">true</span>
+	<span class="t-fn">print</span>(<span class="t-type">string</span>.<span class="t-fn">format</span>(<span class="t-str">&quot;[ModuleLoader] Scope &#x27;%s&#x27; boot completed (%d modules).&quot;</span>, scopeName, #units))
+<span class="t-kw">end</span>
+
+<span class="t-kw">return</span> ModuleLoader
+</code>quot;</span>)
 	<span class="t-kw">if</span> simpleName <span class="t-kw">and</span> ModuleCache[simpleName] == <span class="t-kw">nil</span> <span class="t-kw">then</span>
 		ModuleCache[simpleName] = module
 	<span class="t-kw">end</span>

@@ -31,8 +31,8 @@ Welcome to the official repository for my developer portfolio. I am a **Senior R
 - **`AbilityService.luau` — Character Ability & Cooldown Rate-Limiter**  
   Authoritative server ability pipeline with high-precision timestamp verification (`os.clock()`), cooldown enforcement, player disconnect state reclamation, and automated anti-cheat displacement bypass integration during high-velocity dashes and combat abilities.
 
-- **`InteractionController.luau` — Proximity Interaction & Puzzle Prompt Engine**  
-  Client-side interaction framework designed for dense multiplayer maps (doors, generators, chests, interactables). Utilizes `TagService` dynamic CollectionService watchers with Scythe zero-allocation scope cleanup and a throttled 5 Hz distance calculation loop to maintain 60 FPS without per-frame CPU degradation.
+- **`InteractionController.luau`, `InteractionClient.luau` & `InteractionServer.luau` — AAA Contextual Interaction & Facility State Pipeline**  
+  High-fidelity contextual interaction and facility state synchronization engine. Features server-authoritative hold sessions (`ActiveHolds[Player]`) with continuous line-of-sight raycasts and network latency tolerances to eliminate client-side packet tampering. Includes dynamic 3D world-space to viewport-projected HUD with screen-edge boundary clamping (`math.clamp`), off-screen culling, and dual-mode instant/radial progress indicators (< 0.04 ms/frame overhead). Coordinates multi-objective facility protocol state machines (Auxiliary Generator repair ➔ Security Keycard clearance ➔ Hydraulic Bulkhead breach), slide-in priority toast notification queues, and event-driven procedural VFX/SFX (spark extinguishment, pressure-valve steam discharges, and animated sliding bulkheads).
 
 - **`ZoneService.luau` — Dynamic Spatial Danger Zone & Round Orchestrator**  
   Multi-phase round boundary shrinkage using cubic Hermite smoothstep curves (`3t² - 2t³`) for stutter-free network replication, coordinating with client storm visualizers and applying throttled 1 Hz radial out-of-zone player damage.
